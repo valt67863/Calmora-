@@ -1,3 +1,23 @@
+import { Header } from '@/components/landing/Header';
+import { Hero } from '@/components/landing/Hero';
+import { Products } from '@/components/landing/Products';
+import { Testimonials } from '@/components/landing/Testimonials';
+import { ConsultationRecommender } from '@/components/landing/ConsultationRecommender';
+import { ConsultationForm } from '@/components/landing/ConsultationForm';
+import { Footer } from '@/components/landing/Footer';
+
 export default function Home() {
-  return <></>;
+  return (
+    <div className="flex flex-col min-h-dvh">
+      <Header />
+      <main className="flex-1">
+        <Hero />
+        <Products />
+        <Testimonials />
+        <ConsultationRecommender />
+        <ConsultationForm />
+      </main>
+      <Footer />
+    </div>
+  );
 }
