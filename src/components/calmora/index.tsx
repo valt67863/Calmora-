@@ -50,7 +50,8 @@ import {
   KeyRound,
   Eye,
   EyeOff,
-  User
+  User,
+  CreditCard
 } from "lucide-react";
 import { normalizeStatus } from "@/lib/calmora-utils";
 
@@ -1026,6 +1027,32 @@ export const SessionRow = ({ session, onOpen, formatDate }: any) => (
       );
     };
 
+export const BillingModal = ({ user, onClose }: any) => {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3 className="modal-title">Billing</h3>
+          <button className="modal-close" onClick={onClose}>
+            <X size={18} strokeWidth={2} />
+          </button>
+        </div>
+        <div className="modal-body">
+          <p className="setting-desc mb-4">You are currently on the <strong className="text-[var(--text-primary)]">{user.plan}</strong> plan.</p>
+          <div className="p-4 bg-[var(--surface-hover)] border border-[var(--border)] rounded-lg">
+             <div className="setting-label">Next invoice</div>
+             <div className="text-[var(--text-primary)] font-medium">This is a demo. No payment is required.</div>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" disabled>Manage Subscription</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const EditProfileModal = ({ user, onSave, onClose }: any) => {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
@@ -1142,7 +1169,7 @@ export const ChangePasswordModal = ({ onClose }: any) => {
   );
 };
 
-export const SettingsView = ({ user, theme, setTheme, onSignOut, onShowEditProfile, onShowChangePassword }: any) => {
+export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowChangePassword, onShowBilling }: any) => {
     return (
         <div className="settings-page">
             <div className="settings-header">
@@ -1176,10 +1203,12 @@ export const SettingsView = ({ user, theme, setTheme, onSignOut, onShowEditProfi
                         </div>
                         <div className="setting-row">
                             <div className="setting-info">
-                                <div className="setting-label">Plan</div>
-                                <div className="setting-value">{user.plan}</div>
+                                <div className="setting-label">Billing</div>
+                                <div className="setting-desc">Manage your subscription and view invoices.</div>
                             </div>
-                            <button className="btn-secondary" disabled>Manage Plan</button>
+                            <button className="btn-secondary" onClick={onShowBilling}>
+                                <CreditCard size={14} /> Manage Billing
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1219,18 +1248,6 @@ export const SettingsView = ({ user, theme, setTheme, onSignOut, onShowEditProfi
                     <div className="card-content">
                         <div className="setting-row">
                             <div className="setting-info">
-                                <div className="setting-label">Sign Out</div>
-                                <div className="setting-desc">
-                                    End your current session on this device.
-                                </div>
-                            </div>
-                            <button className="btn-danger" onClick={onSignOut}>
-                                <LogOut size={14} strokeWidth={2} />
-                                Sign Out
-                            </button>
-                        </div>
-                        <div className="setting-row">
-                            <div className="setting-info">
                                 <div className="setting-label">Delete Account</div>
                                 <div className="setting-desc">
                                     Permanently delete your account and all data.
@@ -1248,6 +1265,7 @@ export const SettingsView = ({ user, theme, setTheme, onSignOut, onShowEditProfi
     );
 };
     
+
 
 
 

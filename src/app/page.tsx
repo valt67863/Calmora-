@@ -33,6 +33,7 @@ import {
     SettingsView,
     EditProfileModal,
     ChangePasswordModal,
+    BillingModal,
 } from "@/components/calmora";
 import Header from "@/components/Header";
 
@@ -173,6 +174,7 @@ const HomePage = () => {
   
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+  const [showBillingModal, setShowBillingModal] = useState(false);
    
   const [achievements, setAchievements] = useState([
     { id: 1, title: 'Built personal website', completedDaysAgo: 2, duration: '2 weeks' },
@@ -635,9 +637,9 @@ const HomePage = () => {
                             user={user} 
                             theme={theme} 
                             setTheme={changeTheme} 
-                            onSignOut={() => window.location.reload()}
                             onShowEditProfile={() => setShowEditProfileModal(true)}
                             onShowChangePassword={() => setShowChangePasswordModal(true)}
+                            onShowBilling={() => setShowBillingModal(true)}
                          />}
                         {appMode === "projects" && <ProjectsView projects={projects} setShowProjectModal={setShowProjectModal} onOpenProject={handleOpenProject} setProjectActionData={setProjectActionData} />}
                         {appMode === "history" && <HistoryView sessions={threads} onOpenSession={switchThread} />}
@@ -729,6 +731,12 @@ const HomePage = () => {
         {showChangePasswordModal && (
             <ChangePasswordModal
                 onClose={() => setShowChangePasswordModal(false)}
+            />
+        )}
+        {showBillingModal && (
+            <BillingModal
+                user={user}
+                onClose={() => setShowBillingModal(false)}
             />
         )}
 
