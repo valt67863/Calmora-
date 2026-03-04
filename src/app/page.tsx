@@ -31,6 +31,8 @@ import {
     EditNameModal,
     DeleteConfirmModal,
     SettingsView,
+    EditProfileModal,
+    ChangePasswordModal,
 } from "@/components/calmora";
 import Header from "@/components/Header";
 
@@ -168,6 +170,9 @@ const HomePage = () => {
   const [projectActionData, setProjectActionData] = useState<any>(null);
   const [renameProject, setRenameProject] = useState<any>(null);
   const [deleteProject, setDeleteProject] = useState<any>(null);
+  
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
    
   const [achievements, setAchievements] = useState([
     { id: 1, title: 'Built personal website', completedDaysAgo: 2, duration: '2 weeks' },
@@ -454,6 +459,11 @@ const HomePage = () => {
       }
   };
 
+  const handleUpdateUser = (updatedUser: any) => {
+    setUser(updatedUser);
+    setShowEditProfileModal(false);
+  };
+
   return (
     <>
       <div className={`app-root`}>
@@ -621,7 +631,14 @@ const HomePage = () => {
                             </div>
                         )}
                         
-                        {appMode === "settings" && <SettingsView user={user} theme={theme} setTheme={changeTheme} onSignOut={() => window.location.reload()} />}
+                        {appMode === "settings" && <SettingsView 
+                            user={user} 
+                            theme={theme} 
+                            setTheme={changeTheme} 
+                            onSignOut={() => window.location.reload()}
+                            onShowEditProfile={() => setShowEditProfileModal(true)}
+                            onShowChangePassword={() => setShowChangePasswordModal(true)}
+                         />}
                         {appMode === "projects" && <ProjectsView projects={projects} setShowProjectModal={setShowProjectModal} onOpenProject={handleOpenProject} setProjectActionData={setProjectActionData} />}
                         {appMode === "history" && <HistoryView sessions={threads} onOpenSession={switchThread} />}
                         {appMode === "goals" && <GoalsView activeGoals={activeGoals} setShowGoalModal={setShowGoalModal} />}
@@ -702,6 +719,19 @@ const HomePage = () => {
             />
         )}
         
+        {showEditProfileModal && (
+            <EditProfileModal
+                user={user}
+                onSave={handleUpdateUser}
+                onClose={() => setShowEditProfileModal(false)}
+            />
+        )}
+        {showChangePasswordModal && (
+            <ChangePasswordModal
+                onClose={() => setShowChangePasswordModal(false)}
+            />
+        )}
+
       </div>
     </>
   );

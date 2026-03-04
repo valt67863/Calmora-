@@ -49,7 +49,8 @@ import {
   History,
   KeyRound,
   Eye,
-  EyeOff
+  EyeOff,
+  User
 } from "lucide-react";
 import { normalizeStatus } from "@/lib/calmora-utils";
 
@@ -1025,7 +1026,123 @@ export const SessionRow = ({ session, onOpen, formatDate }: any) => (
       );
     };
 
-export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
+export const EditProfileModal = ({ user, onSave, onClose }: any) => {
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+
+  const handleSave = () => {
+    onSave({ ...user, name });
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3 className="modal-title">Edit Profile</h3>
+          <button className="modal-close" onClick={onClose}>
+            <X size={18} strokeWidth={2} />
+          </button>
+        </div>
+        <div className="modal-body">
+          <label className="modal-label">Full Name</label>
+          <input
+            type="text"
+            className="modal-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your full name"
+            autoFocus
+          />
+          <label className="modal-label" style={{ marginTop: '20px' }}>Email Address</label>
+          <input
+            type="email"
+            className="modal-input"
+            value={email}
+            disabled
+            readOnly
+          />
+        </div>
+        <div className="modal-footer">
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" onClick={handleSave} disabled={!name.trim()}>Save Changes</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ChangePasswordModal = ({ onClose }: any) => {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPasswords, setShowPasswords] = useState(false);
+
+  const canSave = currentPassword && newPassword && newPassword === confirmPassword;
+
+  const handleSave = () => {
+    console.log("Password change requested.");
+    onClose();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3 className="modal-title">Change Password</h3>
+          <button className="modal-close" onClick={onClose}>
+            <X size={18} strokeWidth={2} />
+          </button>
+        </div>
+        <div className="modal-body">
+          <div style={{ marginBottom: 16 }}>
+            <label className="modal-label">Current Password</label>
+            <div style={{position: 'relative'}}>
+              <input
+                type={showPasswords ? "text" : "password"}
+                className="modal-input"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                autoFocus
+              />
+            </div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label className="modal-label">New Password</label>
+             <div style={{position: 'relative'}}>
+              <input
+                type={showPasswords ? "text" : "password"}
+                className="modal-input"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label className="modal-label">Confirm New Password</label>
+             <div style={{position: 'relative'}}>
+              <input
+                type={showPasswords ? "text" : "password"}
+                className="modal-input"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+          </div>
+           <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-secondary)]">
+                <input type="checkbox" checked={showPasswords} onChange={() => setShowPasswords(!showPasswords)} />
+                Show Passwords
+            </label>
+        </div>
+        <div className="modal-footer">
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn-primary" onClick={handleSave} disabled={!canSave}>Update Password</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const SettingsView = ({ user, theme, setTheme, onSignOut, onShowEditProfile, onShowChangePassword }: any) => {
     return (
         <div className="settings-page">
             <div className="settings-header">
@@ -1041,10 +1158,21 @@ export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
                     <div className="card-content">
                         <div className="setting-row">
                             <div className="setting-info">
-                                <div className="setting-label">Email</div>
-                                <div className="setting-value">{user.email}</div>
+                                <div className="setting-label">Profile</div>
+                                <div className="setting-desc">Your name and email address.</div>
                             </div>
-                            <button className="btn-secondary" disabled>Change</button>
+                            <button className="btn-secondary" onClick={onShowEditProfile}>
+                                <User size={14} /> Edit Profile
+                            </button>
+                        </div>
+                         <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Password</div>
+                                <div className="setting-desc">Update your login password.</div>
+                            </div>
+                            <button className="btn-secondary" onClick={onShowChangePassword}>
+                                <KeyRound size={14} /> Change Password
+                            </button>
                         </div>
                         <div className="setting-row">
                             <div className="setting-info">
@@ -1120,6 +1248,7 @@ export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
     );
 };
     
+
 
 
 
