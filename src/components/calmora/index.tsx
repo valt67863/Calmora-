@@ -1093,12 +1093,24 @@ export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
                             <div className="setting-info">
                                 <div className="setting-label">Sign Out</div>
                                 <div className="setting-desc">
-                                    Sign out of your Calmora account.
+                                    End your current session on this device.
                                 </div>
                             </div>
                             <button className="btn-danger" onClick={onSignOut}>
                                 <LogOut size={14} strokeWidth={2} />
                                 Sign Out
+                            </button>
+                        </div>
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Delete Account</div>
+                                <div className="setting-desc">
+                                    Permanently delete your account and all data.
+                                </div>
+                            </div>
+                            <button className="btn-danger">
+                                <Trash2 size={14} strokeWidth={2} />
+                                Delete Account
                             </button>
                         </div>
                     </div>
@@ -1108,6 +1120,7 @@ export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
     );
 };
     
+
 
 
 
