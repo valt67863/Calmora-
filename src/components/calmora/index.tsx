@@ -739,90 +739,7 @@ export const renderIcon = (iconName: string, props = {}) => {
     </div>
   );
   
-export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
-    return (
-        <div className="settings-page">
-            <div className="settings-header">
-                <h1 className="settings-title">Settings</h1>
-                <p className="settings-subtitle">Manage your account and preferences.</p>
-            </div>
-
-            <div className="settings-content">
-                <div className="settings-card">
-                    <div className="card-header">
-                        <h2 className="card-title">Account</h2>
-                    </div>
-                    <div className="card-content">
-                        <div className="setting-row">
-                            <div className="setting-info">
-                                <div className="setting-label">Email</div>
-                                <div className="setting-value">{user.email}</div>
-                            </div>
-                            <button className="btn-secondary" disabled>Change</button>
-                        </div>
-                        <div className="setting-row">
-                            <div className="setting-info">
-                                <div className="setting-label">Plan</div>
-                                <div className="setting-value">{user.plan}</div>
-                            </div>
-                            <button className="btn-secondary" disabled>Manage Plan</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="settings-card">
-                    <div className="card-header">
-                        <h2 className="card-title">Appearance</h2>
-                    </div>
-                    <div className="card-content">
-                        <div className="setting-row">
-                            <div className="setting-info">
-                                <div className="setting-label">Theme</div>
-                                <div className="setting-desc">
-                                    Choose between light and dark mode.
-                                </div>
-                            </div>
-                            <div className="theme-toggle">
-                                <button 
-                                    className={`theme-option ${theme === 'light' ? 'active' : ''}`}
-                                    onClick={() => setTheme('light')}>
-                                    <Sun size={14} /> Light
-                                </button>
-                                <button 
-                                    className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
-                                    onClick={() => setTheme('dark')}>
-                                    <Moon size={14} /> Dark
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="settings-card danger-card">
-                    <div className="card-header">
-                        <h2 className="card-title">Danger Zone</h2>
-                    </div>
-                    <div className="card-content">
-                        <div className="setting-row">
-                            <div className="setting-info">
-                                <div className="setting-label">Sign Out</div>
-                                <div className="setting-desc">
-                                    Sign out of your Calmora account.
-                                </div>
-                            </div>
-                            <button className="btn-danger" onClick={onSignOut}>
-                                <LogOut size={14} strokeWidth={2} />
-                                Sign Out
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-  
-  export const ProjectsView = ({ projects, setShowProjectModal, onOpenProject, setProjectActionData }: any) => (
+export const ProjectsView = ({ projects, setShowProjectModal, onOpenProject, setProjectActionData }: any) => (
       <div className="desktop-content">
           <div className="content-container">
               <section className="hero-desktop">
@@ -1108,8 +1025,90 @@ export const SessionRow = ({ session, onOpen, formatDate }: any) => (
       );
     };
 
+export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
+    return (
+        <div className="settings-page">
+            <div className="settings-header">
+                <h1 className="settings-title">Settings</h1>
+                <p className="settings-subtitle">Manage your account and preferences.</p>
+            </div>
 
+            <div className="settings-content">
+                <div className="settings-card">
+                    <div className="card-header">
+                        <h2 className="card-title">Account</h2>
+                    </div>
+                    <div className="card-content">
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Email</div>
+                                <div className="setting-value">{user.email}</div>
+                            </div>
+                            <button className="btn-secondary" disabled>Change</button>
+                        </div>
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Plan</div>
+                                <div className="setting-value">{user.plan}</div>
+                            </div>
+                            <button className="btn-secondary" disabled>Manage Plan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="settings-card">
+                    <div className="card-header">
+                        <h2 className="card-title">Appearance</h2>
+                    </div>
+                    <div className="card-content">
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Theme</div>
+                                <div className="setting-desc">
+                                    Choose between light and dark mode.
+                                </div>
+                            </div>
+                            <div className="theme-toggle">
+                                <button 
+                                    className={`theme-option ${theme === 'light' ? 'active' : ''}`}
+                                    onClick={() => setTheme('light')}>
+                                    <Sun size={14} /> Light
+                                </button>
+                                <button 
+                                    className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
+                                    onClick={() => setTheme('dark')}>
+                                    <Moon size={14} /> Dark
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="settings-card danger-card">
+                    <div className="card-header">
+                        <h2 className="card-title">Danger Zone</h2>
+                    </div>
+                    <div className="card-content">
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Sign Out</div>
+                                <div className="setting-desc">
+                                    Sign out of your Calmora account.
+                                </div>
+                            </div>
+                            <button className="btn-danger" onClick={onSignOut}>
+                                <LogOut size={14} strokeWidth={2} />
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
     
+
 
 
 
