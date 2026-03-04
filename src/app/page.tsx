@@ -12,7 +12,8 @@ import {
   Mic,
   ChevronDown,
   X,
-  Plus
+  Plus,
+  Settings
 } from "lucide-react";
 import { safeLocalStorage, generateId, normalizeStatus, triggerConfetti, generateBasicTasks, aiSystemInstruction, FOCUS_DEMO_STEPS } from "@/lib/calmora-utils";
 import {
@@ -29,6 +30,7 @@ import {
     ProjectActionSheet,
     EditNameModal,
     DeleteConfirmModal,
+    SettingsView,
 } from "@/components/calmora";
 import Header from "@/components/Header";
 
@@ -543,6 +545,13 @@ const HomePage = () => {
 
             <div className="sidebar-bottom">
               <NavItem 
+                icon={Settings} 
+                label="Settings" 
+                collapsed={isCollapsed}
+                onClick={() => { setAppMode('settings'); if(isMobile) setSidebarOpen(false); }}
+                active={appMode === 'settings'}
+              />
+              <NavItem 
                 icon={LogOut} 
                 label="Sign out" 
                 collapsed={isCollapsed}
@@ -612,6 +621,7 @@ const HomePage = () => {
                             </div>
                         )}
                         
+                        {appMode === "settings" && <SettingsView user={user} theme={theme} setTheme={changeTheme} onSignOut={() => window.location.reload()} />}
                         {appMode === "projects" && <ProjectsView projects={projects} setShowProjectModal={setShowProjectModal} onOpenProject={handleOpenProject} setProjectActionData={setProjectActionData} />}
                         {appMode === "history" && <HistoryView sessions={threads} onOpenSession={switchThread} />}
                         {appMode === "goals" && <GoalsView activeGoals={activeGoals} setShowGoalModal={setShowGoalModal} />}

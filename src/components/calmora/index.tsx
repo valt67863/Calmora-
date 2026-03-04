@@ -739,463 +739,88 @@ export const renderIcon = (iconName: string, props = {}) => {
     </div>
   );
   
-export const ProjectSettingsView = ({ project, onUpdate, onDelete }: any) => {
-    const projectData = { ...project, name: project.name || project.title };
-    
-    const [isActive, setIsActive] = useState(projectData.isActive !== false);
-    const [aiMode, setAiMode] = useState(projectData.aiMode !== false);
-    const [focusMode, setFocusMode] = useState(projectData.focusMode || false);
-  
-    const [editNameOpen, setEditNameOpen] = useState(false);
-    const [editDescOpen, setEditDescOpen] = useState(false);
-    const [iconPickerOpen, setIconPickerOpen] = useState(false);
-    const [inviteMembersOpen, setInviteMembersOpen] = useState(false);
-    const [permissionsOpen, setPermissionsOpen] = useState(false);
-    const [sessionTypeOpen, setSessionTypeOpen] = useState(false);
-    const [taskCategoriesOpen, setTaskCategoriesOpen] = useState(false);
-    const [sessionsListOpen, setSessionsListOpen] = useState(false);
-    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  
-    const handleProjectStatusToggle = (checked: boolean) => {
-      setIsActive(checked);
-      onUpdate({ ...project, isActive: checked });
-    };
-  
-    const handleAiModeToggle = (checked: boolean) => {
-      setAiMode(checked);
-      onUpdate({ ...project, aiMode: checked });
-    };
-  
-    const handleFocusModeToggle = (checked: boolean) => {
-      setFocusMode(checked);
-      onUpdate({ ...project, focusMode: checked });
-    };
-  
-    const handleExport = async () => {
-      const data = {
-        project: projectData,
-        sessions: project.sessions,
-        notes: project.notes,
-        tasks: project.tasks,
-        progress: project.progress
-      };
-  
-      const blob = new Blob([JSON.stringify(data, null, 2)], {   
-        type: 'application/json'   
-      });  
-          
-      const url = URL.createObjectURL(blob);  
-      const a = document.createElement('a');  
-      a.href = url;  
-      a.download = `${projectData.name}-export.json`;  
-      a.click();
-    };
-  
-    const handleArchive = () => {
-      if (confirm('Archive this project? You can restore it later.')) {
-        onUpdate({ ...project, archived: true });
-      }
-    };
-  
+export const SettingsView = ({ user, theme, setTheme, onSignOut }: any) => {
     return (
-      <div className="settings-page">
-  
-        <div className="settings-header">
-          <h1 className="settings-title">Project Settings</h1>
-          <p className="settings-subtitle">Manage {projectData.name}</p>
+        <div className="settings-page">
+            <div className="settings-header">
+                <h1 className="settings-title">Settings</h1>
+                <p className="settings-subtitle">Manage your account and preferences.</p>
+            </div>
+
+            <div className="settings-content">
+                <div className="settings-card">
+                    <div className="card-header">
+                        <h2 className="card-title">Account</h2>
+                    </div>
+                    <div className="card-content">
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Email</div>
+                                <div className="setting-value">{user.email}</div>
+                            </div>
+                            <button className="btn-secondary" disabled>Change</button>
+                        </div>
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Plan</div>
+                                <div className="setting-value">{user.plan}</div>
+                            </div>
+                            <button className="btn-secondary" disabled>Manage Plan</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="settings-card">
+                    <div className="card-header">
+                        <h2 className="card-title">Appearance</h2>
+                    </div>
+                    <div className="card-content">
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Theme</div>
+                                <div className="setting-desc">
+                                    Choose between light and dark mode.
+                                </div>
+                            </div>
+                            <div className="theme-toggle">
+                                <button 
+                                    className={`theme-option ${theme === 'light' ? 'active' : ''}`}
+                                    onClick={() => setTheme('light')}>
+                                    <Sun size={14} /> Light
+                                </button>
+                                <button 
+                                    className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
+                                    onClick={() => setTheme('dark')}>
+                                    <Moon size={14} /> Dark
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="settings-card danger-card">
+                    <div className="card-header">
+                        <h2 className="card-title">Danger Zone</h2>
+                    </div>
+                    <div className="card-content">
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Sign Out</div>
+                                <div className="setting-desc">
+                                    Sign out of your Calmora account.
+                                </div>
+                            </div>
+                            <button className="btn-danger" onClick={onSignOut}>
+                                <LogOut size={14} strokeWidth={2} />
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-  
-        <div className="settings-content">
-  
-          <div className="settings-card">
-            <div className="card-header">
-              <h2 className="card-title">Project Identity</h2>
-            </div>
-  
-            <div className="card-content">
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Project Status</div>
-                  <div className="setting-desc">
-                    {isActive 
-                      ? 'Active projects appear in your workspace' 
-                      : 'Inactive projects are hidden from main list'}
-                  </div>
-                </div>
-                <label className="toggle">
-                  <input 
-                    type="checkbox" 
-                    checked={isActive} 
-                    onChange={(e) => handleProjectStatusToggle(e.target.checked)} 
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Name</div>
-                  <div className="setting-value">{projectData.name}</div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => setEditNameOpen(true)}
-                >
-                  <Edit2 size={14} strokeWidth={2} />
-                  Edit
-                </button>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Description</div>
-                  <div className="setting-value">
-                    {projectData.description || 'Add a short description for this project'}
-                  </div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => setEditDescOpen(true)}
-                >
-                  <Edit2 size={14} strokeWidth={2} />
-                  Edit
-                </button>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Icon</div>
-                  <div className="setting-value">Customize the project icon</div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => setIconPickerOpen(true)}
-                >
-                  Change
-                </button>
-              </div>
-            </div>
-          </div>
-  
-          <div className="settings-card">
-            <div className="card-header">
-              <h2 className="card-title">Access & Ownership</h2>
-            </div>
-  
-            <div className="card-content">
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Owner</div>
-                  <div className="setting-value">You</div>
-                </div>
-                <div className="owner-avatar">JD</div>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Members</div>
-                  <div className="setting-desc">
-                    Manage who can see this project
-                  </div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => setInviteMembersOpen(true)}
-                >
-                  <Users size={14} strokeWidth={2} />
-                  Invite
-                </button>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Permissions</div>
-                  <div className="setting-desc">
-                    Configure member access levels
-                  </div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => setPermissionsOpen(true)}
-                >
-                  <Shield size={14} strokeWidth={2} />
-                  Manage
-                </button>
-              </div>
-            </div>
-          </div>
-  
-          <div className="settings-card">
-            <div className="card-header">
-              <h2 className="card-title">Work Structure</h2>
-            </div>
-  
-            <div className="card-content">
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Default Session Type</div>
-                  <div className="setting-value">
-                    {projectData.defaultSessionType || 'Standard chat'}
-                  </div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => setSessionTypeOpen(true)}
-                >
-                  Change
-                </button>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Task Categories</div>
-                  <div className="setting-desc">
-                    Customize task statuses and tags
-                  </div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={() => setTaskCategoriesOpen(true)}
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
-          </div>
-  
-          <div className="settings-card">
-            <div className="card-header">
-              <h2 className="card-title">Data & History</h2>
-            </div>
-  
-            <div className="card-content">
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Export Project</div>
-                  <div className="setting-desc">
-                    Download all data for this project
-                  </div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={handleExport}
-                >
-                  <Download size={14} strokeWidth={2} />
-                  Export
-                </button>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Session Count</div>
-                  <div className="setting-value">
-                    {projectData.sessionCount || 12} active sessions
-                  </div>
-                </div>
-                <button 
-                  className="btn-text" 
-                  onClick={() => setSessionsListOpen(true)}
-                >
-                  View all
-                </button>
-              </div>
-            </div>
-          </div>
-  
-          <div className="settings-card">
-            <div className="card-header">
-              <h2 className="card-title">Advanced</h2>
-            </div>
-  
-            <div className="card-content">
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">AI Mode</div>
-                  <div className="setting-desc">
-                    {aiMode 
-                      ? 'AI suggestions and automation active' 
-                      : 'Manual-only workspace, no automation'}
-                  </div>
-                </div>
-                <label className="toggle">
-                  <input 
-                    type="checkbox" 
-                    checked={aiMode} 
-                    onChange={(e) => handleAiModeToggle(e.target.checked)} 
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Focus Mode</div>
-                  <div className="setting-desc">
-                    {focusMode 
-                      ? 'Minimal interface, no notifications' 
-                      : 'Full interface with notifications'}
-                  </div>
-                </div>
-                <label className="toggle">
-                  <input 
-                    type="checkbox" 
-                    checked={focusMode} 
-                    onChange={(e) => handleFocusModeToggle(e.target.checked)} 
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-          </div>
-  
-          <div className="settings-card danger-card">
-            <div className="card-header">
-              <h2 className="card-title">Danger Zone</h2>
-            </div>
-  
-            <div className="card-content">
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Archive Project</div>
-                  <div className="setting-desc">
-                    Hide project from active lists (reversible)
-                  </div>
-                </div>
-                <button 
-                  className="btn-secondary" 
-                  onClick={handleArchive}
-                >
-                  <Archive size={14} strokeWidth={2} />
-                  Archive
-                </button>
-              </div>
-  
-              
-  
-              <div className="setting-row">
-                <div className="setting-info">
-                  <div className="setting-label">Delete Project</div>
-                  <div className="setting-desc">
-                    Permanently delete project and data (irreversible)
-                  </div>
-                </div>
-                <button 
-                  className="btn-danger" 
-                  onClick={() => setDeleteConfirmOpen(true)}
-                >
-                  <Trash2 size={14} strokeWidth={2} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-  
-          <div className="settings-footer">
-            <p className="footer-text">
-              Project ID: {projectData.id} • Created Just now
-            </p>
-          </div>
-  
-        </div>
-  
-        {editNameOpen && (
-          <EditNameModal 
-            currentName={projectData.name} 
-            onSave={(newName: string) => {
-              onUpdate({ ...project, title: newName, name: newName });
-              setEditNameOpen(false);
-            }} 
-            onClose={() => setEditNameOpen(false)} 
-          />
-        )}
-  
-        {editDescOpen && (
-          <EditDescriptionModal 
-            currentDesc={projectData.description} 
-            onSave={(newDesc: string) => {
-              onUpdate({ ...project, description: newDesc });
-              setEditDescOpen(false);
-            }} 
-            onClose={() => setEditDescOpen(false)} 
-          />
-        )}
-  
-        {iconPickerOpen && (
-          <IconPickerModal 
-            currentIconName={projectData.icon} 
-            onSelect={(iconName: string) => {
-              onUpdate({ ...project, icon: iconName });
-              setIconPickerOpen(false);
-            }} 
-            onClose={() => setIconPickerOpen(false)} 
-          />
-        )}
-  
-        {inviteMembersOpen && (
-          <InviteMembersModal 
-            projectId={projectData.id} 
-            onClose={() => setInviteMembersOpen(false)} 
-          />
-        )}
-  
-        {permissionsOpen && (
-          <PermissionsModal 
-            onClose={() => setPermissionsOpen(false)} 
-          />
-        )}
-  
-        {sessionTypeOpen && (
-          <SessionTypeModal 
-            currentType={projectData.defaultSessionType} 
-            onSelect={(type: string) => {
-              onUpdate({ ...project, defaultSessionType: type });
-              setSessionTypeOpen(false);
-            }} 
-            onClose={() => setSessionTypeOpen(false)} 
-          />
-        )}
-  
-        {taskCategoriesOpen && (
-          <TaskCategoriesModal 
-            onClose={() => setTaskCategoriesOpen(false)} 
-          />
-        )}
-  
-        {sessionsListOpen && (
-          <SessionsListModal 
-            onClose={() => setSessionsListOpen(false)} 
-          />
-        )}
-  
-        {deleteConfirmOpen && (
-          <DeleteConfirmModal 
-            projectName={projectData.name} 
-            onConfirm={() => {
-              onDelete(projectData.id);
-              setDeleteConfirmOpen(false);
-            }} 
-            onClose={() => setDeleteConfirmOpen(false)} 
-          />
-        )}
-      </div>
     );
-  };
+};
   
   export const ProjectsView = ({ projects, setShowProjectModal, onOpenProject, setProjectActionData }: any) => (
       <div className="desktop-content">
@@ -1485,5 +1110,6 @@ export const SessionRow = ({ session, onOpen, formatDate }: any) => (
 
 
     
+
 
 
