@@ -82,7 +82,8 @@ const HomePage = () => {
     "Create SaaS landing page",
     "Build AI startup homepage",
     "Make portfolio website",
-    "Create product landing page"
+    "Create product landing page",
+    "Remix a website"
   ], []);
 
   const filteredSuggestions = useMemo(() => {
