@@ -12,18 +12,20 @@ const suggestions = [
 
 return (
 
-<div className="flex flex-wrap justify-center gap-2 mt-4">
+<div className="w-full max-w-[600px] mx-auto">
+    <div className="flex flex-wrap justify-center gap-2.5">
 
-{suggestions.map((text,index)=>(
-<button
-key={index}
-onClick={()=>setPrompt(text)}
-className="px-4 py-2 text-sm rounded-full bg-[#1e1e22] border border-[#2b2b2f] text-gray-300 hover:border-[#E91E63] hover:text-white transition"
->
-{text}
-</button>
-))}
+    {suggestions.map((text,index)=>(
+    <button
+        key={index}
+        onClick={()=>setPrompt(text)}
+        className="px-4 py-2 text-sm rounded-lg bg-[var(--surface-raised)] border border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] transition-all"
+    >
+        {text}
+    </button>
+    ))}
 
+    </div>
 </div>
 
 )

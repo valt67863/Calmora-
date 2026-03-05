@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import type { Dispatch, SetStateAction } from "react"
 
-export default function ModeToggle({ mode, setMode }: {mode: string, setMode: (mode: string) => void}) {
+export default function ModeToggle({ mode, setMode }: {mode: string, setMode: Dispatch<SetStateAction<string>>}) {
 
   return (
-    <div className="flex justify-center mb-4">
+    <div className="flex justify-center">
       
       <div className="flex bg-[#1c1c1f] rounded-xl p-1 border border-[#2a2a2e]">
 

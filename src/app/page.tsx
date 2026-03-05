@@ -613,17 +613,7 @@ const HomePage = () => {
                         {appMode === "chat" && (
                             <div className="flex flex-col items-center w-full px-4 py-6 min-h-full relative">
                                 {chatStage === "new-chat" ? (
-                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full -mt-20 w-full max-w-[720px] px-5 pointer-events-none">
-                                        <div className="text-left transition-opacity duration-500 opacity-100">
-                                            <div className="flex items-center gap-2 mb-3"><span className="text-[hsl(var(--accent))] text-lg">✦</span><span className="text-xl font-medium text-[var(--text-primary)] font-sans">{greeting}</span></div>
-                                            <h1 className="text-4xl md:text-5xl font-medium text-[var(--text-primary)] mb-3 font-sans tracking-tight text-left leading-[1.15]">
-                                                {activeProject ? `Let's work on ${activeProject.title}.` : "What would feel good to finish today?"}
-                                            </h1>
-                                            <p className="text-lg text-[var(--text-secondary)] opacity-80 font-sans">
-                                                {activeProject ? "Everything is ready for you here." : "No rush — we’ll go at your pace."}
-                                            </p>
-                                        </div>
-                                    </div>
+                                    null
                                 ) : (
                                     <>
                                         {messages.map((msg) => ( (msg.id === "welcome" && chatStage !== "active") ? null : (
@@ -675,7 +665,21 @@ const HomePage = () => {
             {appMode === 'chat' && (
                 <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
                     
-                    {chatStage === 'new-chat' && <ModeToggle mode={buildMode} setMode={setBuildMode} />}
+                    {chatStage === 'new-chat' && (
+                        <div className="w-full flex flex-col items-center">
+                            <div className="text-center">
+                                <h1 className="text-2xl font-semibold text-[var(--text-primary)] mb-1">
+                                    Build Websites with AI
+                                </h1>
+                                <p className="text-md text-[var(--text-secondary)]">
+                                    Design and code websites with AI
+                                </p>
+                            </div>
+                            <div className="my-4">
+                                <ModeToggle mode={buildMode} setMode={setBuildMode} />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="chat-input-surface">
                         <textarea 
@@ -698,10 +702,10 @@ const HomePage = () => {
                         )}
                     </div>
                     {chatStage === "new-chat" && (
-                        <>
+                        <div className="mt-4">
                             <PromptSuggestions setPrompt={handleSuggestionClick} />
                             <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
-                        </>
+                        </div>
                     )}
                 </div>
             )}
