@@ -1,14 +1,7 @@
 
 'use client';
 
-export default function PromptSuggestions({ setPrompt }: { setPrompt: (prompt: string) => void }) {
-
-const suggestions = [
-"Create SaaS landing page",
-"Build AI startup homepage",
-"Make portfolio website",
-"Create product landing page"
-]
+export default function PromptSuggestions({ suggestions, setPrompt }: { suggestions: string[], setPrompt: (prompt: string) => void }) {
 
 return (
 

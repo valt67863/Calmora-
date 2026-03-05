@@ -38,6 +38,7 @@ import {
 import Header from "@/components/Header";
 import ModeToggle from "@/components/ModeToggle";
 import PromptSuggestions from "@/components/PromptSuggestions";
+import PromptSuggestionList from "@/components/PromptSuggestionList";
 
 const HomePage = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -75,6 +76,20 @@ const HomePage = () => {
   const scrollContentRef = useRef<HTMLDivElement>(null);
 
   const [settingsView, setSettingsView] = useState("main");
+
+  const promptSuggestions = useMemo(() => [
+    "Create SaaS landing page",
+    "Build AI startup homepage",
+    "Make portfolio website",
+    "Create product landing page"
+  ], []);
+
+  const filteredSuggestions = useMemo(() => {
+    if (!input.trim()) return [];
+    const lowercasedInput = input.toLowerCase();
+    return promptSuggestions.filter(s => s.toLowerCase().includes(lowercasedInput));
+  }, [input, promptSuggestions]);
+
 
   useEffect(() => {
     if (appMode !== 'settings') {
@@ -702,9 +717,15 @@ const HomePage = () => {
                         )}
                     </div>
                     {chatStage === "new-chat" && (
-                        <div className="mt-4">
-                            <PromptSuggestions setPrompt={handleSuggestionClick} />
-                            <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
+                        <div className="mt-4 w-full max-w-xl mx-auto">
+                            {input.trim() === '' ? (
+                                <>
+                                    <PromptSuggestions suggestions={promptSuggestions} setPrompt={handleSuggestionClick} />
+                                    <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
+                                </>
+                            ) : (
+                                filteredSuggestions.length > 0 && <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                            )}
                         </div>
                     )}
                 </div>
