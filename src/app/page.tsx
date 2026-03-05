@@ -36,6 +36,7 @@ import {
     BillingModal,
 } from "@/components/calmora";
 import Header from "@/components/Header";
+import ModeToggle from "@/components/ModeToggle";
 
 const HomePage = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -44,6 +45,7 @@ const HomePage = () => {
   const headerUser = { name: user.name, email: user.email, isPro: user.plan === 'Pro', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' };
 
   const [appMode, setAppMode] = useState("chat");
+  const [buildMode, setBuildMode] = useState("chat");
   const [focusStepIndex, setFocusStepIndex] = useState(0);
   const [chatStage, setChatStage] = useState("new-chat");
   
@@ -666,6 +668,9 @@ const HomePage = () => {
 
             {appMode === 'chat' && (
                 <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
+                    
+                    {chatStage === 'new-chat' && <ModeToggle mode={buildMode} setMode={setBuildMode} />}
+
                     <div className="chat-input-surface">
                         <textarea 
                             ref={textareaRef} 
