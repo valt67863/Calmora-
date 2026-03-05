@@ -1980,8 +1980,7 @@
     display: none;
   }
 
-  .notification-modal,
-  .user-menu-modal {
+  .notification-modal {
     position: fixed;
     top: auto;
     bottom: 0;
@@ -1990,10 +1989,10 @@
     width: 100%;
     max-width: 100%;
     border-radius: 24px 24px 0 0;
-    animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modal-slide-up-mobile 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  @keyframes modal-slide-up {
+  @keyframes modal-slide-up-mobile {
     from {
       opacity: 0;
       transform: translateY(100%);
