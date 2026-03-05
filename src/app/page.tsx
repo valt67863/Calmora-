@@ -62,6 +62,7 @@ const HomePage = () => {
   const [thinking, setThinking] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
     
+  const [showSuggestionList, setShowSuggestionList] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
     
   const [activeProject, setActiveProject] = useState<any>(null);
@@ -295,6 +296,7 @@ const HomePage = () => {
     setThinking(false); 
     setInput(""); 
     setAppMode("chat");
+    setShowSuggestionList(false);
   };
 
   const switchThread = (threadId: string) => {
@@ -313,6 +315,7 @@ const HomePage = () => {
     
   const handleSuggestionClick = (prompt: string) => {
     setInput(prompt);
+    setShowSuggestionList(false);
     textareaRef.current?.focus();
   };
 
@@ -329,6 +332,7 @@ const HomePage = () => {
     
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setShowSuggestionList(false);
     setThinking(true);
 
     const callGemini = async (retryCount = 0) => {
@@ -700,7 +704,10 @@ const HomePage = () => {
                         <textarea 
                             ref={textareaRef} 
                             value={input} 
-                            onChange={(e) => setInput(e.target.value)} 
+                            onChange={(e) => {
+                                setInput(e.target.value);
+                                setShowSuggestionList(e.target.value.trim().length > 0);
+                            }} 
                             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} 
                             placeholder={activeProject ? `Type to add to ${activeProject.title}...` : "What do you need to finish?"} 
                             className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1" 
@@ -724,7 +731,7 @@ const HomePage = () => {
                                     <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
                                 </>
                             ) : (
-                                filteredSuggestions.length > 0 && <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                                showSuggestionList && filteredSuggestions.length > 0 && <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
                             )}
                         </div>
                     )}
