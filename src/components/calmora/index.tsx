@@ -1180,6 +1180,34 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
             <div className="settings-content">
                 <div className="settings-card">
                     <div className="card-header">
+                        <h2 className="card-title">Appearance</h2>
+                    </div>
+                    <div className="card-content">
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <div className="setting-label">Theme</div>
+                                <div className="setting-desc">
+                                    Choose between light and dark mode.
+                                </div>
+                            </div>
+                            <div className="theme-toggle">
+                                <button 
+                                    className={`theme-option ${theme === 'light' ? 'active' : ''}`}
+                                    onClick={() => setTheme('light')}>
+                                    <Sun size={14} /> Light
+                                </button>
+                                <button 
+                                    className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
+                                    onClick={() => setTheme('dark')}>
+                                    <Moon size={14} /> Dark
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="settings-card">
+                    <div className="card-header">
                         <h2 className="card-title">Account</h2>
                     </div>
                     <div className="card-content">
@@ -1213,34 +1241,6 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                     </div>
                 </div>
 
-                <div className="settings-card">
-                    <div className="card-header">
-                        <h2 className="card-title">Appearance</h2>
-                    </div>
-                    <div className="card-content">
-                        <div className="setting-row">
-                            <div className="setting-info">
-                                <div className="setting-label">Theme</div>
-                                <div className="setting-desc">
-                                    Choose between light and dark mode.
-                                </div>
-                            </div>
-                            <div className="theme-toggle">
-                                <button 
-                                    className={`theme-option ${theme === 'light' ? 'active' : ''}`}
-                                    onClick={() => setTheme('light')}>
-                                    <Sun size={14} /> Light
-                                </button>
-                                <button 
-                                    className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
-                                    onClick={() => setTheme('dark')}>
-                                    <Moon size={14} /> Dark
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div className="settings-card danger-card">
                     <div className="card-header">
                         <h2 className="card-title">Danger Zone</h2>
@@ -1265,6 +1265,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
     );
 };
     
+
 
 
 
