@@ -37,6 +37,7 @@ import {
 } from "@/components/calmora";
 import Header from "@/components/Header";
 import ModeToggle from "@/components/ModeToggle";
+import PromptSuggestions from "@/components/PromptSuggestions";
 
 const HomePage = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -295,6 +296,11 @@ const HomePage = () => {
   const handleScroll = () => { if (scrollRef.current) { const { scrollTop, scrollHeight, clientHeight } = scrollRef.current; setShowScrollButton(scrollHeight - scrollTop - clientHeight < 150); } };
   const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
     
+  const handleSuggestionClick = (prompt: string) => {
+    setInput(prompt);
+    textareaRef.current?.focus();
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || !activeThreadId) return;
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(8);
@@ -539,7 +545,7 @@ const HomePage = () => {
                                 onClick={() => switchThread(thread.id)}
                                 className={`
                                     w-10 h-10 mx-auto flex items-center justify-center rounded-lg transition-all duration-200
-                                    ${activeThreadId === thread.id && appMode === 'chat' ? "bg-[var(--surface-hover)] !text-[hsl(var(--accent))]" : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}
+                                    ${activeThreadId === thread.id && appMode === 'chat' ? "sidebar-list-item active" : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}
                                 `}
                                 title={thread.title}
                             >
@@ -691,7 +697,12 @@ const HomePage = () => {
                             </button>
                         )}
                     </div>
-                    {chatStage === "new-chat" && <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>}
+                    {chatStage === "new-chat" && (
+                        <>
+                            <PromptSuggestions setPrompt={handleSuggestionClick} />
+                            <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
+                        </>
+                    )}
                 </div>
             )}
 
