@@ -29,9 +29,9 @@
             --dark-text-secondary: #A0A0B0;   /* Muted text (medium gray) */
             
             /* PRIMARY BRAND */
-            --color-primary: #EFA062;        /* Exact peach-orange from your button */
-            --color-primary-hover: #F4B07A;  /* Soft lighter hover */
-            --color-primary-press: #D98A4C; /* Slightly deeper press state */
+            --color-primary: #E91E63;        /* Deep-Rose */
+            --color-primary-hover: #F06292;  /* Soft lighter hover */
+            --color-primary-press: #C2185B; /* Slightly deeper press state */
             
             /* ACTION COLORS */
             --color-success: #2ECC71;   /* Green (for success messages) */
@@ -39,9 +39,12 @@
             --color-error: #FF6B6B;   /* Bright Red (errors) */
 
             /* OPACITY VARIANTS */
-            --color-primary-10: rgba(239, 160, 98, 0.10);  /* Subtle tint */
-            --color-primary-20: rgba(239, 160, 98, 0.20);  /* Badge bg */
-            --color-primary-40: rgba(239, 160, 98, 0.40);  /* Overlay */
+            --color-primary-10: rgba(233, 30, 99, 0.10);  /* Subtle tint */
+            --color-primary-15: rgba(233, 30, 99, 0.15);  /* For active sidebar */
+            --color-primary-20: rgba(233, 30, 99, 0.20);  /* Badge bg */
+            --color-primary-35: rgba(233, 30, 99, 0.35);  /* For active sidebar border */
+            --color-primary-40: rgba(233, 30, 99, 0.40);  /* Overlay */
+            --accent-glow-input: rgba(233, 30, 99, 0.25); /* Chat input glow */
 
             /* SHADCN THEME MAPPING (Dark) */
             --background: 240 4% 11%; /* maps to --dark-bg-base */
@@ -50,19 +53,19 @@
             --card-foreground: 0 0% 100%;
             --popover: 240 5% 15%;
             --popover-foreground: 0 0% 100%;
-            --primary: 26 84% 66%; /* maps to --color-primary */
-            --primary-foreground: 0 0% 0%; /* Dark text for contrast */
+            --primary: 340 82% 52%; /* maps to --color-primary */
+            --primary-foreground: 0 0% 100%; /* White text for contrast */
             --secondary: 224 16% 40%;
             --secondary-foreground: 0 0% 100%;
             --muted: 224 16% 40%;
             --muted-foreground: 240 4% 65%;
-            --accent: 26 84% 66%;
-            --accent-foreground: 0 0% 0%; /* Dark text for contrast */
+            --accent: 340 82% 52%; /* maps to --color-primary */
+            --accent-foreground: 0 0% 100%; /* White text for contrast */
             --destructive: 0 90% 70%; /* maps to --color-error */
             --destructive-foreground: 0 0% 100%;
             --border: 224 13% 29%; /* maps to --dark-border */
             --input: 224 13% 29%;
-            --ring: 26 84% 66%;
+            --ring: 340 82% 52%;
             --radius: 0.75rem;
 
             --bg: var(--dark-bg-base);
@@ -118,19 +121,19 @@
             --card-foreground: 231 39% 11%;
             --popover: 0 0% 100%;
             --popover-foreground: 231 39% 11%;
-            --primary: 26 84% 66%; /* maps to --color-primary */
-            --primary-foreground: 0 0% 0%; /* Dark text for contrast */
+            --primary: 340 82% 52%; /* maps to --color-primary */
+            --primary-foreground: 0 0% 100%; /* White text for contrast */
             --secondary: 240 4% 46%;
             --secondary-foreground: 0 0% 100%;
             --muted: 240 4% 46%;
             --muted-foreground: 231 10% 47%;
-            --accent: 26 84% 66%;
-            --accent-foreground: 0 0% 0%; /* Dark text for contrast */
+            --accent: 340 82% 52%; /* maps to --color-primary */
+            --accent-foreground: 0 0% 100%; /* White text for contrast */
             --destructive: 0 100% 63%; /* maps to --color-error */
             --destructive-foreground: 0 0% 100%;
             --border: 240 6% 87%; /* maps to --light-border */
             --input: 240 6% 87%;
-            --ring: 26 84% 66%;
+            --ring: 340 82% 52%;
 
             /* App variables */
             --bg: var(--light-bg-base);
@@ -299,7 +302,7 @@
 
         .chat-input-surface:focus-within {
             border-color: hsl(var(--accent));
-            box-shadow: 0 0 0 1px hsl(var(--accent)), var(--shadow-lg);
+            box-shadow: 0 0 0 1px hsl(var(--accent)), var(--shadow-lg), 0 0 60px var(--accent-glow-input);
             background: var(--surface);
         }
         
@@ -756,9 +759,10 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             font-size: 14px;
-            padding: 8px 12px;
+            padding: 7px 11px;
             border-radius: 6px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
             color: var(--text-secondary);
         }
 
@@ -768,7 +772,8 @@
         }
 
         .sidebar-list-item.active {
-            background-color: var(--surface-hover);
+            background-color: var(--color-primary-15);
+            border-color: var(--color-primary-35);
             color: hsl(var(--accent));
             font-weight: 500;
         }
@@ -2347,3 +2352,6 @@
 
 
 
+
+
+    

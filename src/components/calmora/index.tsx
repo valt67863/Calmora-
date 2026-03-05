@@ -445,13 +445,13 @@ export const renderIcon = (iconName: string, props = {}) => {
   export const NavItem = ({ icon: Icon, label, collapsed, onClick, danger, active }: any) => {
     if (collapsed) {
       return (
-        <button 
+        <button
           onClick={onClick}
           className={`
-            w-10 h-10 mx-auto flex items-center justify-center rounded-lg 
+            w-10 h-10 mx-auto flex items-center justify-center rounded-lg
             transition-all duration-200
-            ${active 
-              ? "bg-[var(--surface-hover)] !text-[var(--accent)]" 
+            ${active
+              ? "bg-[var(--color-primary-15)] !text-[var(--accent)]"
               : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--accent-hover)]"
             }
             ${danger ? "text-[var(--danger)] hover:bg-[var(--danger-bg)] hover:text-[var(--danger)]" : ""}
@@ -463,16 +463,12 @@ export const renderIcon = (iconName: string, props = {}) => {
       );
     }
     return (
-      <button 
+      <button
         onClick={onClick}
         className={`
-          w-full flex items-center gap-3 px-3 py-2 rounded-lg 
-          text-sm font-medium transition-all duration-200 font-sans group relative
-          ${active 
-            ? "bg-[var(--surface-hover)] !text-[var(--accent)] font-semibold" 
-            : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--accent-hover)]"
-          }
-          ${danger ? "!text-[var(--danger)] hover:bg-[var(--danger-bg)]" : ""}
+          sidebar-list-item w-full flex items-center gap-3
+          ${active ? 'active' : ''}
+          ${danger ? '!text-[var(--danger)] hover:!bg-[var(--danger-bg)]' : ''}
         `}
       >
         <Icon size={16} strokeWidth={active ? 2 : 1.5} />
@@ -1273,3 +1269,6 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
 
+
+
+    
