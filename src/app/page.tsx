@@ -71,6 +71,14 @@ const HomePage = () => {
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
 
+  const [settingsView, setSettingsView] = useState("main");
+
+  useEffect(() => {
+    if (appMode !== 'settings') {
+        setSettingsView('main');
+    }
+  }, [appMode]);
+
   useEffect(() => {
     const content = scrollContentRef.current;
     const wrapper = scrollWrapperRef.current;
@@ -464,6 +472,7 @@ const HomePage = () => {
   const handleUpdateUser = (updatedUser: any) => {
     setUser(updatedUser);
     setShowEditProfileModal(false);
+    setSettingsView('main');
   };
 
   return (
@@ -503,7 +512,7 @@ const HomePage = () => {
           </div>
           
             <div className="p-3 space-y-1 flex-shrink-0">
-                <button onClick={startNewChat} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-[var(--accent-hover)] transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
+                <button onClick={startNewChat} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
                     <Plus size={16} strokeWidth={2.5} />
                     {!isCollapsed && <span className="text-sm font-semibold font-sans">Start New Session</span>}
                 </button>
@@ -519,7 +528,7 @@ const HomePage = () => {
             <div className="sidebar-scroll-wrapper" ref={scrollWrapperRef}>
                 <div className="sidebar-scroll-content custom-scrollbar" ref={scrollContentRef}>
                 <div className="px-3 pb-3">
-                    {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-secondary)] mb-2 mt-4 px-3 font-semibold font-sans">History</div>}
+                    {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">History</div>}
                     <div className="space-y-1">
                     {threads.map(thread => (
                         isCollapsed ? (
@@ -640,6 +649,10 @@ const HomePage = () => {
                             onShowEditProfile={() => setShowEditProfileModal(true)}
                             onShowChangePassword={() => setShowChangePasswordModal(true)}
                             onShowBilling={() => setShowBillingModal(true)}
+                            isMobile={isMobile}
+                            settingsView={settingsView}
+                            setSettingsView={setSettingsView}
+                            onUpdateUser={handleUpdateUser}
                          />}
                         {appMode === "projects" && <ProjectsView projects={projects} setShowProjectModal={setShowProjectModal} onOpenProject={handleOpenProject} setProjectActionData={setProjectActionData} />}
                         {appMode === "history" && <HistoryView sessions={threads} onOpenSession={switchThread} />}

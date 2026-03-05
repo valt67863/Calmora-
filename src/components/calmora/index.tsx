@@ -451,7 +451,7 @@ export const renderIcon = (iconName: string, props = {}) => {
             w-10 h-10 mx-auto flex items-center justify-center rounded-lg
             transition-all duration-200
             ${active
-              ? "bg-[var(--color-primary-15)] !text-[var(--accent)]"
+              ? "bg-[var(--color-primary-15)] !text-[hsl(var(--accent))] border border-transparent"
               : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--accent-hover)]"
             }
             ${danger ? "text-[var(--danger)] hover:bg-[var(--danger-bg)] hover:text-[var(--danger)]" : ""}
@@ -554,7 +554,7 @@ export const renderIcon = (iconName: string, props = {}) => {
           />
           <div className="flex justify-end gap-3">
             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Cancel</button>
-            <button onClick={() => title.trim() && onCreate(title)} disabled={!title.trim()} className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-[var(--accent-hover)] transition-opacity disabled:opacity-50">Create Project</button>
+            <button onClick={() => title.trim() && onCreate(title)} disabled={!title.trim()} className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-opacity disabled:opacity-50">Create Project</button>
           </div>
         </div>
       </ModalOverlay>
@@ -578,7 +578,7 @@ export const renderIcon = (iconName: string, props = {}) => {
           />
           <div className="flex justify-end gap-3">
             <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Cancel</button>
-            <button onClick={() => title.trim() && onCreate(title)} disabled={!title.trim()} className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-[var(--accent-hover)] transition-opacity disabled:opacity-50">Set Goal</button>
+            <button onClick={() => title.trim() && onCreate(title)} disabled={!title.trim()} className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-opacity disabled:opacity-50">Set Goal</button>
           </div>
         </div>
       </ModalOverlay>
@@ -1010,7 +1010,7 @@ export const SessionRow = ({ session, onOpen, formatDate }: any) => (
                     <p className="text-[var(--text-secondary)] text-base font-sans leading-relaxed">{currentStep.detail}</p>
                 </div>
                 <div className="pt-2 flex flex-col gap-3">
-                    <button onClick={handleNext} className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-medium text-base hover:bg-[var(--accent-hover)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                    <button onClick={handleNext} className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-medium text-base hover:bg-primary/90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                         <CheckCircle2 size={18} className="text-primary-foreground" /> I did it
                     </button>
                     <button className="w-full py-3 rounded-xl bg-transparent border border-[var(--border-strong)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-raised)] font-medium text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2">
@@ -1165,7 +1165,173 @@ export const ChangePasswordModal = ({ onClose }: any) => {
   );
 };
 
-export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowChangePassword, onShowBilling }: any) => {
+const EditProfileView = ({ user, onSave, onBack, isMobile }: any) => {
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+
+  const handleSave = () => {
+    onSave({ ...user, name });
+  };
+
+  return (
+    <div className="settings-page">
+      <div className="settings-header">
+        {isMobile && (
+          <button onClick={onBack} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
+            <ArrowLeft size={16} /> All Settings
+          </button>
+        )}
+        <h1 className="settings-title">Edit Profile</h1>
+        <p className="settings-subtitle">Update your name and email address.</p>
+      </div>
+      <div className="settings-content">
+        <div className="settings-card">
+          <div className="card-content !p-7 space-y-5">
+            <div>
+              <label className="modal-label">Full Name</label>
+              <input
+                type="text"
+                className="modal-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your full name"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="modal-label">Email Address</label>
+              <input
+                type="email"
+                className="modal-input"
+                value={email}
+                disabled
+                readOnly
+              />
+            </div>
+          </div>
+          <div className="modal-footer justify-end">
+            <button className="btn-primary" onClick={handleSave} disabled={!name.trim()}>Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ChangePasswordView = ({ onBack, isMobile }: any) => {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPasswords, setShowPasswords] = useState(false);
+
+  const canSave = currentPassword && newPassword && newPassword === confirmPassword;
+
+  const handleSave = () => {
+    console.log("Password change requested.");
+    onBack();
+  };
+
+  return (
+    <div className="settings-page">
+      <div className="settings-header">
+        {isMobile && (
+          <button onClick={onBack} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
+            <ArrowLeft size={16} /> All Settings
+          </button>
+        )}
+        <h1 className="settings-title">Change Password</h1>
+        <p className="settings-subtitle">Update your login password for better security.</p>
+      </div>
+      <div className="settings-content">
+        <div className="settings-card">
+          <div className="card-content !p-7 space-y-4">
+            <div>
+              <label className="modal-label">Current Password</label>
+              <input
+                type={showPasswords ? "text" : "password"}
+                className="modal-input"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="modal-label">New Password</label>
+              <input
+                type={showPasswords ? "text" : "password"}
+                className="modal-input"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="modal-label">Confirm New Password</label>
+              <input
+                type={showPasswords ? "text" : "password"}
+                className="modal-input"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-secondary)] pt-2">
+              <input type="checkbox" checked={showPasswords} onChange={() => setShowPasswords(!showPasswords)} />
+              Show Passwords
+            </label>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-primary" onClick={handleSave} disabled={!canSave}>Update Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BillingView = ({ user, onBack, isMobile }: any) => {
+  return (
+    <div className="settings-page">
+      <div className="settings-header">
+        {isMobile && (
+          <button onClick={onBack} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
+            <ArrowLeft size={16} /> All Settings
+          </button>
+        )}
+        <h1 className="settings-title">Billing</h1>
+        <p className="settings-subtitle">Manage your subscription and view invoices.</p>
+      </div>
+      <div className="settings-content">
+        <div className="settings-card">
+          <div className="card-content !p-7">
+            <p className="setting-desc mb-4">You are currently on the <strong className="text-[var(--text-primary)]">{user.plan}</strong> plan.</p>
+            <div className="p-4 bg-[var(--surface-hover)] border border-[var(--border)] rounded-lg">
+              <div className="setting-label">Next invoice</div>
+              <div className="text-[var(--text-primary)] font-medium">This is a demo. No payment is required.</div>
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn-primary" disabled>Manage Subscription</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowChangePassword, onShowBilling, isMobile, settingsView, setSettingsView, onUpdateUser }: any) => {
+    
+    if (isMobile) {
+        if (settingsView === 'profile') {
+            return <EditProfileView user={user} onSave={onUpdateUser} onBack={() => setSettingsView('main')} isMobile={isMobile} />;
+        }
+        if (settingsView === 'password') {
+            return <ChangePasswordView onBack={() => setSettingsView('main')} isMobile={isMobile} />;
+        }
+        if (settingsView === 'billing') {
+            return <BillingView user={user} onBack={() => setSettingsView('main')} isMobile={isMobile} />;
+        }
+    }
+
     return (
         <div className="settings-page">
             <div className="settings-header">
@@ -1212,7 +1378,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                                 <div className="setting-label">Profile</div>
                                 <div className="setting-desc">Your name and email address.</div>
                             </div>
-                            <button className="btn-secondary" onClick={onShowEditProfile}>
+                            <button className="btn-secondary" onClick={() => isMobile ? setSettingsView('profile') : onShowEditProfile()}>
                                 <User size={14} /> Edit Profile
                             </button>
                         </div>
@@ -1221,7 +1387,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                                 <div className="setting-label">Password</div>
                                 <div className="setting-desc">Update your login password.</div>
                             </div>
-                            <button className="btn-secondary" onClick={onShowChangePassword}>
+                            <button className="btn-secondary" onClick={() => isMobile ? setSettingsView('password') : onShowChangePassword()}>
                                 <KeyRound size={14} /> Change Password
                             </button>
                         </div>
@@ -1230,7 +1396,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                                 <div className="setting-label">Billing</div>
                                 <div className="setting-desc">Manage your subscription and view invoices.</div>
                             </div>
-                            <button className="btn-secondary" onClick={onShowBilling}>
+                            <button className="btn-secondary" onClick={() => isMobile ? setSettingsView('billing') : onShowBilling()}>
                                 <CreditCard size={14} /> Manage Billing
                             </button>
                         </div>
@@ -1246,7 +1412,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                             <div className="setting-info">
                                 <div className="setting-label">Delete Account</div>
                                 <div className="setting-desc">
-                                    Permanently delete your account and all data.
+                                    Permanently delete your account and all data. This action cannot be undone.
                                 </div>
                             </div>
                             <button className="btn-danger">
