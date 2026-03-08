@@ -1026,23 +1026,74 @@ export const SessionRow = ({ session, onOpen, formatDate }: any) => (
 export const BillingModal = ({ user, onClose }: any) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3 className="modal-title">Billing</h3>
-          <button className="modal-close" onClick={onClose}>
-            <X size={18} strokeWidth={2} />
+      <div className="w-full max-w-[520px] bg-[var(--bg)] rounded-2xl border border-[var(--border)] p-6 shadow-2xl animate-in fade-in-0 zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">Billing</h2>
+          <button
+            onClick={onClose}
+            className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
+          >
+            <X size={20} />
           </button>
         </div>
-        <div className="modal-body">
-          <p className="setting-desc mb-4">You are currently on the <strong className="text-[var(--text-primary)]">{user.plan}</strong> plan.</p>
-          <div className="p-4 bg-[var(--surface-hover)] border border-[var(--border)] rounded-lg">
-             <div className="setting-label">Next invoice</div>
-             <div className="text-[var(--text-primary)] font-medium">This is a demo. No payment is required.</div>
+
+        {/* Plan Info */}
+        <div className="bg-[var(--surface)] rounded-xl p-4 mb-4 border border-[var(--border)]">
+          <p className="text-[var(--text-tertiary)] text-sm mb-1">Current Plan</p>
+          <div className="flex items-center justify-between">
+            <h3 className="text-[var(--text-primary)] font-semibold">Calmora {user.plan}</h3>
+            <span className="text-[hsl(var(--accent))] font-medium">$19 / month</span>
+          </div>
+          <p className="text-[var(--success)] text-sm mt-1">Active subscription</p>
+        </div>
+
+        {/* Billing Cycle */}
+        <div className="bg-[var(--surface)] rounded-xl p-4 mb-4 border border-[var(--border)]">
+          <p className="text-[var(--text-tertiary)] text-sm mb-2">Billing Cycle</p>
+
+          <div className="flex justify-between text-sm">
+            <span className="text-[var(--text-tertiary)]">Next billing date</span>
+            <span className="text-[var(--text-primary)]">Aug 25, 2026</span>
+          </div>
+
+          <div className="flex justify-between text-sm mt-1">
+            <span className="text-[var(--text-tertiary)]">Billing interval</span>
+            <span className="text-[var(--text-primary)]">Monthly</span>
           </div>
         </div>
-        <div className="modal-footer">
-          <button className="btn-secondary" onClick={onClose}>Cancel</button>
-          <button className="btn-primary" disabled>Manage Subscription</button>
+
+        {/* Payment Method */}
+        <div className="bg-[var(--surface)] rounded-xl p-4 mb-6 border border-[var(--border)]">
+          <p className="text-[var(--text-tertiary)] text-sm mb-2">Payment Method</p>
+
+          <div className="flex items-center justify-between">
+            <span className="text-[var(--text-primary)]">
+              Visa •••• 4242
+            </span>
+
+            <button className="text-[hsl(var(--accent))] hover:text-[var(--accent-hover)] text-sm font-medium">
+              Update
+            </button>
+          </div>
+
+          <p className="text-[var(--text-tertiary)] text-xs mt-1">
+            Expires 12/27
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+
+          <button className="flex-1 bg-[var(--surface-hover)] hover:bg-[var(--surface-raised)] text-[var(--text-primary)] rounded-lg py-2 text-sm border border-[var(--border)]">
+            Change Plan
+          </button>
+
+          <button className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg py-2 text-sm">
+            Manage Subscription
+          </button>
+
         </div>
       </div>
     </div>
@@ -1438,3 +1489,4 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
