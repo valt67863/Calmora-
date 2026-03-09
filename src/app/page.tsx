@@ -156,10 +156,11 @@ const HomePage = () => {
         if (savedThreads) {
             setThreads(JSON.parse(savedThreads));
         } else {
+            const now = Date.now();
             setThreads([
-                { id: generateId(), title: "SaaS landing page idea", updatedAt: Date.now() },
-                { id: generateId(), title: "Thoughts on resume builder", updatedAt: Date.now() - 86400000 },
-                { id: generateId(), title: "AI portfolio concepts", updatedAt: Date.now() - 604800000 },
+                { id: generateId(), title: "SaaS landing page idea", createdAt: now, updatedAt: now },
+                { id: generateId(), title: "Thoughts on resume builder", createdAt: now - 86400000, updatedAt: now - 86400000 },
+                { id: generateId(), title: "AI portfolio concepts", createdAt: now - 604800000, updatedAt: now - 604800000 },
             ]);
         }
 
@@ -255,7 +256,7 @@ const HomePage = () => {
   }, [messages, thinking, chatStage, appMode]);
 
   useEffect(() => {
-    if (activeThreadId) {
+    if (activeThreadId && messages.length > 0) {
       setHistoryStore(prev => ({ ...prev, [activeThreadId]: messages }));
     }
   }, [messages, activeThreadId]);
@@ -325,15 +326,48 @@ const HomePage = () => {
   const sendMessage = async () => {
     if (!input.trim() || !activeThreadId) return;
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(8);
-    
+
     const userText = input;
     const userMsg = { id: Date.now().toString(), role: "user", content: userText };
-    
-    setChatStage("active");
-    const threadExists = threads.some(t => t.id === activeThreadId);
-    if (!threadExists) setThreads(prev => [{ id: activeThreadId, title: userText.slice(0, 40) + (userText.length > 40 ? "..." : ""), updatedAt: Date.now() }, ...prev]);
-    
+
     setMessages((prev) => [...prev, userMsg]);
+
+    setThreads(prevThreads => {
+        let newThreads = [...prevThreads];
+        const threadIndex = newThreads.findIndex(t => t.id === activeThreadId);
+
+        if (threadIndex > -1) {
+            // Existing thread: update its timestamp
+            newThreads[threadIndex] = { ...newThreads[threadIndex], updatedAt: Date.now() };
+        } else {
+            // New thread: create it
+            const newThread = {
+                id: activeThreadId,
+                title: userText.slice(0, 40) + (userText.length > 40 ? "..." : ""),
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+            };
+            newThreads.unshift(newThread);
+
+            // Enforce session limit (max 100)
+            if (newThreads.length > 100) {
+                // Sort by updatedAt ascending to find the least recently updated
+                newThreads.sort((a, b) => a.updatedAt - b.updatedAt);
+                const oldestThread = newThreads.shift(); // Remove the oldest one
+
+                if (oldestThread) {
+                    setHistoryStore(prevHistory => {
+                        const newHistory = { ...prevHistory };
+                        delete newHistory[oldestThread.id];
+                        return newHistory;
+                    });
+                }
+            }
+        }
+        return newThreads;
+    });
+
+    setChatStage("active");
     setInput("");
     setShowSuggestionList(false);
     setThinking(true);
@@ -566,7 +600,7 @@ const HomePage = () => {
                 <div className="px-3 pb-3">
                     {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
                     <div className="space-y-1">
-                    {threads.slice(0, 5).map(thread => (
+                    {threads.sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 5).map(thread => (
                         isCollapsed ? (
                             <button
                                 key={thread.id}
@@ -718,7 +752,11 @@ const HomePage = () => {
                             value={input} 
                             onChange={(e) => {
                                 setInput(e.target.value);
-                                setShowSuggestionList(e.target.value.trim().length > 0);
+                                if (e.target.value.trim().length > 0) {
+                                    setShowSuggestionList(true);
+                                } else {
+                                    setShowSuggestionList(false);
+                                }
                             }} 
                             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} 
                             placeholder={activeProject ? `Type to add to ${activeProject.title}...` : "What do you need to finish?"} 

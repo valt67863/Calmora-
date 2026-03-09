@@ -1414,7 +1414,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
     return (
         <div className="fixed inset-0 z-[1001] flex items-end justify-center">
             <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-md"
+                className="absolute inset-0 z-[1002] bg-black/40 backdrop-blur-md"
                 onClick={onClose}
             />
             <div className="relative w-full bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up" style={{maxHeight: 'fit-content'}}>
@@ -1555,6 +1555,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 
