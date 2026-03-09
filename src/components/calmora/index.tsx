@@ -51,8 +51,10 @@ import {
   Eye,
   EyeOff,
   User,
-  CreditCard
+  CreditCard,
+  Copy
 } from "lucide-react";
+import { differenceInCalendarDays } from 'date-fns';
 import { normalizeStatus } from "@/lib/calmora-utils";
 
 // --- Branding Component ---
@@ -585,7 +587,7 @@ export const renderIcon = (iconName: string, props = {}) => {
     );
   };
   
-  export const ProjectActionSheet = ({ projectData, onClose, onRename, onDelete }: any) => {
+  export const ProjectActionSheet = ({ projectData, onClose, onRename, onDuplicate, onDelete }: any) => {
       const sheetRef = useRef(null);
       const { project, position } = projectData;
   
@@ -617,6 +619,9 @@ export const renderIcon = (iconName: string, props = {}) => {
           <div className="p-2">
             <button onClick={() => { onRename(project); onClose(); }} className="menu-item w-full text-left flex items-center gap-3">
                 <Edit3 size={15} /> Rename
+            </button>
+            <button onClick={() => { onDuplicate(project); onClose(); }} className="menu-item w-full text-left flex items-center gap-3">
+                <Copy size={15} /> Duplicate
             </button>
             <div className="h-px bg-[var(--border)] my-1" />
             <button onClick={() => { onDelete(project); onClose(); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3">
@@ -766,10 +771,37 @@ export const ProjectsView = ({ projects, setShowProjectModal, onOpenProject, set
   );
   
   export const HistoryView = ({ sessions, onOpenSession }: any) => {
-    const formatDate = (timestamp: number) => {
-        const date = new Date(timestamp);
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    };
+    const groupedSessions = useMemo(() => {
+        const groups: { [key: string]: any[] } = {};
+
+        [...sessions].sort((a,b) => b.updatedAt - a.updatedAt).forEach((session: any) => {
+            if (!session.updatedAt) return;
+            const sessionDate = new Date(session.updatedAt);
+            const now = new Date();
+            const daysAgo = differenceInCalendarDays(now, sessionDate);
+
+            let groupKey: string;
+            if (daysAgo === 0) {
+                groupKey = 'Today';
+            } else if (daysAgo === 1) {
+                groupKey = 'Yesterday';
+            } else if (daysAgo < 7) {
+                groupKey = 'Previous 7 Days';
+            } else if (daysAgo < 30) {
+                groupKey = 'Previous 30 Days';
+            } else {
+                groupKey = 'Older';
+            }
+
+            if (!groups[groupKey]) {
+                groups[groupKey] = [];
+            }
+            groups[groupKey].push(session);
+        });
+        return groups;
+    }, [sessions]);
+
+    const groupOrder = ['Today', 'Yesterday', 'Previous 7 Days', 'Previous 30 Days', 'Older'];
 
     return (
       <div className="desktop-content">
@@ -780,32 +812,40 @@ export const ProjectsView = ({ projects, setShowProjectModal, onOpenProject, set
               </section>
 
               <section className="section-secondary">
-                  <div className="space-y-0">
-                      {sessions.length > 0 ? (
-                          sessions.map((s: any) => <SessionRow key={s.id} session={s} onOpen={onOpenSession} formatDate={formatDate} />)
-                      ) : (
-                          <div className="text-center py-20 border border-dashed border-[var(--border)] rounded-xl">
-                              <p className="text-[var(--text-tertiary)] text-lg mb-6 font-sans">No sessions in your history yet.</p>
-                          </div>
-                      )}
-                  </div>
+                  {sessions.length > 0 ? (
+                      <div className="space-y-8">
+                          {groupOrder.map(groupName => (
+                              groupedSessions[groupName] && groupedSessions[groupName].length > 0 && (
+                                  <div key={groupName}>
+                                      <h2 className="text-[11px] uppercase tracking-widest text-[var(--text-tertiary)] mb-4 font-medium font-sans opacity-60">
+                                          {groupName}
+                                      </h2>
+                                      <div className="space-y-0">
+                                          {groupedSessions[groupName].map((s: any) => <SessionRow key={s.id} session={s} onOpen={onOpenSession} />)}
+                                      </div>
+                                  </div>
+                              )
+                          ))}
+                      </div>
+                  ) : (
+                      <div className="text-center py-20 border border-dashed border-[var(--border)] rounded-xl">
+                          <p className="text-[var(--text-tertiary)] text-lg mb-6 font-sans">No sessions in your history yet.</p>
+                      </div>
+                  )}
               </section>
           </div>
       </div>
     );
 };
 
-export const SessionRow = ({ session, onOpen, formatDate }: any) => (
-    <div onClick={() => onOpen(session.id)} className="py-4 border-b border-[var(--border)] last:border-0 group cursor-pointer hover:bg-[var(--surface-hover)] -mx-4 px-4 transition-colors">
+export const SessionRow = ({ session, onOpen }: any) => (
+    <div onClick={() => onOpen(session.id)} className="py-4 border-b border-[var(--border)] last:border-0 group cursor-pointer hover:bg-[var(--surface-hover)] -mx-4 px-4 rounded-lg transition-colors">
       <div className="flex items-center gap-4">
         <div className="text-[var(--text-tertiary)] group-hover:text-[var(--text-primary)] transition-colors">
             <MessageSquare size={18} />
         </div>
         <div className="flex-1 min-w-0">
             <h3 className="text-[15px] font-medium text-[var(--text-primary)] font-sans truncate">{session.title}</h3>
-            <p className="text-xs text-[var(--text-tertiary)] font-sans mt-0.5">
-              {session.updatedAt ? `Last activity on ${formatDate(session.updatedAt)}` : 'New session'}
-            </p>
         </div>
         <ChevronRight size={16} className="text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
@@ -1337,31 +1377,35 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                 );
             default:
                 return (
-                    <>
-                        <div className="mb-6">
-                             <h3 className="text-[var(--text-tertiary)] text-sm mb-3">Account</h3>
-                             <div className="space-y-2">
-                                 <button onClick={() => setView('profile')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium flex items-center justify-between"><span>Profile</span> <ChevronRight size={16} /></button>
-                                 <button onClick={() => setView('password')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium flex items-center justify-between"><span>Password</span> <ChevronRight size={16} /></button>
-                                 <button onClick={() => setView('billing')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium flex items-center justify-between"><span>Billing</span> <ChevronRight size={16} /></button>
-                             </div>
-                         </div>
-                        <div className="mb-6">
-                            <h3 className="text-[var(--text-tertiary)] text-sm mb-2">Appearance</h3>
-                            <div className="bg-[var(--surface-raised)] p-4 rounded-xl">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-[var(--text-primary)] font-medium">Theme</span>
-                                    <div className="flex gap-2">
-                                        <button onClick={() => setTheme('light')} className={`px-3 py-1.5 rounded-lg text-sm transition ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Light</button>
-                                        <button onClick={() => setTheme('dark')} className={`px-3 py-1.5 rounded-lg text-sm transition ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Dark</button>
+                     <>
+                        <div className="space-y-6">
+                             <div>
+                                 <h3 className="text-[var(--text-tertiary)] text-xs font-medium uppercase tracking-wider mb-2">Appearance</h3>
+                                 <div className="bg-[var(--surface-raised)] p-3 rounded-xl">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[var(--text-primary)] font-medium text-sm pl-1">Theme</span>
+                                        <div className="flex items-center gap-1 bg-[var(--bg)] p-1 rounded-lg border border-[var(--border)]">
+                                            <button onClick={() => setTheme('light')} className={`px-3 py-1.5 rounded-md text-sm transition ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Light</button>
+                                            <button onClick={() => setTheme('dark')} className={`px-3 py-1.5 rounded-md text-sm transition ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Dark</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4 mt-6">
-                            <p className="text-red-400 font-medium mb-2">Danger Zone</p>
-                            <button className="text-red-500 border border-red-500 px-4 py-2 rounded-lg text-sm">Delete Account</button>
-                        </div>
+                             </div>
+                             <div>
+                                 <h3 className="text-[var(--text-tertiary)] text-xs font-medium uppercase tracking-wider mb-2">Account</h3>
+                                 <div className="bg-[var(--surface-raised)] p-2 rounded-xl space-y-1">
+                                     <button onClick={() => setView('profile')} className="w-full text-left p-3 rounded-lg text-[var(--text-primary)] font-medium flex items-center justify-between text-sm hover:bg-[var(--surface-hover)]"><span>Profile</span> <ChevronRight size={16} /></button>
+                                     <button onClick={() => setView('password')} className="w-full text-left p-3 rounded-lg text-[var(--text-primary)] font-medium flex items-center justify-between text-sm hover:bg-[var(--surface-hover)]"><span>Password</span> <ChevronRight size={16} /></button>
+                                     <button onClick={() => setView('billing')} className="w-full text-left p-3 rounded-lg text-[var(--text-primary)] font-medium flex items-center justify-between text-sm hover:bg-[var(--surface-hover)]"><span>Billing</span> <ChevronRight size={16} /></button>
+                                 </div>
+                             </div>
+                             <div>
+                                 <h3 className="text-red-500/80 text-xs font-medium uppercase tracking-wider mb-2">Danger Zone</h3>
+                                 <div className="bg-red-500/10 border border-red-500/30 p-2 rounded-xl">
+                                     <button className="w-full text-left p-3 rounded-lg text-red-500 font-medium flex items-center justify-between text-sm hover:bg-red-500/10"><span>Delete Account</span> <ChevronRight size={16} /></button>
+                                 </div>
+                             </div>
+                         </div>
                     </>
                 );
         }
@@ -1373,7 +1417,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                 className="absolute inset-0 bg-black/40 backdrop-blur-md"
                 onClick={onClose}
             />
-            <div className="relative w-full max-h-[90vh] bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
+            <div className="relative w-full bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
                 
                 {/* Drag Handle */}
                 <div className="flex-shrink-0">
@@ -1384,14 +1428,19 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
 
                 {/* Content */}
                 <div className="overflow-y-auto custom-scrollbar px-5 pb-6">
-                    {view !== 'main' && (
-                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-4 -ml-1">
-                            <ArrowLeft size={16} /> Back
+                    <div className="flex items-center justify-between mb-4">
+                        {view !== 'main' ? (
+                            <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] -ml-1">
+                                <ArrowLeft size={16} /> Back
+                            </button>
+                        ) : <div />}
+                        <h2 className="text-lg font-semibold text-[var(--text-primary)] absolute left-1/2 -translate-x-1/2">
+                            {getTitle()}
+                        </h2>
+                        <button onClick={onClose} className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)]">
+                            <X size={20} />
                         </button>
-                    )}
-                    <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
-                        {getTitle()}
-                    </h2>
+                    </div>
                     {renderSheetContent()}
                 </div>
             </div>
@@ -1506,6 +1555,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 

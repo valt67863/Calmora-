@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu, X, ArrowLeft, ChevronDown } from 'lucide-react';
 import UserMenuModal from './UserMenuModal';
+import { renderIcon } from '@/components/calmora';
 
 interface Props {
   user: {
@@ -74,14 +75,16 @@ const Header: React.FC<Props> = ({
       </div>
 
       {activeProject ? (
-        <div className="flex-1 flex items-center justify-center gap-2 text-center min-w-0">
+        <div className="flex-1 flex items-center justify-center gap-3 text-center min-w-0">
+          <span className="text-[var(--text-tertiary)] font-medium text-lg hidden md:inline">Projects /</span>
+          {renderIcon(activeProject.icon, { size: 22, className: "text-[var(--text-primary)] flex-shrink-0" })}
           <h2 className="text-lg font-semibold text-[var(--text-primary)] truncate">{activeProject.title}</h2>
           <button
               className="p-1 rounded-md hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors flex-shrink-0"
               onClick={(e) => {
                   e.stopPropagation();
                   const rect = e.currentTarget.getBoundingClientRect();
-                  onTriggerProjectAction({ project: activeProject, position: { x: rect.left, y: rect.bottom + 5 } });
+                  onTriggerProjectAction({ project: activeProject, position: { x: rect.left, y: rect.bottom + 8 } });
               }}
           >
               <ChevronDown size={20} />

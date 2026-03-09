@@ -154,6 +154,12 @@ const HomePage = () => {
         const savedThreads = safeLocalStorage.getItem('threads');
         if (savedThreads) {
             setThreads(JSON.parse(savedThreads));
+        } else {
+            setThreads([
+                { id: generateId(), title: "SaaS landing page idea", updatedAt: Date.now() },
+                { id: generateId(), title: "Thoughts on resume builder", updatedAt: Date.now() - 86400000 },
+                { id: generateId(), title: "AI portfolio concepts", updatedAt: Date.now() - 604800000 },
+            ]);
         }
 
         const savedHistory = safeLocalStorage.getItem('historyStore');
@@ -545,14 +551,21 @@ const HomePage = () => {
                     onClick={() => { setAppMode('projects'); if(isMobile) setSidebarOpen(false); }} 
                     active={appMode === 'projects' || appMode === 'project-view'} 
                 />
+                 <NavItem 
+                    icon={History} 
+                    label="History" 
+                    collapsed={isCollapsed}
+                    onClick={() => { setAppMode('history'); if(isMobile) setSidebarOpen(false); }} 
+                    active={appMode === 'history'}
+                />
             </div>
             
             <div className="sidebar-scroll-wrapper" ref={scrollWrapperRef}>
                 <div className="sidebar-scroll-content custom-scrollbar" ref={scrollContentRef}>
                 <div className="px-3 pb-3">
-                    {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">History</div>}
+                    {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
                     <div className="space-y-1">
-                    {threads.map(thread => (
+                    {threads.slice(0, 5).map(thread => (
                         isCollapsed ? (
                             <button
                                 key={thread.id}
@@ -563,7 +576,7 @@ const HomePage = () => {
                                 `}
                                 title={thread.title}
                             >
-                                <History size={18} strokeWidth={activeThreadId === thread.id && appMode === 'chat' ? 2 : 1.5} />
+                                <MessageSquare size={18} strokeWidth={activeThreadId === thread.id && appMode === 'chat' ? 2 : 1.5} />
                             </button>
                         ) : (
                             <button
@@ -756,6 +769,11 @@ const HomePage = () => {
                 projectData={projectActionData}
                 onClose={() => setProjectActionData(null)}
                 onRename={(project) => { setProjectActionData(null); setRenameProject(project); }}
+                onDuplicate={(project) => {
+                    const newProject = { ...project, id: generateId(), title: `${project.title} (Copy)` };
+                    setProjects(prev => [newProject, ...prev]);
+                    setProjectActionData(null);
+                }}
                 onDelete={(project) => { setProjectActionData(null); setDeleteProject(project); }}
             />
         )}
