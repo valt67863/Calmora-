@@ -1368,12 +1368,12 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
     };
     
     return (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="fixed inset-0 z-[1000] flex items-end justify-center">
             <div
                 className="absolute inset-0 bg-black/40 backdrop-blur-md"
                 onClick={onClose}
             />
-            <div className="relative w-[92%] max-w-[420px] h-[70vh] mb-4 bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
+            <div className="relative w-full h-[85vh] bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
                 
                 {/* Drag Handle */}
                 <div className="flex-shrink-0">
@@ -1506,6 +1506,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 
