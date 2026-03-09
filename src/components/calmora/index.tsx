@@ -1236,18 +1236,29 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
         console.log("Password change requested.");
         setView('main');
     };
+    
+    useEffect(() => {
+        if(open) {
+            setView('main');
+        }
+    }, [open]);
 
     if (!open) return null;
 
-    const renderContent = () => {
+    const getTitle = () => {
+        switch(view) {
+            case 'profile': return 'Edit Profile';
+            case 'password': return 'Change Password';
+            case 'billing': return 'Billing';
+            default: return 'Settings';
+        }
+    };
+
+    const renderSheetContent = () => {
         switch (view) {
             case 'profile':
                 return (
                     <>
-                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
-                            <ArrowLeft size={16} /> All Settings
-                        </button>
-                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Edit Profile</h2>
                         <div className="space-y-5">
                             <div>
                                 <label className="modal-label">Full Name</label>
@@ -1264,10 +1275,6 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
             case 'password':
                 return (
                      <>
-                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
-                            <ArrowLeft size={16} /> All Settings
-                        </button>
-                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Change Password</h2>
                         <div className="space-y-4">
                             <div>
                                 <label className="modal-label">Current Password</label>
@@ -1292,10 +1299,6 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
             case 'billing':
                 return (
                     <>
-                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
-                            <ArrowLeft size={16} /> All Settings
-                        </button>
-                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Billing</h2>
                         <div className="space-y-4">
                             <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
                                 <p className="text-[var(--text-tertiary)] text-sm mb-1">Current Plan</p>
@@ -1318,7 +1321,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                                 </div>
                                 <p className="text-[var(--text-tertiary)] text-xs mt-1">Expires 12/27</p>
                             </div>
-                            <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
+                             <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
                                 <p className="text-[var(--text-tertiary)] text-sm mb-2">History</p>
                                 <div className="flex flex-col items-start gap-2">
                                     <button className="text-sm text-[hsl(var(--accent))] hover:text-[var(--accent-hover)] font-medium">View invoices</button>
@@ -1335,7 +1338,6 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
             default:
                 return (
                     <>
-                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Settings</h2>
                         <div className="mb-6">
                             <h3 className="text-[var(--text-tertiary)] text-sm mb-2">Appearance</h3>
                             <div className="flex gap-2">
@@ -1351,7 +1353,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                                 <button onClick={() => setView('billing')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium">Billing</button>
                             </div>
                         </div>
-                        <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4">
+                        <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4 mt-6">
                             <p className="text-red-400 font-medium mb-2">Danger Zone</p>
                             <button className="text-red-500 border border-red-500 px-4 py-2 rounded-lg text-sm">Delete Account</button>
                         </div>
@@ -1361,12 +1363,31 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
     };
     
     return (
-        <div className="fixed inset-0 z-50">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose} />
-            <div className="absolute bottom-0 left-0 right-0 mx-auto w-full max-w-lg bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-2xl animate-sheet-up" style={{ height: '85vh' }}>
-                <div className="w-12 h-1.5 bg-[var(--border)] rounded-full mx-auto my-4" />
-                <div className="h-[calc(100%-40px)] overflow-y-auto px-6 pb-8 custom-scrollbar">
-                    {renderContent()}
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <div
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={onClose}
+            />
+            <div className="relative w-[92%] max-w-md h-[70vh] mb-4 bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-2xl flex flex-col animate-sheet-up">
+                
+                {/* Drag Handle */}
+                <div className="flex-shrink-0">
+                    <div className="flex justify-center pt-3 pb-2">
+                      <div className="w-10 h-1 bg-[var(--border-strong)] rounded-full"/>
+                    </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-6">
+                    {view !== 'main' && (
+                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-4 -ml-1">
+                            <ArrowLeft size={16} /> Back
+                        </button>
+                    )}
+                    <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
+                        {getTitle()}
+                    </h2>
+                    {renderSheetContent()}
                 </div>
             </div>
         </div>
@@ -1480,6 +1501,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 
