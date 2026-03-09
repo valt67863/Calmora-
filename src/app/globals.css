@@ -1980,7 +1980,7 @@
     display: none;
   }
 
-  .notification-modal, .user-menu-modal {
+  .notification-modal {
     position: fixed;
     top: auto;
     bottom: 0;
@@ -2003,8 +2003,35 @@
     }
   }
 
-  .notification-modal, .user-menu-modal {
+  .notification-modal {
     max-height: 80vh;
+  }
+
+  .search-modal-overlay {
+     padding-top: 70px;
+  }
+  .search-container.focused .search-input {
+    position: fixed;
+    top: 12px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+    z-index: 201;
+  }
+  
+  .search-modal-content {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    border: none;
+    transform: none;
+    max-height: none;
+    animation: none; /* Let overlay handle animation */
   }
 }
 
@@ -2354,5 +2381,6 @@
 
 
     
+
 
 
