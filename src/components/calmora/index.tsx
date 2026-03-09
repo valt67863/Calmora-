@@ -1399,7 +1399,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                                      <button onClick={() => setView('billing')} className="w-full text-left p-3 rounded-lg text-[var(--text-primary)] font-medium flex items-center justify-between text-sm hover:bg-[var(--surface-hover)]"><span>Billing</span> <ChevronRight size={16} /></button>
                                  </div>
                              </div>
-                             <div>
+                             <div className="mt-6">
                                  <h3 className="text-red-500/80 text-xs font-medium uppercase tracking-wider mb-2">Danger Zone</h3>
                                  <div className="bg-red-500/10 border border-red-500/30 p-2 rounded-xl">
                                      <button className="w-full text-left p-3 rounded-lg text-red-500 font-medium flex items-center justify-between text-sm hover:bg-red-500/10"><span>Delete Account</span> <ChevronRight size={16} /></button>
@@ -1417,7 +1417,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                 className="absolute inset-0 bg-black/40 backdrop-blur-md"
                 onClick={onClose}
             />
-            <div className="relative w-full bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
+            <div className="relative w-full bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up" style={{maxHeight: 'fit-content'}}>
                 
                 {/* Drag Handle */}
                 <div className="flex-shrink-0">
@@ -1555,6 +1555,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 

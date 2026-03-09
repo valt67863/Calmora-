@@ -13,7 +13,8 @@ import {
   ChevronDown,
   X,
   Plus,
-  Settings
+  Settings,
+  MessageSquare
 } from "lucide-react";
 import { safeLocalStorage, generateId, normalizeStatus, triggerConfetti, generateBasicTasks, aiSystemInstruction, FOCUS_DEMO_STEPS } from "@/lib/calmora-utils";
 import {
