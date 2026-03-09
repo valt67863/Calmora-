@@ -1368,12 +1368,12 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
     };
     
     return (
-        <div className="fixed inset-0 z-[1000] flex items-end justify-center">
+        <div className="fixed inset-0 z-[1001] flex items-end justify-center">
             <div
                 className="absolute inset-0 bg-black/40 backdrop-blur-md"
                 onClick={onClose}
             />
-            <div className="relative w-full h-[85vh] bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
+            <div className="relative w-full max-h-[90vh] bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
                 
                 {/* Drag Handle */}
                 <div className="flex-shrink-0">
@@ -1383,7 +1383,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-6">
+                <div className="overflow-y-auto custom-scrollbar px-5 pb-6">
                     {view !== 'main' && (
                         <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-4 -ml-1">
                             <ArrowLeft size={16} /> Back
@@ -1506,6 +1506,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 
