@@ -1318,9 +1318,12 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                                 </div>
                                 <p className="text-[var(--text-tertiary)] text-xs mt-1">Expires 12/27</p>
                             </div>
-                             <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
-                                <button className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">View invoices</button><br/>
-                                <button className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Payment history</button>
+                            <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
+                                <p className="text-[var(--text-tertiary)] text-sm mb-2">History</p>
+                                <div className="flex flex-col items-start gap-2">
+                                    <button className="text-sm text-[hsl(var(--accent))] hover:text-[var(--accent-hover)] font-medium">View invoices</button>
+                                    <button className="text-sm text-[hsl(var(--accent))] hover:text-[var(--accent-hover)] font-medium">Payment history</button>
+                                </div>
                             </div>
                         </div>
                         <div className="flex gap-3 mt-6">
@@ -1360,9 +1363,11 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
     return (
         <div className="fixed inset-0 z-50">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose} />
-            <div className="absolute bottom-0 left-0 right-0 bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] p-6 animate-slideUp max-h-[90vh] overflow-y-auto">
-                <div className="w-12 h-1.5 bg-gray-600 rounded-full mx-auto mb-5" />
-                {renderContent()}
+            <div className="absolute bottom-0 left-0 right-0 mx-auto w-full max-w-lg bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] shadow-2xl animate-sheet-up" style={{ height: '85vh' }}>
+                <div className="w-12 h-1.5 bg-[var(--border)] rounded-full mx-auto my-4" />
+                <div className="h-[calc(100%-40px)] overflow-y-auto px-6 pb-8 custom-scrollbar">
+                    {renderContent()}
+                </div>
             </div>
         </div>
     );
@@ -1475,6 +1480,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 

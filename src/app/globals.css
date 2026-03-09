@@ -592,10 +592,10 @@
 
         /* 3. Sheet Up (Bottom -> Up) */
         @keyframes sheet-up {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
-        .animate-sheet-up { animation: sheet-up 0.26s cubic-bezier(0.16,1,0.3,1) forwards; }
+        .animate-sheet-up { animation: sheet-up 0.25s ease-out forwards; }
         
         /* Redefine notes-appear to simple fade */
         @keyframes notes-appear { from { opacity: 0; } to { opacity: 1; } }
@@ -1980,7 +1980,7 @@
     display: none;
   }
 
-  .notification-modal {
+  .notification-modal, .user-menu-modal {
     position: fixed;
     top: auto;
     bottom: 0;
@@ -2003,7 +2003,7 @@
     }
   }
 
-  .notification-modal {
+  .notification-modal, .user-menu-modal {
     max-height: 80vh;
   }
 }
@@ -2340,14 +2340,6 @@
   }
 }
 
-@keyframes slideUp{
-    from{ transform:translateY(100%); }
-    to{ transform:translateY(0); }
-}
-
-.animate-slideUp{
-    animation:slideUp 0.25s ease-out;
-}
     
 
     
@@ -2362,4 +2354,5 @@
 
 
     
+
 
