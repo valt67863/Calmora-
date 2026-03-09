@@ -451,7 +451,7 @@ export const renderIcon = (iconName: string, props = {}) => {
             w-10 h-10 mx-auto flex items-center justify-center rounded-lg
             transition-all duration-200
             ${active
-              ? "bg-[var(--color-primary-15)] !text-[hsl(var(--accent))] border border-transparent"
+              ? "sidebar-list-item active"
               : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--accent-hover)]"
             }
             ${danger ? "text-[var(--danger)] hover:bg-[var(--danger-bg)] hover:text-[var(--danger)]" : ""}
@@ -1216,209 +1216,159 @@ export const ChangePasswordModal = ({ onClose }: any) => {
   );
 };
 
-const EditProfileView = ({ user, onSave, onBack, isMobile }: any) => {
-  const [name, setName] = useState(user.name);
-  const [email, setEmail] = useState(user.email);
+export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUser }: any) => {
+    const [view, setView] = useState('main');
 
-  const handleSave = () => {
-    onSave({ ...user, name });
-  };
+    const [name, setName] = useState(user.name);
+    const [email, ] = useState(user.email);
+    const handleProfileSave = () => {
+        onUpdateUser({ ...user, name });
+        setView('main');
+    };
 
-  return (
-    <div className="settings-page">
-      <div className="settings-header">
-        {isMobile && (
-          <button onClick={onBack} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
-            <ArrowLeft size={16} /> All Settings
-          </button>
-        )}
-        <h1 className="settings-title">Edit Profile</h1>
-        <p className="settings-subtitle">Update your name and email address.</p>
-      </div>
-      <div className="settings-content">
-        <div className="settings-card">
-          <div className="card-content !p-7 space-y-5">
-            <div>
-              <label className="modal-label">Full Name</label>
-              <input
-                type="text"
-                className="modal-input"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your full name"
-                autoFocus
-              />
-            </div>
-            <div>
-              <label className="modal-label">Email Address</label>
-              <input
-                type="email"
-                className="modal-input"
-                value={email}
-                disabled
-                readOnly
-              />
-            </div>
-          </div>
-          <div className="modal-footer justify-end">
-            <button className="btn-primary" onClick={handleSave} disabled={!name.trim()}>Save Changes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPasswords, setShowPasswords] = useState(false);
+    const canSavePassword = currentPassword && newPassword && newPassword === confirmPassword;
 
-const ChangePasswordView = ({ onBack, isMobile }: any) => {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPasswords, setShowPasswords] = useState(false);
+    const handlePasswordSave = () => {
+        console.log("Password change requested.");
+        setView('main');
+    };
 
-  const canSave = currentPassword && newPassword && newPassword === confirmPassword;
+    if (!open) return null;
 
-  const handleSave = () => {
-    console.log("Password change requested.");
-    onBack();
-  };
-
-  return (
-    <div className="settings-page">
-      <div className="settings-header">
-        {isMobile && (
-          <button onClick={onBack} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
-            <ArrowLeft size={16} /> All Settings
-          </button>
-        )}
-        <h1 className="settings-title">Change Password</h1>
-        <p className="settings-subtitle">Update your login password for better security.</p>
-      </div>
-      <div className="settings-content">
-        <div className="settings-card">
-          <div className="card-content !p-7 space-y-4">
-            <div>
-              <label className="modal-label">Current Password</label>
-              <input
-                type={showPasswords ? "text" : "password"}
-                className="modal-input"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                autoFocus
-              />
-            </div>
-            <div>
-              <label className="modal-label">New Password</label>
-              <input
-                type={showPasswords ? "text" : "password"}
-                className="modal-input"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="modal-label">Confirm New Password</label>
-              <input
-                type={showPasswords ? "text" : "password"}
-                className="modal-input"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-            <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-secondary)] pt-2">
-              <input type="checkbox" checked={showPasswords} onChange={() => setShowPasswords(!showPasswords)} />
-              Show Passwords
-            </label>
-          </div>
-          <div className="modal-footer">
-            <button className="btn-primary" onClick={handleSave} disabled={!canSave}>Update Password</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const BillingView = ({ user, onBack, isMobile }: any) => {
-  return (
-    <div className="settings-page">
-      <div className="settings-header">
-        {isMobile && (
-          <button onClick={onBack} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
-            <ArrowLeft size={16} /> All Settings
-          </button>
-        )}
-        <h1 className="settings-title">Billing</h1>
-        <p className="settings-subtitle">Manage your subscription and view invoices.</p>
-      </div>
-      <div className="settings-content">
-        <div className="settings-card">
-          <div className="card-content !p-7 space-y-4">
-            
-            {/* Plan Info */}
-            <div className="bg-[var(--bg)] rounded-xl p-4 border border-[var(--border)]">
-              <p className="text-[var(--text-tertiary)] text-sm mb-1">Current Plan</p>
-              <div className="flex items-center justify-between">
-                <h3 className="text-[var(--text-primary)] font-semibold">Calmora {user.plan}</h3>
-                <span className="text-[hsl(var(--accent))] font-medium">$19 / month</span>
-              </div>
-              <p className="text-[var(--success)] text-sm mt-1">Active subscription</p>
-            </div>
-
-            {/* Billing Cycle */}
-            <div className="bg-[var(--bg)] rounded-xl p-4 border border-[var(--border)]">
-              <p className="text-[var(--text-tertiary)] text-sm mb-2">Billing Cycle</p>
-              <div className="flex justify-between text-sm">
-                <span className="text-[var(--text-tertiary)]">Next billing date</span>
-                <span className="text-[var(--text-primary)]">Aug 25, 2026</span>
-              </div>
-              <div className="flex justify-between text-sm mt-1">
-                <span className="text-[var(--text-tertiary)]">Billing interval</span>
-                <span className="text-[var(--text-primary)]">Monthly</span>
-              </div>
-            </div>
-
-            {/* Payment Method */}
-            <div className="bg-[var(--bg)] rounded-xl p-4 border border-[var(--border)]">
-              <p className="text-[var(--text-tertiary)] text-sm mb-2">Payment Method</p>
-              <div className="flex items-center justify-between">
-                <span className="text-[var(--text-primary)]">
-                  Visa •••• 4242
-                </span>
-                <button className="text-[hsl(var(--accent))] hover:text-[var(--accent-hover)] text-sm font-medium">
-                  Update
-                </button>
-              </div>
-              <p className="text-[var(--text-tertiary)] text-xs mt-1">
-                Expires 12/27
-              </p>
-            </div>
-
-          </div>
-          <div className="modal-footer">
-            <button className="btn-secondary flex-1 justify-center">Change Plan</button>
-            <button className="btn-primary flex-1 justify-center">Manage Subscription</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowChangePassword, onShowBilling, isMobile, settingsView, setSettingsView, onUpdateUser }: any) => {
+    const renderContent = () => {
+        switch (view) {
+            case 'profile':
+                return (
+                    <>
+                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
+                            <ArrowLeft size={16} /> All Settings
+                        </button>
+                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Edit Profile</h2>
+                        <div className="space-y-5">
+                            <div>
+                                <label className="modal-label">Full Name</label>
+                                <input type="text" className="modal-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" autoFocus />
+                            </div>
+                            <div>
+                                <label className="modal-label">Email Address</label>
+                                <input type="email" className="modal-input" value={email} disabled readOnly />
+                            </div>
+                        </div>
+                        <button className="btn-primary w-full mt-6" onClick={handleProfileSave} disabled={!name.trim()}>Save Changes</button>
+                    </>
+                );
+            case 'password':
+                return (
+                     <>
+                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
+                            <ArrowLeft size={16} /> All Settings
+                        </button>
+                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Change Password</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="modal-label">Current Password</label>
+                                <input type={showPasswords ? "text" : "password"} className="modal-input" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoFocus />
+                            </div>
+                            <div>
+                                <label className="modal-label">New Password</label>
+                                <input type={showPasswords ? "text" : "password"} className="modal-input" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                            </div>
+                            <div>
+                                <label className="modal-label">Confirm New Password</label>
+                                <input type={showPasswords ? "text" : "password"} className="modal-input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                            </div>
+                            <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-secondary)] pt-2">
+                                <input type="checkbox" checked={showPasswords} onChange={() => setShowPasswords(!showPasswords)} />
+                                Show Passwords
+                            </label>
+                        </div>
+                        <button className="btn-primary w-full mt-6" onClick={handlePasswordSave} disabled={!canSavePassword}>Update Password</button>
+                    </>
+                );
+            case 'billing':
+                return (
+                    <>
+                        <button onClick={() => setView('main')} className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-6 -ml-1">
+                            <ArrowLeft size={16} /> All Settings
+                        </button>
+                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Billing</h2>
+                        <div className="space-y-4">
+                            <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
+                                <p className="text-[var(--text-tertiary)] text-sm mb-1">Current Plan</p>
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[var(--text-primary)] font-semibold">Calmora {user.plan}</h3>
+                                    <span className="text-[hsl(var(--accent))] font-medium">$19 / month</span>
+                                </div>
+                                <p className="text-[var(--success)] text-sm mt-1">Active subscription</p>
+                            </div>
+                            <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
+                                <p className="text-[var(--text-tertiary)] text-sm mb-2">Billing Cycle</p>
+                                <div className="flex justify-between text-sm"><span className="text-[var(--text-tertiary)]">Next billing date</span><span className="text-[var(--text-primary)]">Aug 25, 2026</span></div>
+                                <div className="flex justify-between text-sm mt-1"><span className="text-[var(--text-tertiary)]">Billing interval</span><span className="text-[var(--text-primary)]">Monthly</span></div>
+                            </div>
+                            <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
+                                <p className="text-[var(--text-tertiary)] text-sm mb-2">Payment Method</p>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[var(--text-primary)]">Visa •••• 4242</span>
+                                    <button className="text-[hsl(var(--accent))] hover:text-[var(--accent-hover)] text-sm font-medium">Update</button>
+                                </div>
+                                <p className="text-[var(--text-tertiary)] text-xs mt-1">Expires 12/27</p>
+                            </div>
+                             <div className="bg-[var(--surface-raised)] rounded-xl p-4 border border-[var(--border)]">
+                                <button className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">View invoices</button><br/>
+                                <button className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Payment history</button>
+                            </div>
+                        </div>
+                        <div className="flex gap-3 mt-6">
+                            <button className="flex-1 bg-[var(--surface-hover)] hover:bg-[var(--surface-raised)] text-[var(--text-primary)] rounded-lg py-2 text-sm border border-[var(--border)]">Change Plan</button>
+                            <button className="flex-1 btn-primary justify-center">Manage Subscription</button>
+                        </div>
+                    </>
+                );
+            default:
+                return (
+                    <>
+                        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Settings</h2>
+                        <div className="mb-6">
+                            <h3 className="text-[var(--text-tertiary)] text-sm mb-2">Appearance</h3>
+                            <div className="flex gap-2">
+                                <button onClick={() => setTheme('light')} className={`px-4 py-2 rounded-lg text-sm transition ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Light</button>
+                                <button onClick={() => setTheme('dark')} className={`px-4 py-2 rounded-lg text-sm transition ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Dark</button>
+                            </div>
+                        </div>
+                        <div className="mb-6">
+                            <h3 className="text-[var(--text-tertiary)] text-sm mb-3">Account</h3>
+                            <div className="space-y-2">
+                                <button onClick={() => setView('profile')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium">Profile</button>
+                                <button onClick={() => setView('password')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium">Password</button>
+                                <button onClick={() => setView('billing')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium">Billing</button>
+                            </div>
+                        </div>
+                        <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4">
+                            <p className="text-red-400 font-medium mb-2">Danger Zone</p>
+                            <button className="text-red-500 border border-red-500 px-4 py-2 rounded-lg text-sm">Delete Account</button>
+                        </div>
+                    </>
+                );
+        }
+    };
     
-    if (isMobile) {
-        if (settingsView === 'profile') {
-            return <EditProfileView user={user} onSave={onUpdateUser} onBack={() => setSettingsView('main')} isMobile={isMobile} />;
-        }
-        if (settingsView === 'password') {
-            return <ChangePasswordView onBack={() => setSettingsView('main')} isMobile={isMobile} />;
-        }
-        if (settingsView === 'billing') {
-            return <BillingView user={user} onBack={() => setSettingsView('main')} isMobile={isMobile} />;
-        }
-    }
+    return (
+        <div className="fixed inset-0 z-50">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose} />
+            <div className="absolute bottom-0 left-0 right-0 bg-[var(--surface)] rounded-t-3xl border-t border-[var(--border)] p-6 animate-slideUp max-h-[90vh] overflow-y-auto">
+                <div className="w-12 h-1.5 bg-gray-600 rounded-full mx-auto mb-5" />
+                {renderContent()}
+            </div>
+        </div>
+    );
+};
 
+export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowChangePassword, onShowBilling }: any) => {
     return (
         <div className="settings-page">
             <div className="settings-header">
@@ -1465,7 +1415,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                                 <div className="setting-label">Profile</div>
                                 <div className="setting-desc">Your name and email address.</div>
                             </div>
-                            <button className="btn-secondary" onClick={() => isMobile ? setSettingsView('profile') : onShowEditProfile()}>
+                            <button className="btn-secondary" onClick={onShowEditProfile}>
                                 <User size={14} /> Edit Profile
                             </button>
                         </div>
@@ -1474,7 +1424,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                                 <div className="setting-label">Password</div>
                                 <div className="setting-desc">Update your login password.</div>
                             </div>
-                            <button className="btn-secondary" onClick={() => isMobile ? setSettingsView('password') : onShowChangePassword()}>
+                            <button className="btn-secondary" onClick={onShowChangePassword}>
                                 <KeyRound size={14} /> Change Password
                             </button>
                         </div>
@@ -1483,7 +1433,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
                                 <div className="setting-label">Billing</div>
                                 <div className="setting-desc">Manage your subscription and view invoices.</div>
                             </div>
-                            <button className="btn-secondary" onClick={() => isMobile ? setSettingsView('billing') : onShowBilling()}>
+                            <button className="btn-secondary" onClick={onShowBilling}>
                                 <CreditCard size={14} /> Manage Billing
                             </button>
                         </div>
@@ -1525,5 +1475,6 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 

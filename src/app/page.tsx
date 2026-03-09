@@ -34,6 +34,7 @@ import {
     EditProfileModal,
     ChangePasswordModal,
     BillingModal,
+    SettingsSheet,
 } from "@/components/calmora";
 import Header from "@/components/Header";
 import ModeToggle from "@/components/ModeToggle";
@@ -76,7 +77,7 @@ const HomePage = () => {
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const scrollContentRef = useRef<HTMLDivElement>(null);
 
-  const [settingsView, setSettingsView] = useState("main");
+  const [showSettingsSheet, setShowSettingsSheet] = useState(false);
 
   const promptSuggestions = useMemo(() => [
     "Create SaaS landing page",
@@ -92,12 +93,6 @@ const HomePage = () => {
     return promptSuggestions.filter(s => s.toLowerCase().includes(lowercasedInput));
   }, [input, promptSuggestions]);
 
-
-  useEffect(() => {
-    if (appMode !== 'settings') {
-        setSettingsView('main');
-    }
-  }, [appMode]);
 
   useEffect(() => {
     const content = scrollContentRef.current;
@@ -500,7 +495,6 @@ const HomePage = () => {
   const handleUpdateUser = (updatedUser: any) => {
     setUser(updatedUser);
     setShowEditProfileModal(false);
-    setSettingsView('main');
   };
 
   return (
@@ -597,7 +591,14 @@ const HomePage = () => {
                 icon={Settings} 
                 label="Settings" 
                 collapsed={isCollapsed}
-                onClick={() => { setAppMode('settings'); if(isMobile) setSidebarOpen(false); }}
+                onClick={() => {
+                  if (isMobile) {
+                    setShowSettingsSheet(true);
+                  } else {
+                    setAppMode('settings');
+                  }
+                  if (isMobile && sidebarOpen) setSidebarOpen(false);
+                }}
                 active={appMode === 'settings'}
               />
               <NavItem 
@@ -667,10 +668,6 @@ const HomePage = () => {
                             onShowEditProfile={() => setShowEditProfileModal(true)}
                             onShowChangePassword={() => setShowChangePasswordModal(true)}
                             onShowBilling={() => setShowBillingModal(true)}
-                            isMobile={isMobile}
-                            settingsView={settingsView}
-                            setSettingsView={setSettingsView}
-                            onUpdateUser={handleUpdateUser}
                          />}
                         {appMode === "projects" && <ProjectsView projects={projects} setShowProjectModal={setShowProjectModal} onOpenProject={handleOpenProject} setProjectActionData={setProjectActionData} />}
                         {appMode === "history" && <HistoryView sessions={threads} onOpenSession={switchThread} />}
@@ -800,6 +797,17 @@ const HomePage = () => {
                 user={user}
                 onClose={() => setShowBillingModal(false)}
             />
+        )}
+        
+        {isMobile && showSettingsSheet && (
+          <SettingsSheet
+            open={showSettingsSheet}
+            onClose={() => setShowSettingsSheet(false)}
+            user={user}
+            theme={theme}
+            setTheme={changeTheme}
+            onUpdateUser={handleUpdateUser}
+          />
         )}
 
       </div>
