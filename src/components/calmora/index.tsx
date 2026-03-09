@@ -1259,7 +1259,7 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
             case 'profile':
                 return (
                     <>
-                        <div className="space-y-5">
+                        <div className="space-y-4">
                             <div>
                                 <label className="modal-label">Full Name</label>
                                 <input type="text" className="modal-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" autoFocus />
@@ -1339,18 +1339,23 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
                 return (
                     <>
                         <div className="mb-6">
-                            <h3 className="text-[var(--text-tertiary)] text-sm mb-2">Appearance</h3>
-                            <div className="flex gap-2">
-                                <button onClick={() => setTheme('light')} className={`px-4 py-2 rounded-lg text-sm transition ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Light</button>
-                                <button onClick={() => setTheme('dark')} className={`px-4 py-2 rounded-lg text-sm transition ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Dark</button>
-                            </div>
-                        </div>
+                             <h3 className="text-[var(--text-tertiary)] text-sm mb-3">Account</h3>
+                             <div className="space-y-2">
+                                 <button onClick={() => setView('profile')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium flex items-center justify-between"><span>Profile</span> <ChevronRight size={16} /></button>
+                                 <button onClick={() => setView('password')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium flex items-center justify-between"><span>Password</span> <ChevronRight size={16} /></button>
+                                 <button onClick={() => setView('billing')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium flex items-center justify-between"><span>Billing</span> <ChevronRight size={16} /></button>
+                             </div>
+                         </div>
                         <div className="mb-6">
-                            <h3 className="text-[var(--text-tertiary)] text-sm mb-3">Account</h3>
-                            <div className="space-y-2">
-                                <button onClick={() => setView('profile')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium">Profile</button>
-                                <button onClick={() => setView('password')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium">Password</button>
-                                <button onClick={() => setView('billing')} className="w-full text-left bg-[var(--surface-raised)] p-4 rounded-xl text-[var(--text-primary)] font-medium">Billing</button>
+                            <h3 className="text-[var(--text-tertiary)] text-sm mb-2">Appearance</h3>
+                            <div className="bg-[var(--surface-raised)] p-4 rounded-xl">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[var(--text-primary)] font-medium">Theme</span>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setTheme('light')} className={`px-3 py-1.5 rounded-lg text-sm transition ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Light</button>
+                                        <button onClick={() => setTheme('dark')} className={`px-3 py-1.5 rounded-lg text-sm transition ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'}`}>Dark</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4 mt-6">
@@ -1365,10 +1370,10 @@ export const SettingsSheet = ({ open, onClose, user, theme, setTheme, onUpdateUs
     return (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/40 backdrop-blur-md"
                 onClick={onClose}
             />
-            <div className="relative w-[92%] max-w-md h-[70vh] mb-4 bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-2xl flex flex-col animate-sheet-up">
+            <div className="relative w-[92%] max-w-[420px] h-[70vh] mb-4 bg-[var(--surface)] rounded-3xl border border-[var(--border)] shadow-[0_20px_80px_rgba(0,0,0,0.6)] flex flex-col animate-sheet-up">
                 
                 {/* Drag Handle */}
                 <div className="flex-shrink-0">
@@ -1501,6 +1506,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 
