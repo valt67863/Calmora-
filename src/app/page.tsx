@@ -534,6 +534,8 @@ const HomePage = () => {
     setShowEditProfileModal(false);
   };
 
+  const isBuilderVisible = buildMode === 'builder' && appMode === 'chat' && !isMobile;
+
   return (
     <>
       <div className="app-root">
@@ -669,11 +671,11 @@ const HomePage = () => {
               activeProject={activeProject}
               onTriggerProjectAction={setProjectActionData}
               onExitProject={handleExitProject}
-              isBuilderMode={buildMode === 'builder'}
+              isBuilderMode={isBuilderVisible}
             />
             
-            <div className={`flex-1 min-h-0 relative flex ${buildMode === 'builder' && !isMobile ? 'flex-row' : 'flex-col'}`}>
-              <div className="flex-1 min-h-0 relative flex flex-col">
+            <div className={`flex-1 min-h-0 relative flex ${isBuilderVisible ? 'flex-row' : 'flex-col'}`}>
+              <div className={`relative flex flex-col h-full min-h-0 ${isBuilderVisible ? 'w-[calc(40vw-40px)] flex-shrink-0' : 'w-full'}`}>
                 <div className="scroll-content custom-scrollbar" ref={scrollRef} onScroll={handleScroll}>
                   <div className="workspace-container">
                     <div className="flex-1 w-full relative">
@@ -797,14 +799,14 @@ const HomePage = () => {
                   </div>
                 )}
               </div>
-              {buildMode === 'builder' && !isMobile && (
+              {isBuilderVisible && (
                 <div className="w-[calc(60vw+40px)] flex-shrink-0" />
               )}
             </div>
           </div>
         </main>
         
-        {buildMode === 'builder' && <BuilderPage />}
+        {isBuilderVisible && <BuilderPage />}
 
         {showProjectModal && <NewProjectModal onClose={() => setShowProjectModal(false)} onCreate={(t: string) => { 
             const newProject = { id: generateId(), icon: 'file-text', title: t, step: 1, lastActive: 'just now', tasks: [] };
@@ -885,3 +887,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+    
