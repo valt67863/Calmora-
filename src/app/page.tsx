@@ -861,6 +861,7 @@ const HomePage = () => {
               activeProject={activeProject}
               onTriggerProjectAction={setProjectActionData}
               onExitProject={handleExitProject}
+              isBuilderMode={buildMode === 'builder'}
             />
             { buildMode === 'builder' ? <>{ChatView}</> : <>{MainView}</> }
           </div>

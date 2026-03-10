@@ -354,7 +354,7 @@ export default function BuilderPage() {
   }, [code, isGenerating]);
 
   return (
-    <div className="w-full h-screen bg-[#0f0f12] text-white flex flex-col font-sans">
+    <div className="w-full h-full bg-[#0f0f12] text-white flex flex-col font-sans">
       
       {/* 1️⃣ UNIFIED PROFESSIONAL SAAS HEADER */}
       <header className="flex items-center justify-between px-6 h-14 border-b border-white/10 bg-[#0b0b0f]">

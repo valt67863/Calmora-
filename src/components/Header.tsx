@@ -20,6 +20,7 @@ interface Props {
   activeProject: any | null;
   onTriggerProjectAction: (data: any) => void;
   onExitProject: () => void;
+  isBuilderMode?: boolean;
 }
 
 const Header: React.FC<Props> = ({ 
@@ -32,6 +33,7 @@ const Header: React.FC<Props> = ({
   activeProject,
   onTriggerProjectAction,
   onExitProject,
+  isBuilderMode,
 }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -59,7 +61,7 @@ const Header: React.FC<Props> = ({
   };
   
   return (
-    <header className="app-header">
+    <header className={`app-header ${isBuilderMode ? 'py-2 h-14' : 'py-4'}`}>
       
       <div className="header-left-container">
         {isMobile && !activeProject && (
