@@ -723,9 +723,9 @@ const HomePage = () => {
 
   return (
     <>
-      <div className={`app-root ${buildMode === 'builder' ? '!block' : ''}`}>
+      <div className={`app-root ${buildMode === 'builder' ? 'h-screen w-full flex bg-[#0f0f12] overflow-hidden' : ''}`}>
         {buildMode === 'builder' ? (
-          <div className="h-screen w-full flex bg-[#0f0f12] overflow-hidden">
+          <>
             <div className="w-[420px] bg-[#111214] border-r border-[#2a2a2e] flex flex-col">
               <Header
                 user={headerUser}
@@ -770,14 +770,14 @@ const HomePage = () => {
                   <div ref={messagesEndRef} className="h-1" />
                 </div>
                 <div className="p-4 border-t border-[#2a2a2e] bg-[#111214]">
-                  <div className="flex items-center w-full bg-[#1c1c1e] rounded-2xl px-2 py-1 text-white">
+                  <div className="chat-input-surface">
                     <textarea
                       ref={textareaRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                       placeholder="Message builder..."
-                      className="flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-white placeholder-gray-400 min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-2 px-3"
+                      className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
                       rows={1}
                     />
                     {input.trim() ? (
@@ -785,8 +785,8 @@ const HomePage = () => {
                         {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                       </button>
                     ) : (
-                      <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-gray-400 hover:text-white hover:bg-gray-700/50 active:scale-95">
-                        <Mic size={20} />
+                      <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+                        <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
                       </button>
                     )}
                   </div>
@@ -796,7 +796,7 @@ const HomePage = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
               <BuilderPage />
             </div>
-          </div>
+          </>
         ) : (
           <>
             {(isMobile && buildMode !== 'builder') && sidebarOpen && (
@@ -858,7 +858,7 @@ const HomePage = () => {
                     <div className="px-3 pb-3">
                         {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
                         <div className="space-y-1">
-                        {threads.slice(0, 5).map(thread => (
+                        {threads.sort((a,b) => b.updatedAt - a.updatedAt).slice(0, 5).map(thread => (
                             isCollapsed ? (
                                 <button
                                     key={thread.id}
