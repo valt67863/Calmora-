@@ -2367,21 +2367,57 @@
     animation: none; /* Let overlay handle animation */
   }
 }
+    
+/* Gemini Builder Mode Styles */
+.builder-floating {
+  position: absolute;
+  top: 80px;
+  right: 40px;
+  width: 60%;
+  height: 80vh;
+  max-width: 1200px;
+  pointer-events: none;
+  z-index: 200;
+}
+
+.builder-window {
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 4px 20px rgba(0,0,0,0.4);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  animation: builderFloat .25s ease forwards;
+}
+
+@keyframes builderFloat {
+  from {
+      transform: translateY(20px);
+      opacity: 0;
+  }
+  to {
+      transform: translateY(0);
+      opacity: 1;
+  }
+}
 
     
 
+
+
+
+
+
+
+
+
+
     
 
-
-
-
-
-
-
-
-
-
-    
 
 
 
