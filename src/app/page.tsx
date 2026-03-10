@@ -122,7 +122,7 @@ const HomePage = () => {
         if (content) content.removeEventListener('scroll', handleScroll);
         resizeObserver.disconnect();
     };
-  }, [threads, !desktopSidebarOpen && !isMobile]);
+  }, [threads, !desktopSidebarOpen && !isMobile, appMode, buildMode]);
 
 
   useEffect(() => {
@@ -299,7 +299,7 @@ const HomePage = () => {
     setThinking(false); 
     setInput(""); 
     setAppMode("chat");
-    setBuildMode("chat");
+    // Don't reset buildMode here, let the user control it
     setShowSuggestionList(false);
   };
 
@@ -534,15 +534,10 @@ const HomePage = () => {
     setShowEditProfileModal(false);
   };
 
-  const isBuilderVisible = buildMode === 'builder' && appMode === 'chat' && !isMobile;
+  const isBuilderVisible = buildMode === 'builder' && !isMobile;
 
-  return (
+  const renderStandardMode = () => (
     <>
-      <div className="app-root">
-        {isMobile && sidebarOpen && (
-          <div onTouchStart={() => setSidebarOpen(false)} onMouseDown={() => setSidebarOpen(false)} className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm" style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }} aria-hidden="true" />
-        )}
-        
         <aside
           className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
         >
@@ -671,11 +666,10 @@ const HomePage = () => {
               activeProject={activeProject}
               onTriggerProjectAction={setProjectActionData}
               onExitProject={handleExitProject}
-              isBuilderMode={isBuilderVisible}
             />
             
-            <div className={`flex-1 min-h-0 relative flex ${isBuilderVisible ? 'flex-row' : 'flex-col'}`}>
-              <div className={`relative flex flex-col h-full min-h-0 ${isBuilderVisible ? 'w-[calc(40vw-40px)] flex-shrink-0' : 'w-full'}`}>
+            <div className="flex-1 min-h-0 relative flex flex-col">
+              <div className="relative flex flex-col h-full min-h-0 w-full">
                 <div className="scroll-content custom-scrollbar" ref={scrollRef} onScroll={handleScroll}>
                   <div className="workspace-container">
                     <div className="flex-1 w-full relative">
@@ -799,93 +793,159 @@ const HomePage = () => {
                   </div>
                 )}
               </div>
-              {isBuilderVisible && (
-                <div className="w-[calc(60vw+40px)] flex-shrink-0" />
-              )}
             </div>
           </div>
         </main>
-        
-        {isBuilderVisible && <BuilderPage />}
+    </>
+  );
 
-        {showProjectModal && <NewProjectModal onClose={() => setShowProjectModal(false)} onCreate={(t: string) => { 
-            const newProject = { id: generateId(), icon: 'file-text', title: t, step: 1, lastActive: 'just now', tasks: [] };
-            setProjects([...projects, newProject]); 
-            setShowProjectModal(false);
-            handleOpenProject(newProject);
-        }} />}
-        
-        {showGoalModal && <NewGoalModal onClose={() => setShowGoalModal(false)} onCreate={(t: string) => { setActiveGoals([...activeGoals, { id: generateId(), icon: 'target', title: t, startedDaysAgo: 0, progress: 0, nextStep: 'Get started' }]); setShowGoalModal(false); }} />}
-        
-        {projectActionData && (
-            <ProjectActionSheet 
-                projectData={projectActionData}
-                onClose={() => setProjectActionData(null)}
-                onRename={(project) => { setProjectActionData(null); setRenameProject(project); }}
-                onDuplicate={(project) => {
-                    const newProject = { ...project, id: generateId(), title: `${project.title} (Copy)` };
-                    setProjects(prev => [newProject, ...prev]);
-                    setProjectActionData(null);
-                }}
-                onDelete={(project) => { setProjectActionData(null); setDeleteProject(project); }}
-            />
-        )}
-        {renameProject && (
-            <EditNameModal
-                currentName={(renameProject as any).title}
-                onSave={(newTitle: string) => {
-                    handleRenameProject((renameProject as any).id, newTitle);
-                    setRenameProject(null);
-                }}
-                onClose={() => setRenameProject(null)}
-            />
-        )}
-        {deleteProject && (
-            <DeleteConfirmModal
-                projectName={(deleteProject as any).title}
-                onConfirm={() => {
-                    handleDeleteProject((deleteProject as any).id);
-                    setDeleteProject(null);
-                }}
-                onClose={() => setDeleteProject(null)}
-            />
-        )}
-        
-        {showEditProfileModal && (
-            <EditProfileModal
-                user={user}
-                onSave={handleUpdateUser}
-                onClose={() => setShowEditProfileModal(false)}
-            />
-        )}
-        {showChangePasswordModal && (
-            <ChangePasswordModal
-                onClose={() => setShowChangePasswordModal(false)}
-            />
-        )}
-        {showBillingModal && (
-            <BillingModal
-                user={user}
-                onClose={() => setShowBillingModal(false)}
-            />
-        )}
-        
-        {isMobile && showSettingsSheet && (
-          <SettingsSheet
-            open={showSettingsSheet}
-            onClose={() => setShowSettingsSheet(false)}
-            user={user}
-            theme={theme}
-            setTheme={changeTheme}
-            onUpdateUser={handleUpdateUser}
-          />
-        )}
+  const renderBuilderMode = () => (
+      <div className="flex w-full h-screen bg-[#0f0f12] text-white">
+          {/* Left Chat Panel */}
+          <div className="w-[440px] flex-shrink-0 bg-[#111214] border-r border-[#2a2a2e] flex flex-col">
+              <div className="h-14 flex-shrink-0 flex items-center justify-between px-4 border-b border-[#2a2a2e]">
+                  <div className="flex items-center gap-2">
+                      <CalmoraLogo size={24} className="text-primary" />
+                      <h2 className="font-semibold text-white">Builder Mode</h2>
+                  </div>
+                  <ModeToggle mode={buildMode} setMode={setBuildMode} />
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto p-5 custom-scrollbar" ref={scrollRef}>
+                {messages.map((msg) => (
+                    <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-start"} mb-6 animate-message-in`}>
+                      {msg.role === "user" ? (
+                        <div className="bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl rounded-br-sm text-[15px] leading-relaxed max-w-[90%] text-gray-200 font-sans">{msg.content}</div>
+                      ) : (
+                        <div className="w-full max-w-full font-sans text-gray-400">{formatAIResponse(msg.content)}</div>
+                      )}
+                    </div>
+                  ))}
+                  {thinking && (
+                    <div className="w-full flex justify-start mb-6 animate-message-in">
+                      <div className="w-full max-w-[720px] flex items-center gap-2 text-[var(--text-tertiary)]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.2s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.1s]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce" />
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+              </div>
+              <div className="p-4 border-t border-[#2a2a2e]">
+                  <div className="chat-input-surface">
+                      <textarea
+                        ref={textareaRef}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                        placeholder="Continue building..."
+                        className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
+                        rows={1}
+                      />
+                      {input.trim() ? (
+                        <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+                          {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                        </button>
+                      ) : (
+                        <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+                          <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+                        </button>
+                      )}
+                  </div>
+              </div>
+          </div>
 
+          {/* Right Builder Panel */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+              <BuilderPage />
+          </div>
       </div>
+  );
+
+  return (
+    <>
+      <div className="app-root">
+        {isBuilderVisible && appMode === 'chat' ? renderBuilderMode() : renderStandardMode()}
+        
+        {isMobile && sidebarOpen && (
+          <div onTouchStart={() => setSidebarOpen(false)} onMouseDown={() => setSidebarOpen(false)} className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm" style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }} aria-hidden="true" />
+        )}
+      </div>
+        
+      {showProjectModal && <NewProjectModal onClose={() => setShowProjectModal(false)} onCreate={(t: string) => { 
+          const newProject = { id: generateId(), icon: 'file-text', title: t, step: 1, lastActive: 'just now', tasks: [] };
+          setProjects([...projects, newProject]); 
+          setShowProjectModal(false);
+          handleOpenProject(newProject);
+      }} />}
+      
+      {showGoalModal && <NewGoalModal onClose={() => setShowGoalModal(false)} onCreate={(t: string) => { setActiveGoals([...activeGoals, { id: generateId(), icon: 'target', title: t, startedDaysAgo: 0, progress: 0, nextStep: 'Get started' }]); setShowGoalModal(false); }} />}
+      
+      {projectActionData && (
+          <ProjectActionSheet 
+              projectData={projectActionData}
+              onClose={() => setProjectActionData(null)}
+              onRename={(project) => { setProjectActionData(null); setRenameProject(project); }}
+              onDuplicate={(project) => {
+                  const newProject = { ...project, id: generateId(), title: `${project.title} (Copy)` };
+                  setProjects(prev => [newProject, ...prev]);
+                  setProjectActionData(null);
+              }}
+              onDelete={(project) => { setProjectActionData(null); setDeleteProject(project); }}
+          />
+      )}
+      {renameProject && (
+          <EditNameModal
+              currentName={(renameProject as any).title}
+              onSave={(newTitle: string) => {
+                  handleRenameProject((renameProject as any).id, newTitle);
+                  setRenameProject(null);
+              }}
+              onClose={() => setRenameProject(null)}
+          />
+      )}
+      {deleteProject && (
+          <DeleteConfirmModal
+              projectName={(deleteProject as any).title}
+              onConfirm={() => {
+                  handleDeleteProject((deleteProject as any).id);
+                  setDeleteProject(null);
+              }}
+              onClose={() => setDeleteProject(null)}
+          />
+      )}
+      
+      {showEditProfileModal && (
+          <EditProfileModal
+              user={user}
+              onSave={handleUpdateUser}
+              onClose={() => setShowEditProfileModal(false)}
+          />
+      )}
+      {showChangePasswordModal && (
+          <ChangePasswordModal
+              onClose={() => setShowChangePasswordModal(false)}
+          />
+      )}
+      {showBillingModal && (
+          <BillingModal
+              user={user}
+              onClose={() => setShowBillingModal(false)}
+          />
+      )}
+      
+      {isMobile && showSettingsSheet && (
+        <SettingsSheet
+          open={showSettingsSheet}
+          onClose={() => setShowSettingsSheet(false)}
+          user={user}
+          theme={theme}
+          setTheme={changeTheme}
+          onUpdateUser={handleUpdateUser}
+        />
+      )}
     </>
   );
 };
 
 export default HomePage;
-
-    

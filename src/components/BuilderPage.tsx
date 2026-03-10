@@ -327,133 +327,93 @@ export default function BuilderPage() {
     setTimeout(() => setIsRevealing(false), 1200);
   };
 
-  // Project Actions
-  const simulateAIGeneration = () => {
-    if (isGenerating) return;
-    setIsGenerating(true);
-    setCode(''); 
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      setCode(prev => prev + initialCode.substring(currentIndex, currentIndex + 5));
-      currentIndex += 5;
-      if (currentIndex >= initialCode.length) {
-        clearInterval(interval);
-        setCode(initialCode); 
-        setIsGenerating(false);
-      }
-    }, 15);
-  };
-
   // Debounced Compilation Hook
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedCode(code);
-      setSaveStatus(isGenerating ? 'Saving changes...' : 'Auto-saved just now');
+      setSaveStatus(isGenerating ? 'Saving...' : 'Auto-saved');
     }, 500);
     return () => clearTimeout(handler);
   }, [code, isGenerating]);
 
   return (
-    <div className="builder-floating">
-        <div className="builder-window">
-            <header className="flex items-center justify-between px-4 h-[52px] border-b border-[#2a2a2e] bg-[#161618] flex-shrink-0 gap-3">
-                
-                <div className="flex items-center gap-6">
-                <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-2 text-[13px] text-gray-300 bg-white/5 px-2.5 py-1 rounded border border-white/5 font-mono">
-                    <span className="text-[#61dafb] text-[15px]">⚛</span> App.jsx
-                    </span>
-                </div>
-                
-                <div className="flex items-center gap-1">
-                    <button onClick={handleCopy} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
-                    <Copy size={14} /> {copied ? 'Copied' : 'Copy'}
-                    </button>
-                    <button onClick={handleDownloadZip} disabled={isDownloading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-50">
-                    <Download size={14} /> {isDownloading ? 'Zipping...' : 'Download'}
-                    </button>
-                    <button onClick={handleFormat} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
-                    <Wand2 size={14} /> Format
-                    </button>
-                </div>
-                </div>
-
-                <div className="flex items-center justify-center gap-6 flex-1">
-                <div className="flex items-center gap-2 hidden lg:flex">
-                    <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" />
-                    <span className="text-[13px] text-green-500 font-medium tracking-wide">Live Preview</span>
-                </div>
-
-                <div className="hidden md:flex items-center bg-[#151519] rounded-md p-[3px] border border-white/10">
-                    {['Desktop', 'Tablet', 'Mobile'].map(mode => {
-                    const Icon = mode === 'Desktop' ? Monitor : mode === 'Tablet' ? Tablet : Smartphone;
-                    return (
-                        <button
-                        key={mode}
-                        onClick={() => setDeviceMode(mode)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-[4px] transition-all ${
-                            deviceMode === mode 
-                            ? 'bg-[#2a2a30] text-white shadow-sm border border-white/5' 
-                            : 'text-gray-400 hover:text-white hover:bg-[#2a2a30]/50 border border-transparent'
-                        }`}
-                        >
-                        <Icon size={14} />
-                        <span className="hidden xl:inline">{mode}</span>
-                        </button>
-                    )
-                    })}
-                </div>
-
-                <div className="flex items-center gap-1">
-                    <button onClick={handleReload} disabled={isReloading} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-50">
-                    <RefreshCw size={14} className={isReloading ? "animate-spin" : ""} /> 
-                    <span className="hidden xl:inline">Reload</span>
-                    </button>
-                    <button onClick={() => setIsFullscreen(!isFullscreen)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
-                    <Maximize size={14} /> 
-                    <span className="hidden xl:inline">Fullscreen</span>
-                    </button>
-                </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                <span className="text-[11px] text-gray-500 mr-2 font-mono hidden 2xl:block">{saveStatus}</span>
-                
-                <button onClick={simulateAIGeneration} disabled={isGenerating} className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-300 border border-white/10 rounded-md hover:bg-white/5 hover:text-white transition-all disabled:opacity-50">
-                    <Sparkles size={14} className={isGenerating ? "text-rose-500 animate-pulse" : ""} />
-                    <span className="hidden lg:inline">{isGenerating ? 'AI typing...' : 'Simulate AI'}</span>
+    <div className="w-full h-full flex flex-col bg-[#1c1c1e]">
+        <header className="flex items-center justify-between px-4 h-[52px] border-b border-[#2a2a2e] bg-[#161618] flex-shrink-0 gap-3">
+            
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-2 text-[13px] text-gray-300 bg-white/5 px-2.5 py-1 rounded border border-white/5 font-mono">
+                <span className="text-[#61dafb] text-[15px]">⚛</span> App.jsx
+              </span>
+              <div className="flex items-center gap-1">
+                <button onClick={handleCopy} title="Copy Code" className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
+                  <Copy size={14} /> <span className="hidden lg:inline">{copied ? 'Copied' : 'Copy'}</span>
                 </button>
-
-                <button className="flex items-center gap-2 px-3 py-1.5 text-[13px] font-medium text-gray-300 border border-white/10 rounded-md hover:bg-white/5 hover:text-white transition-all hidden xl:flex">
-                    <Save size={14} />
-                    Save Project
+                <button onClick={handleDownloadZip} title="Download Project" disabled={isDownloading} className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-50">
+                  <Download size={14} /> <span className="hidden lg:inline">{isDownloading ? 'Zipping...' : 'Download'}</span>
                 </button>
-
-                <button className="flex items-center gap-2.5 px-4 py-1.5 text-[13px] font-medium bg-black text-white border border-[#333] rounded-md hover:bg-white hover:text-black transition-all shadow-[0_0_10px_rgba(255,255,255,0.05)] group">
-                    <svg viewBox="0 0 76 65" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[11px] h-[11px] text-white group-hover:text-black transition-colors">
-                    <path d="M37.5274 0L75.0548 65H0L37.5274 0Z" fill="currentColor"/>
-                    </svg>
-                    Deploy to Vercel
+                <button onClick={handleFormat} title="Format Code" className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
+                  <Wand2 size={14} /> <span className="hidden lg:inline">Format</span>
                 </button>
-                </div>
-            </header>
-
-            <div className="grid grid-cols-2 flex-1 overflow-hidden bg-[#1c1c1e]">
-                <CodePanel 
-                code={code} 
-                setCode={setCode} 
-                isGenerating={isGenerating}
-                editorRef={editorRef}
-                />
-                <PreviewPanel 
-                reloadKey={previewKey} 
-                code={debouncedCode}
-                isFullscreen={isFullscreen}
-                deviceMode={deviceMode}
-                isReloading={isReloading}
-                isRevealing={isRevealing}
-                />
+              </div>
             </div>
+
+            <div className="flex items-center justify-center gap-4 flex-1">
+              <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                  <span className="text-[13px] text-green-400 font-medium">Live</span>
+              </div>
+              <div className="flex items-center bg-[#151519] rounded-md p-[3px] border border-white/10">
+                  {['Desktop', 'Tablet', 'Mobile'].map(mode => {
+                  const Icon = mode === 'Desktop' ? Monitor : mode === 'Tablet' ? Tablet : Smartphone;
+                  return (
+                      <button
+                      key={mode}
+                      onClick={() => setDeviceMode(mode)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-[4px] transition-all ${
+                          deviceMode === mode 
+                          ? 'bg-[#2a2a30] text-white shadow-sm border border-white/5' 
+                          : 'text-gray-400 hover:text-white hover:bg-[#2a2a30]/50 border border-transparent'
+                      }`}
+                      >
+                      <Icon size={14} />
+                      <span className="hidden xl:inline">{mode}</span>
+                      </button>
+                  )
+                  })}
+              </div>
+              <div className="flex items-center gap-1">
+                  <button onClick={handleReload} title="Reload Preview" disabled={isReloading} className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-50">
+                    <RefreshCw size={14} className={isReloading ? "animate-spin" : ""} /> 
+                  </button>
+                  <button onClick={() => setIsFullscreen(!isFullscreen)} title="Fullscreen Preview" className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
+                    <Maximize size={14} />
+                  </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] text-gray-500 font-mono">{saveStatus}</span>
+              <button className="flex items-center gap-2.5 px-4 py-1.5 text-[13px] font-medium bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
+                Deploy
+              </button>
+            </div>
+        </header>
+
+        <div className="grid grid-cols-2 flex-1 overflow-hidden bg-[#1c1c1e]">
+            <CodePanel 
+            code={code} 
+            setCode={setCode} 
+            isGenerating={isGenerating}
+            editorRef={editorRef}
+            />
+            <PreviewPanel 
+            reloadKey={previewKey} 
+            code={debouncedCode}
+            isFullscreen={isFullscreen}
+            deviceMode={deviceMode}
+            isReloading={isReloading}
+            isRevealing={isRevealing}
+            />
         </div>
     </div>
   );
