@@ -251,10 +251,8 @@ const HomePage = () => {
   }, [input]);
 
   useEffect(() => {
-    if (appMode === 'chat') {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages, thinking, chatStage, appMode]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, thinking, appMode, buildMode]);
 
   useEffect(() => {
     if (activeThreadId && messages.length > 0) {
@@ -725,152 +723,223 @@ const HomePage = () => {
 
   return (
     <>
-      <div className={`app-root`}>
-
-        {(isMobile && buildMode !== 'builder') && sidebarOpen && (
-          <div onTouchStart={() => setSidebarOpen(false)} onMouseDown={() => setSidebarOpen(false)} className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm" style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }} aria-hidden="true" />
-        )}
-        
-        { buildMode !== 'builder' && (
-        <aside
-          className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
-        >
-          <div className="h-16 flex items-center justify-between px-6 border-b border-[var(--border)] min-w-0 transition-all duration-300 flex-shrink-0">
-               {!isCollapsed ? (
-                <>
-                  <div className="flex items-center gap-3 overflow-hidden text-[var(--accent)]">
-                    <div className="w-8 h-8 flex-none rounded-lg bg-[var(--accent-subtle)] border border-[var(--accent-glow)] flex items-center justify-center">
-                      <CalmoraLogo size={20} />
+      <div className={`app-root ${buildMode === 'builder' ? '!block' : ''}`}>
+        {buildMode === 'builder' ? (
+          <div className="h-screen w-full flex bg-[#0f0f12] overflow-hidden">
+            <div className="w-[420px] bg-[#111214] border-r border-[#2a2a2e] flex flex-col">
+              <Header
+                user={headerUser}
+                isMobile={isMobile}
+                onMenu={() => {}}
+                onSignOut={() => window.location.reload()}
+                theme={theme}
+                setTheme={changeTheme}
+                projects={projects}
+                onOpenProject={handleOpenProject}
+                activeProject={activeProject}
+                onTriggerProjectAction={setProjectActionData}
+                onExitProject={handleExitProject}
+                isBuilderMode={true}
+              />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto p-5 custom-scrollbar" ref={scrollRef}>
+                  {messages.length === 0 && chatStage === 'new-chat' && (
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                        <div className="text-2xl font-semibold text-white mb-1">Builder Mode</div>
+                        <p className="text-gray-400">Start a conversation to build your website.</p>
                     </div>
-                    <span className="font-medium text-[var(--text-primary)] tracking-wide font-sans truncate text-sm">Calmora</span>
-                  </div>
-                  {!isMobile && (
-                    <button onClick={() => setDesktopSidebarOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all p-1 rounded-md hover:bg-[var(--surface-hover)]">
-                      <ChevronLeft size={18} />
-                    </button>
                   )}
-                  {isMobile && (
-                      <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"><X size={20} /></button>
+                  {messages.map((msg) => (
+                    <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-start"} mb-6 animate-message-in`}>
+                      {msg.role === "user" ? (
+                        <div className="bg-[var(--surface)] px-5 py-3 rounded-[20px] rounded-br-sm text-[16px] leading-[1.6] max-w-[85%] text-[var(--text-primary)] font-sans border border-[var(--border)]">{msg.content}</div>
+                      ) : (
+                        <div className="w-full max-w-full font-sans text-[var(--text-secondary)]">{formatAIResponse(msg.content)}</div>
+                      )}
+                    </div>
+                  ))}
+                  {thinking && (
+                    <div className="w-full flex justify-start mb-6 animate-message-in">
+                      <div className="w-full max-w-[720px] pl-4 md:pl-0 flex items-center gap-2 text-[var(--text-tertiary)]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.2s]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.1s]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce" />
+                      </div>
+                    </div>
                   )}
-                </>
-              ) : (
-                 <button onClick={() => setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
-                    <CalmoraLogo size={24} />
-                 </button>
-              )}
-          </div>
-          
-            <div className="p-3 space-y-1 flex-shrink-0">
-                <button onClick={startNewChat} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
-                    <Plus size={16} strokeWidth={2.5} />
-                    {!isCollapsed && <span className="text-sm font-semibold font-sans">Start New Session</span>}
-                </button>
-                <NavItem 
-                    icon={Folder} 
-                    label="Projects" 
-                    collapsed={isCollapsed} 
-                    onClick={() => { setAppMode('projects'); if(isMobile) setSidebarOpen(false); }} 
-                    active={appMode === 'projects' || appMode === 'project-view'} 
-                />
-                 <NavItem 
-                    icon={History} 
-                    label="History" 
-                    collapsed={isCollapsed}
-                    onClick={() => { setAppMode('history'); if(isMobile) setSidebarOpen(false); }} 
-                    active={appMode === 'history'}
-                />
-            </div>
-            
-            <div className="sidebar-scroll-wrapper" ref={scrollWrapperRef}>
-                <div className="sidebar-scroll-content custom-scrollbar" ref={scrollContentRef}>
-                <div className="px-3 pb-3">
-                    {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
-                    <div className="space-y-1">
-                    {threads.slice(0, 5).map(thread => (
-                        isCollapsed ? (
-                            <button
-                                key={thread.id}
-                                onClick={() => switchThread(thread.id)}
-                                className={`
-                                    w-10 h-10 mx-auto flex items-center justify-center rounded-lg transition-all duration-200
-                                    ${activeThreadId === thread.id && appMode === 'chat' ? "sidebar-list-item active" : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}
-                                `}
-                                title={thread.title}
-                            >
-                                <MessageSquare size={18} strokeWidth={activeThreadId === thread.id && appMode === 'chat' ? 2 : 1.5} />
-                            </button>
-                        ) : (
-                            <button
-                                key={thread.id}
-                                onClick={() => switchThread(thread.id)}
-                                className={`sidebar-list-item ${activeThreadId === thread.id && appMode === 'chat' ? 'active' : ''}`}
-                                title={thread.title}
-                            >
-                                <MessageSquare size={16} className="mr-2 flex-shrink-0" />
-                                <span className="truncate">{thread.title}</span>
-                            </button>
-                        )
-                    ))}
-                    {threads.length === 0 && !isCollapsed && (
-                        <div className="px-3 py-4 text-center text-xs text-[var(--text-tertiary)]">
-                            No history yet.
-                        </div>
+                  <div ref={messagesEndRef} className="h-1" />
+                </div>
+                <div className="p-4 border-t border-[#2a2a2e] bg-[#111214]">
+                  <div className="flex items-center w-full bg-[#1c1c1e] rounded-2xl px-2 py-1 text-white">
+                    <textarea
+                      ref={textareaRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                      placeholder="Message builder..."
+                      className="flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-white placeholder-gray-400 min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-2 px-3"
+                      rows={1}
+                    />
+                    {input.trim() ? (
+                      <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+                        {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                      </button>
+                    ) : (
+                      <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-gray-400 hover:text-white hover:bg-gray-700/50 active:scale-95">
+                        <Mic size={20} />
+                      </button>
                     )}
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
             </div>
-
-            <div className="sidebar-bottom">
-              <NavItem 
-                icon={Settings} 
-                label="Settings" 
-                collapsed={isCollapsed}
-                onClick={() => {
-                  if (isMobile) {
-                    setShowSettingsSheet(true);
-                  } else {
-                    setAppMode('settings');
-                  }
-                  if (isMobile && sidebarOpen) setSidebarOpen(false);
-                }}
-                active={appMode === 'settings'}
-              />
-              <NavItem 
-                icon={LogOut} 
-                label="Sign out" 
-                collapsed={isCollapsed}
-                onClick={() => window.location.reload()}
-                danger
-              />
-            </div>
-        </aside>
-        )}
-
-        <main className={`app-main ${buildMode === 'builder' ? 'flex flex-row overflow-hidden' : ''}`}>
-          <div className={`flex flex-col relative h-full transition-all duration-300 ease-in-out ${buildMode === 'builder' ? 'w-[40%] max-w-[600px] border-r border-[var(--border)]' : 'w-full'}`}>
-            <Header
-              user={headerUser}
-              isMobile={isMobile}
-              onMenu={() => setSidebarOpen(true)}
-              onSignOut={() => window.location.reload()}
-              theme={theme}
-              setTheme={changeTheme}
-              projects={projects}
-              onOpenProject={handleOpenProject}
-              activeProject={activeProject}
-              onTriggerProjectAction={setProjectActionData}
-              onExitProject={handleExitProject}
-              isBuilderMode={buildMode === 'builder'}
-            />
-            { buildMode === 'builder' ? <>{ChatView}</> : <>{MainView}</> }
-          </div>
-          {buildMode === 'builder' && (
-            <div className="flex-1 h-full">
+            <div className="flex-1 flex flex-col overflow-hidden">
               <BuilderPage />
             </div>
-          )}
-        </main>
+          </div>
+        ) : (
+          <>
+            {(isMobile && buildMode !== 'builder') && sidebarOpen && (
+              <div onTouchStart={() => setSidebarOpen(false)} onMouseDown={() => setSidebarOpen(false)} className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm" style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }} aria-hidden="true" />
+            )}
+            
+            { buildMode !== 'builder' && (
+            <aside
+              className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
+            >
+              <div className="h-16 flex items-center justify-between px-6 border-b border-[var(--border)] min-w-0 transition-all duration-300 flex-shrink-0">
+                  {!isCollapsed ? (
+                    <>
+                      <div className="flex items-center gap-3 overflow-hidden text-[var(--accent)]">
+                        <div className="w-8 h-8 flex-none rounded-lg bg-[var(--accent-subtle)] border border-[var(--accent-glow)] flex items-center justify-center">
+                          <CalmoraLogo size={20} />
+                        </div>
+                        <span className="font-medium text-[var(--text-primary)] tracking-wide font-sans truncate text-sm">Calmora</span>
+                      </div>
+                      {!isMobile && (
+                        <button onClick={() => setDesktopSidebarOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all p-1 rounded-md hover:bg-[var(--surface-hover)]">
+                          <ChevronLeft size={18} />
+                        </button>
+                      )}
+                      {isMobile && (
+                          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"><X size={20} /></button>
+                      )}
+                    </>
+                  ) : (
+                    <button onClick={() => setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
+                        <CalmoraLogo size={24} />
+                    </button>
+                  )}
+              </div>
+              
+                <div className="p-3 space-y-1 flex-shrink-0">
+                    <button onClick={startNewChat} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
+                        <Plus size={16} strokeWidth={2.5} />
+                        {!isCollapsed && <span className="text-sm font-semibold font-sans">Start New Session</span>}
+                    </button>
+                    <NavItem 
+                        icon={Folder} 
+                        label="Projects" 
+                        collapsed={isCollapsed} 
+                        onClick={() => { setAppMode('projects'); if(isMobile) setSidebarOpen(false); }} 
+                        active={appMode === 'projects' || appMode === 'project-view'} 
+                    />
+                    <NavItem 
+                        icon={History} 
+                        label="History" 
+                        collapsed={isCollapsed}
+                        onClick={() => { setAppMode('history'); if(isMobile) setSidebarOpen(false); }} 
+                        active={appMode === 'history'}
+                    />
+                </div>
+                
+                <div className="sidebar-scroll-wrapper" ref={scrollWrapperRef}>
+                    <div className="sidebar-scroll-content custom-scrollbar" ref={scrollContentRef}>
+                    <div className="px-3 pb-3">
+                        {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
+                        <div className="space-y-1">
+                        {threads.slice(0, 5).map(thread => (
+                            isCollapsed ? (
+                                <button
+                                    key={thread.id}
+                                    onClick={() => switchThread(thread.id)}
+                                    className={`
+                                        w-10 h-10 mx-auto flex items-center justify-center rounded-lg transition-all duration-200
+                                        ${activeThreadId === thread.id && appMode === 'chat' ? "sidebar-list-item active" : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}
+                                    `}
+                                    title={thread.title}
+                                >
+                                    <MessageSquare size={18} strokeWidth={activeThreadId === thread.id && appMode === 'chat' ? 2 : 1.5} />
+                                </button>
+                            ) : (
+                                <button
+                                    key={thread.id}
+                                    onClick={() => switchThread(thread.id)}
+                                    className={`sidebar-list-item ${activeThreadId === thread.id && appMode === 'chat' ? 'active' : ''}`}
+                                    title={thread.title}
+                                >
+                                    <MessageSquare size={16} className="mr-2 flex-shrink-0" />
+                                    <span className="truncate">{thread.title}</span>
+                                </button>
+                            )
+                        ))}
+                        {threads.length === 0 && !isCollapsed && (
+                            <div className="px-3 py-4 text-center text-xs text-[var(--text-tertiary)]">
+                                No history yet.
+                            </div>
+                        )}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <div className="sidebar-bottom">
+                  <NavItem 
+                    icon={Settings} 
+                    label="Settings" 
+                    collapsed={isCollapsed}
+                    onClick={() => {
+                      if (isMobile) {
+                        setShowSettingsSheet(true);
+                      } else {
+                        setAppMode('settings');
+                      }
+                      if (isMobile && sidebarOpen) setSidebarOpen(false);
+                    }}
+                    active={appMode === 'settings'}
+                  />
+                  <NavItem 
+                    icon={LogOut} 
+                    label="Sign out" 
+                    collapsed={isCollapsed}
+                    onClick={() => window.location.reload()}
+                    danger
+                  />
+                </div>
+            </aside>
+            )}
+
+            <main className={`app-main`}>
+              <div className={`flex flex-col relative h-full transition-all duration-300 ease-in-out w-full`}>
+                <Header
+                  user={headerUser}
+                  isMobile={isMobile}
+                  onMenu={() => setSidebarOpen(true)}
+                  onSignOut={() => window.location.reload()}
+                  theme={theme}
+                  setTheme={changeTheme}
+                  projects={projects}
+                  onOpenProject={handleOpenProject}
+                  activeProject={activeProject}
+                  onTriggerProjectAction={setProjectActionData}
+                  onExitProject={handleExitProject}
+                  isBuilderMode={buildMode === 'builder'}
+                />
+                <>{MainView}</>
+              </div>
+            </main>
+          </>
+        )}
 
         {showProjectModal && <NewProjectModal onClose={() => setShowProjectModal(false)} onCreate={(t: string) => { 
             const newProject = { id: generateId(), icon: 'file-text', title: t, step: 1, lastActive: 'just now', tasks: [] };

@@ -184,7 +184,7 @@ MonacoEditor.displayName = 'MonacoEditor';
 // Stripped down purely to editor container
 function CodePanel({ code, setCode, isGenerating, editorRef }) {
   return (
-    <div className="w-1/2 h-full flex flex-col border-r border-[#262626] overflow-hidden">
+    <div className="w-1/2 h-full flex flex-col border-r border-[#262626] overflow-hidden bg-[#1c1c1e]">
       <div className="flex-1 relative min-h-0 bg-[#1e1e1e]">
         <MonacoEditor 
           ref={editorRef} 
@@ -202,7 +202,7 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
   const sandboxDoc = generateSandboxDoc(code);
 
   return (
-    <div className={`flex flex-col bg-[#0f0f12] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] relative ${isFullscreen ? 'fixed inset-0 z-50 w-full' : 'w-1/2'}`}>
+    <div className={`flex flex-col bg-[#141416] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] relative ${isFullscreen ? 'fixed inset-0 z-50 w-full' : 'w-1/2'}`}>
       <style>{`
         @keyframes previewLoad { 0% { width: 0%; } 40% { width: 60%; } 80% { width: 85%; } 100% { width: 100%; } }
         @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
@@ -354,10 +354,10 @@ export default function BuilderPage() {
   }, [code, isGenerating]);
 
   return (
-    <div className="w-full h-full bg-[#0f0f12] text-white flex flex-col font-sans">
+    <div className="w-full h-full bg-[#161618] text-white flex flex-col font-sans">
       
       {/* 1️⃣ UNIFIED PROFESSIONAL SAAS HEADER */}
-      <header className="flex items-center justify-between px-6 h-14 border-b border-white/10 bg-[#0b0b0f]">
+      <header className="flex items-center justify-between px-6 h-[58px] border-b border-[#2a2a2e] bg-[#161618] flex-shrink-0">
         
         {/* LEFT ZONE: Brand & Editor Tools */}
         <div className="flex items-center gap-6">
@@ -444,7 +444,7 @@ export default function BuilderPage() {
       </header>
 
       {/* 2️⃣ CLEAN PANELS */}
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className="grid grid-cols-2 flex-1 overflow-hidden">
         <CodePanel 
           code={code} 
           setCode={setCode} 
