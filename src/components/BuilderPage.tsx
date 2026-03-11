@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, 
-  Save, Sparkles, Monitor, Tablet, Smartphone 
+  Save, Sparkles, Monitor, Tablet, Smartphone, ArrowLeft, MoreHorizontal, Edit3, Trash2
 } from 'lucide-react';
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
@@ -242,7 +242,7 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
   );
 }
 
-export default function BuilderPage() {
+export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
   const [debouncedCode, setDebouncedCode] = useState(initialCode);
@@ -258,6 +258,18 @@ export default function BuilderPage() {
   const [deviceMode, setDeviceMode] = useState('Desktop');
   const [isReloading, setIsReloading] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
+  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
+  const builderMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
+        setShowBuilderMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Editor Actions
   const handleCopy = () => {
@@ -337,23 +349,28 @@ export default function BuilderPage() {
   }, [code, isGenerating]);
 
   return (
-    <div className="builder-floating">
+    <div className="w-full h-full">
       <div className="builder-window">
         <header className="builder-header">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center gap-2 text-[13px] text-gray-300 bg-white/5 px-2.5 py-1 rounded border border-white/5 font-mono">
-                <span className="text-[#61dafb] text-[15px]">⚛</span> App.jsx
-              </span>
-              <div className="flex items-center gap-1">
-                <button onClick={handleCopy} title="Copy Code" className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
-                  <Copy size={14} /> <span className="hidden lg:inline">{copied ? 'Copied' : 'Copy'}</span>
+            <div className="flex items-center gap-3">
+              <button onClick={onExit} title="Exit Builder" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
+                <ArrowLeft size={18} />
+              </button>
+              <span className="text-sm font-medium text-white truncate">SaaS Landing Page</span>
+              <div className="relative" ref={builderMenuRef}>
+                <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
+                  <MoreHorizontal size={18} />
                 </button>
-                <button onClick={handleDownloadZip} title="Download Project" disabled={isDownloading} className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-50">
-                  <Download size={14} /> <span className="hidden lg:inline">{isDownloading ? 'Zipping...' : 'Download'}</span>
-                </button>
-                <button onClick={handleFormat} title="Format Code" className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
-                  <Wand2 size={14} /> <span className="hidden lg:inline">Format</span>
-                </button>
+                {showBuilderMenu && (
+                  <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
+                    <div className="p-2">
+                        <button className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
+                        <button className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
+                        <div className="h-px bg-[var(--border)] my-1" />
+                        <button className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -382,18 +399,24 @@ export default function BuilderPage() {
                   })}
               </div>
               <div className="flex items-center gap-1">
-                  <button onClick={handleReload} title="Reload Preview" disabled={isReloading} className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors disabled:opacity-50">
+                  <button onClick={handleReload} title="Reload Preview" disabled={isReloading} className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-50">
                     <RefreshCw size={14} className={isReloading ? "animate-spin" : ""} /> 
                   </button>
-                  <button onClick={() => setIsFullscreen(!isFullscreen)} title="Fullscreen Preview" className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors">
+                  <button onClick={() => setIsFullscreen(!isFullscreen)} title="Fullscreen Preview" className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
                     <Maximize size={14} />
                   </button>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-[11px] text-gray-500 font-mono">{saveStatus}</span>
-              <button className="flex items-center gap-2.5 px-4 py-1.5 text-[13px] font-medium bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
+              <button onClick={handleCopy} title="Copy Code" className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors">
+                <Copy size={14} /> <span className="hidden lg:inline">{copied ? 'Copied!' : 'Copy'}</span>
+              </button>
+              <button onClick={handleDownloadZip} title="Download Project" disabled={isDownloading} className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors disabled:opacity-50">
+                <Download size={14} /> <span className="hidden lg:inline">{isDownloading ? 'Zipping...' : 'Download'}</span>
+              </button>
+              <span className="text-[11px] text-gray-500 font-mono hidden xl:inline">{saveStatus}</span>
+              <button className="flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
                 Deploy
               </button>
             </div>
