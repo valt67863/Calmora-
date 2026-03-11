@@ -1,6 +1,7 @@
 
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
   Save, Sparkles, Monitor, Tablet, Smartphone
@@ -200,9 +201,14 @@ function CodePanel({ code, setCode, isGenerating, editorRef }) {
 // Stripped down purely to preview container
 function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, isRevealing }) {
   const sandboxDoc = generateSandboxDoc(code);
+  const [isClient, setIsClient] = useState(false);
 
-  return (
-    <div className={`flex flex-col bg-[#141416] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] relative ${isFullscreen ? 'fixed inset-0 z-[1001] w-full' : 'w-full'}`}>
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const panelContent = (
+    <div className={`flex flex-col bg-[#141416] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] ${isFullscreen ? 'fixed inset-0 z-[1001]' : 'relative w-full h-full'}`}>
       <style>{`
         @keyframes previewLoad { 0% { width: 0%; } 40% { width: 60%; } 80% { width: 85%; } 100% { width: 100%; } }
         @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
@@ -215,8 +221,8 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
       
       {isReloading && <div className="preview-loading-bar" />}
 
-      <div className="flex-1 bg-[#0f0f12] overflow-hidden flex justify-center relative">
-        <div className={`relative h-full transition-all duration-300 ${deviceMode === 'Mobile' ? 'w-[375px] border-x border-[#2a2a2e]' : deviceMode === 'Tablet' ? 'w-[768px] border-x border-[#2a2a2e]' : 'w-full'}`}>
+      <div className="flex-1 bg-[#0f0f12] overflow-hidden flex justify-center items-center relative">
+        <div className={`relative h-full transition-all duration-300 ease-in-out ${deviceMode === 'Mobile' ? 'w-[375px] max-w-full border-x border-white/10' : deviceMode === 'Tablet' ? 'w-[768px] max-w-full border-x border-white/10' : 'w-full'}`}>
           <iframe key={reloadKey} title="preview" srcDoc={sandboxDoc} className={`w-full h-full border-none bg-white ${isRevealing ? 'preview-reveal' : ''}`} sandbox="allow-scripts allow-modals allow-forms allow-same-origin" />
           
           <div className={`absolute inset-0 bg-[#0f0f12] flex flex-col z-10 transition-opacity duration-[350ms] ease-in-out ${isReloading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
@@ -238,6 +244,17 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
           </div>
         </div>
       </div>
+    </div>
+  );
+
+  if (isFullscreen) {
+    if (!isClient) return null; // Don't render portal on server
+    return createPortal(panelContent, document.body);
+  }
+
+  return (
+    <div className="relative w-full h-full">
+      {panelContent}
     </div>
   );
 }
