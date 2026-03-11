@@ -44,6 +44,7 @@ import {
 import Header from "@/components/Header";
 import ModeToggle from "@/components/ModeToggle";
 import PromptSuggestionList from "@/components/PromptSuggestionList";
+import PromptSuggestions from "@/components/PromptSuggestions";
 import BuilderPage from "@/components/BuilderPage";
 
 const HomePage = () => {
@@ -110,6 +111,13 @@ const HomePage = () => {
           prompt: "Create a simple landing page to announce a new product launch."
       }
   ];
+
+  const chipSuggestions = useMemo(() => [
+      "Build a SaaS landing page",
+      "Create a startup waitlist",
+      "Generate a portfolio website",
+      "Review my website code"
+  ], []);
 
   const promptSuggestions = useMemo(() => [
       "Build a SaaS landing page for an AI email tool",
@@ -719,6 +727,35 @@ const HomePage = () => {
                                 <span className="flex items-center gap-2">💻 Export real code</span>
                             </div>
 
+                            <div className="w-full max-w-2xl mx-auto mt-12">
+                                <div className="chat-input-surface">
+                                    <textarea
+                                    ref={textareaRef}
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                                    placeholder="Example: “Build a SaaS landing page for an AI email assistant”"
+                                    className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
+                                    rows={1}
+                                    />
+                                    {input.trim() ? (
+                                    <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+                                        {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                                    </button>
+                                    ) : (
+                                    <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+                                        <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+                                    </button>
+                                    )}
+                                </div>
+                                <div className="mt-4">
+                                    <ModeToggle mode={buildMode} setMode={setBuildMode} />
+                                </div>
+                                <div className="mt-6">
+                                    <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
+                                </div>
+                            </div>
+
                             <div className="mt-12 w-full">
                                 <h2 className="font-semibold text-lg text-[var(--text-primary)]">Start with a template</h2>
                                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
@@ -777,11 +814,13 @@ const HomePage = () => {
                           </div>
                         ))}
                         {thinking && (
-                          <div className="w-full flex justify-center mb-6 animate-message-in">
-                            <div className="w-full max-w-[720px] pl-4 md:pl-0 flex items-center gap-2 text-[var(--text-tertiary)]">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.2s]" />
-                              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.1s]" />
-                              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce" />
+                           <div className="w-full flex justify-center mb-6 animate-message-in">
+                            <div className="w-full max-w-[720px] flex items-center gap-2 text-[var(--text-tertiary)]">
+                               <div className="ai-loading">
+                                 <span></span>
+                                 <span></span>
+                                 <span></span>
+                               </div>
                             </div>
                           </div>
                         )}
@@ -811,7 +850,7 @@ const HomePage = () => {
                 </div>
               </div>
 
-              {appMode === 'chat' && (
+              {appMode === 'chat' && chatStage === 'active' && (
                 <div className={`chat-input-layer ${isMobile ? 'mobile-input' : ''}`}>
                   {showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
                     <div className="mb-3">
@@ -819,12 +858,6 @@ const HomePage = () => {
                     </div>
                   )}
 
-                  {chatStage === 'new-chat' && !isBuilderVisible && input.trim() === '' && (
-                    <div className="flex justify-center mb-3">
-                        <ModeToggle mode={buildMode} setMode={setBuildMode} />
-                    </div>
-                  )}
-                  
                   <div className="chat-input-surface">
                     <textarea
                       ref={textareaRef}
@@ -838,7 +871,7 @@ const HomePage = () => {
                         }
                       }}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                      placeholder="Build a SaaS landing page for an AI email tool..."
+                      placeholder="Ask a follow-up or give a new instruction..."
                       className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
                       rows={1}
                     />
@@ -852,12 +885,6 @@ const HomePage = () => {
                       </button>
                     )}
                   </div>
-                  
-                  {chatStage === "new-chat" && (
-                    <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">
-                      Calmora creates a private space for your thoughts.
-                    </div>
-                  )}
                 </div>
               )}
             </div>
