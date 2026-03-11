@@ -23,7 +23,9 @@ import {
   MoreHorizontal,
   Edit3,
   Copy,
-  Trash2
+  Trash2,
+  CheckCircle2,
+  Circle
 } from "lucide-react";
 import { safeLocalStorage, generateId, normalizeStatus, triggerConfetti, generateBasicTasks, aiSystemInstruction, FOCUS_DEMO_STEPS } from "@/lib/calmora-utils";
 import {
@@ -72,6 +74,7 @@ const HomePage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [thinking, setThinking] = useState(false);
+  const [progressStep, setProgressStep] = useState(0);
   const [showScrollButton, setShowScrollButton] = useState(false);
     
   const [showSuggestionList, setShowSuggestionList] = useState(false);
@@ -109,6 +112,20 @@ const HomePage = () => {
       "Review my website code"
   ], []);
 
+  const followUpSuggestions = useMemo(() => [
+    "Improve the design",
+    "Add a pricing section",
+    "Add testimonials",
+    "Make it mobile responsive",
+  ], []);
+
+  const generationSteps = useMemo(() => [
+    "Understanding request",
+    "Designing layout",
+    "Generating React code",
+    "Building preview"
+  ], []);
+
   const promptSuggestions = useMemo(() => [
       "Build a SaaS landing page for an AI email tool",
       "Create a startup waitlist landing page",
@@ -123,6 +140,15 @@ const HomePage = () => {
     return promptSuggestions.filter(s => s.toLowerCase().includes(lowercasedInput));
   }, [input, promptSuggestions]);
 
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (thinking && progressStep < generationSteps.length - 1) {
+      timer = setTimeout(() => {
+        setProgressStep(prev => prev + 1);
+      }, 1200); // Simulate 1.2s per step
+    }
+    return () => clearTimeout(timer);
+  }, [thinking, progressStep, generationSteps.length]);
 
   useEffect(() => {
     const content = scrollContentRef.current;
@@ -395,6 +421,7 @@ const HomePage = () => {
     setInput("");
     setShowSuggestionList(false);
     setThinking(true);
+    setProgressStep(0);
 
     const callGemini = async (retryCount = 0) => {
       try {
@@ -607,12 +634,22 @@ const HomePage = () => {
                     ))}
                     {thinking && (
                        <div className="w-full flex justify-center mb-6 animate-message-in">
-                        <div className="w-full max-w-[720px] flex items-center gap-2 text-[var(--text-tertiary)]">
-                           <div className="ai-loading">
-                             <span></span>
-                             <span></span>
-                             <span></span>
-                           </div>
+                        <div className="w-full max-w-[720px]">
+                          <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating website</div>
+                          <div className="space-y-3">
+                            {generationSteps.map((step, index) => (
+                              <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
+                                {index < progressStep ? (
+                                  <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
+                                ) : index === progressStep ? (
+                                  <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
+                                ) : (
+                                  <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
+                                )}
+                                <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}
@@ -669,6 +706,10 @@ const HomePage = () => {
               ) : (chatStage === 'new-chat' && !input.trim()) ? (
                 <div className="mt-6">
                   <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
+                </div>
+              ) : (chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant') ? (
+                <div className="mt-6">
+                  <PromptSuggestions suggestions={followUpSuggestions} setPrompt={handleSuggestionClick} />
                 </div>
               ) : null
             }
@@ -834,12 +875,22 @@ const HomePage = () => {
                         ))}
                         {thinking && (
                            <div className="w-full flex justify-center mb-6 animate-message-in">
-                            <div className="w-full max-w-[720px] flex items-center gap-2 text-[var(--text-tertiary)]">
-                               <div className="ai-loading">
-                                 <span></span>
-                                 <span></span>
-                                 <span></span>
-                               </div>
+                            <div className="w-full max-w-[720px]">
+                              <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating website</div>
+                              <div className="space-y-3">
+                                {generationSteps.map((step, index) => (
+                                  <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
+                                    {index < progressStep ? (
+                                      <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
+                                    ) : index === progressStep ? (
+                                      <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
+                                    ) : (
+                                      <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
+                                    )}
+                                    <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         )}
@@ -920,6 +971,10 @@ const HomePage = () => {
                     ) : (chatStage === 'new-chat' && !input.trim()) ? (
                       <div className="mt-6">
                         <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
+                      </div>
+                    ) : (chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant') ? (
+                      <div className="mt-6">
+                        <PromptSuggestions suggestions={followUpSuggestions} setPrompt={handleSuggestionClick} />
                       </div>
                     ) : null
                   }
