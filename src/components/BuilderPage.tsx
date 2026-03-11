@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, 
-  Save, Sparkles, Monitor, Tablet, Smartphone, ArrowLeft, MoreHorizontal, Edit3, Trash2
+  Save, Sparkles, Monitor, Tablet, Smartphone
 } from 'lucide-react';
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
@@ -258,18 +258,6 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   const [deviceMode, setDeviceMode] = useState('Desktop');
   const [isReloading, setIsReloading] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
-  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
-  const builderMenuRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
-        setShowBuilderMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   // Editor Actions
   const handleCopy = () => {
@@ -349,31 +337,8 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   }, [code, isGenerating]);
 
   return (
-    <div className="w-full h-full">
-      <div className="builder-window">
+    <div className="w-full h-full flex flex-col bg-[var(--surface)] overflow-hidden">
         <header className="builder-header">
-            <div className="flex items-center gap-3">
-              <button onClick={onExit} title="Exit Builder" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
-                <ArrowLeft size={18} />
-              </button>
-              <span className="text-sm font-medium text-white truncate">SaaS Landing Page</span>
-              <div className="relative" ref={builderMenuRef}>
-                <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
-                  <MoreHorizontal size={18} />
-                </button>
-                {showBuilderMenu && (
-                  <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
-                    <div className="p-2">
-                        <button className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
-                        <button className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
-                        <div className="h-px bg-[var(--border)] my-1" />
-                        <button className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
             <div className="flex items-center justify-center gap-4 flex-1">
               <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
@@ -438,7 +403,6 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
               isRevealing={isRevealing}
             />
         </div>
-      </div>
     </div>
   );
 }

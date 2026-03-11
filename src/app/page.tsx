@@ -20,7 +20,10 @@ import {
   User,
   Flame,
   ArrowLeft,
-  MoreHorizontal
+  MoreHorizontal,
+  Edit3,
+  Copy,
+  Trash2
 } from "lucide-react";
 import { safeLocalStorage, generateId, normalizeStatus, triggerConfetti, generateBasicTasks, aiSystemInstruction, FOCUS_DEMO_STEPS } from "@/lib/calmora-utils";
 import {
@@ -86,6 +89,18 @@ const HomePage = () => {
   const scrollContentRef = useRef<HTMLDivElement>(null);
 
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
+  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
+  const builderMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
+        setShowBuilderMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const chipSuggestions = useMemo(() => [
       "Build a SaaS landing page",
@@ -553,7 +568,29 @@ const HomePage = () => {
     return (
       <div className="app-root">
         {/* Left Panel: Chat */}
-        <div className="w-[500px] h-full flex flex-col bg-[var(--sidebar)] border-r border-[var(--border)] relative">
+        <div className="w-[500px] h-full flex flex-col bg-[var(--sidebar)] relative">
+          <header className="h-[52px] bg-[var(--surface-raised)] border-b border-[var(--border)] flex items-center px-4 gap-3 flex-shrink-0">
+            <button onClick={() => setBuildMode('chat')} title="Exit Builder" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
+                <ArrowLeft size={18} />
+            </button>
+            <span className="text-sm font-medium text-white truncate">SaaS Landing Page</span>
+            <div className="relative" ref={builderMenuRef}>
+                <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
+                  <MoreHorizontal size={18} />
+                </button>
+                {showBuilderMenu && (
+                  <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
+                    <div className="p-2">
+                        <button className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
+                        <button className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
+                        <div className="h-px bg-[var(--border)] my-1" />
+                        <button className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
+                    </div>
+                  </div>
+                )}
+            </div>
+          </header>
+
           <div className="scroll-content custom-scrollbar" ref={scrollRef}>
             <div className="workspace-container">
               <div className="flex-1 w-full relative">
