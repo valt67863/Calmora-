@@ -14,7 +14,11 @@ import {
   X,
   Plus,
   Settings,
-  MessageSquare
+  MessageSquare,
+  Mail,
+  Zap,
+  User,
+  Flame
 } from "lucide-react";
 import { safeLocalStorage, generateId, normalizeStatus, triggerConfetti, generateBasicTasks, aiSystemInstruction, FOCUS_DEMO_STEPS } from "@/lib/calmora-utils";
 import {
@@ -39,7 +43,6 @@ import {
 } from "@/components/calmora";
 import Header from "@/components/Header";
 import ModeToggle from "@/components/ModeToggle";
-import PromptSuggestions from "@/components/PromptSuggestions";
 import PromptSuggestionList from "@/components/PromptSuggestionList";
 import BuilderPage from "@/components/BuilderPage";
 
@@ -81,12 +84,39 @@ const HomePage = () => {
 
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
 
+  const templateCards = [
+      { 
+          title: "SaaS Landing Page", 
+          desc: "For your next big idea.",
+          icon: <Zap size={20} />, 
+          prompt: "Build a SaaS landing page for an AI email tool that writes perfect subject lines." 
+      },
+      { 
+          title: "Startup Waitlist", 
+          desc: "Generate early buzz.",
+          icon: <Mail size={20} />,
+          prompt: "Create a startup waitlist page for a new mobile app that tracks personal finance."
+      },
+      { 
+          title: "Developer Portfolio", 
+          desc: "Showcase your best work.",
+          icon: <User size={20} />,
+          prompt: "Generate a personal portfolio website for a frontend developer specializing in React."
+      },
+      { 
+          title: "Product Launch", 
+          desc: "Announce a new feature.",
+          icon: <Flame size={20} />,
+          prompt: "Create a simple landing page to announce a new product launch."
+      }
+  ];
+
   const promptSuggestions = useMemo(() => [
-    "Create SaaS landing page",
-    "Build AI startup homepage",
-    "Make portfolio website",
-    "Create product landing page",
-    "Remix a website"
+      "Build a SaaS landing page for an AI email tool",
+      "Create a startup waitlist landing page",
+      "Generate a portfolio website for a developer",
+      "Create a product launch page",
+      "Remix a modern SaaS website"
   ], []);
 
   const filteredSuggestions = useMemo(() => {
@@ -568,7 +598,7 @@ const HomePage = () => {
           </div>
           
             <div className="p-3 space-y-1 flex-shrink-0">
-                <button onClick={startNewChat} className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
+                <button onClick={startNewChat} title="Start New Session" className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
                     <Plus size={16} strokeWidth={2.5} />
                     {!isCollapsed && <span className="text-sm font-semibold font-sans">Start New Session</span>}
                 </button>
@@ -674,10 +704,65 @@ const HomePage = () => {
               <div className="scroll-content custom-scrollbar" ref={scrollRef}>
                 <div className="workspace-container">
                   <div className="flex-1 w-full relative">
-                    {appMode === 'chat' && chatStage === 'new-chat' && (
-                      <div className="flex flex-col items-center justify-center h-full">
-                        {/* This space is intentionally left blank for home-mode input */}
-                      </div>
+                    {appMode === 'chat' && chatStage === 'new-chat' && !isBuilderVisible && (
+                        <div className="flex flex-col items-center text-center w-full max-w-4xl mx-auto px-4 pt-8 md:pt-16 animate-in fade-in-0 duration-500">
+                            <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] tracking-tight leading-tight max-w-3xl">
+                                Turn your startup idea into a live website with AI.
+                            </h1>
+                            <p className="mt-4 text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl">
+                                Describe your vision in plain English. Calmora generates the code, you preview it live, and deploy with one click.
+                            </p>
+
+                            <div className="mt-8 flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-[var(--text-tertiary)]">
+                                <span className="flex items-center gap-2">⚡ Built with AI</span>
+                                <span className="flex items-center gap-2">🚀 Deploy instantly</span>
+                                <span className="flex items-center gap-2">💻 Export real code</span>
+                            </div>
+
+                            <div className="mt-12 w-full">
+                                <h2 className="font-semibold text-lg text-[var(--text-primary)]">Start with a template</h2>
+                                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                                    {templateCards.map(card => (
+                                        <button key={card.title} onClick={() => handleSuggestionClick(card.prompt)} className="group p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-left hover:border-[var(--accent)] hover:-translate-y-1 transition-all duration-200 flex flex-col items-start h-full">
+                                            <div className="p-2 bg-[var(--accent-subtle)] text-[hsl(var(--accent))] rounded-lg w-min mb-4">
+                                                {card.icon}
+                                            </div>
+                                            <h3 className="font-semibold text-[var(--text-primary)] flex-grow">{card.title}</h3>
+                                            <p className="text-sm text-[var(--text-tertiary)] mt-1">{card.desc}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="w-full my-20 border-b border-[var(--border)]" />
+
+                            <div className="w-full text-center mb-16">
+                                <h2 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">From idea to live site in 3 steps</h2>
+                                <div className="mt-12 grid md:grid-cols-3 gap-8 text-left">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-subtle)] text-[hsl(var(--accent))] font-bold text-sm">1</span>
+                                            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Describe your idea</h3>
+                                        </div>
+                                        <p className="mt-2 text-[var(--text-secondary)]">Use the prompt below to describe the website you want to build. Start with a template or write your own.</p>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-subtle)] text-[hsl(var(--accent))] font-bold text-sm">2</span>
+                                            <h3 className="text-lg font-semibold text-[var(--text-primary)]">AI builds the website</h3>
+                                        </div>
+                                        <p className="mt-2 text-[var(--text-secondary)]">Our AI agent designs and codes a complete React component based on your description.</p>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-subtle)] text-[hsl(var(--accent))] font-bold text-sm">3</span>
+                                            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Preview and deploy</h3>
+                                        </div>
+                                        <p className="mt-2 text-[var(--text-secondary)]">Review the live preview, edit the code, and deploy your site to the web with one click.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     )}
 
                     {appMode === 'chat' && chatStage === 'active' && (
@@ -727,26 +812,11 @@ const HomePage = () => {
               </div>
 
               {appMode === 'chat' && (
-                <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
-                  {chatStage === 'new-chat' && (
-                    <div className="w-full flex flex-col items-center">
-                      <div className="text-center">
-                        <h1 className="text-2xl font-semibold text-[var(--text-primary)] mb-1">
-                          Build Websites with AI
-                        </h1>
-                        <p className="text-md text-[var(--text-secondary)]">
-                          Design and code websites with AI
-                        </p>
+                <div className={`chat-input-layer ${chatStage === 'new-chat' && !isBuilderVisible ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
+                  {chatStage === 'new-chat' && isBuilderVisible && (
+                      <div className="w-full flex flex-col items-center mb-4">
+                        <ModeToggle mode={buildMode} setMode={(mode) => setBuildMode(mode)} />
                       </div>
-                      <div className="my-4">
-                        <ModeToggle mode={buildMode} setMode={(mode) => {
-                          setBuildMode(mode);
-                          if (mode === 'builder') {
-                            setAppMode('chat');
-                          }
-                        }} />
-                      </div>
-                    </div>
                   )}
                   <div className="chat-input-surface">
                     <textarea
@@ -761,7 +831,7 @@ const HomePage = () => {
                         }
                       }}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                      placeholder={activeProject ? `Type to add to ${activeProject.title}...` : "What do you need to finish?"}
+                      placeholder={activeProject ? `Type to add to ${activeProject.title}...` : "Describe the website you want to build..."}
                       className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
                       rows={1}
                     />
@@ -779,8 +849,10 @@ const HomePage = () => {
                     <div className="mt-4 w-full max-w-xl mx-auto">
                       {input.trim() === '' ? (
                         <>
-                          <PromptSuggestions suggestions={promptSuggestions} setPrompt={handleSuggestionClick} />
-                          <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
+                          {!isBuilderVisible && <ModeToggle mode={buildMode} setMode={setBuildMode} />}
+                          <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">
+                            Calmora creates a private space for your thoughts.
+                          </div>
                         </>
                       ) : (
                         showSuggestionList && filteredSuggestions.length > 0 && <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
