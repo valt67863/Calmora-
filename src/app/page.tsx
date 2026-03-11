@@ -704,7 +704,7 @@ const HomePage = () => {
               <div className="scroll-content custom-scrollbar" ref={scrollRef}>
                 <div className="workspace-container">
                   <div className="flex-1 w-full relative">
-                    {appMode === 'chat' && chatStage === 'new-chat' && !isBuilderVisible && (
+                    {appMode === 'chat' && chatStage === 'new-chat' && (
                         <div className="flex flex-col items-center text-center w-full max-w-4xl mx-auto px-4 pt-8 md:pt-16 animate-in fade-in-0 duration-500">
                             <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] tracking-tight leading-tight max-w-3xl">
                                 Turn your startup idea into a live website with AI.
@@ -812,12 +812,19 @@ const HomePage = () => {
               </div>
 
               {appMode === 'chat' && (
-                <div className={`chat-input-layer ${chatStage === 'new-chat' && !isBuilderVisible ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
-                  {chatStage === 'new-chat' && isBuilderVisible && (
-                      <div className="w-full flex flex-col items-center mb-4">
-                        <ModeToggle mode={buildMode} setMode={(mode) => setBuildMode(mode)} />
-                      </div>
+                <div className={`chat-input-layer ${isMobile ? 'mobile-input' : ''}`}>
+                  {showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
+                    <div className="mb-3">
+                      <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                    </div>
                   )}
+
+                  {chatStage === 'new-chat' && !isBuilderVisible && input.trim() === '' && (
+                    <div className="flex justify-center mb-3">
+                        <ModeToggle mode={buildMode} setMode={setBuildMode} />
+                    </div>
+                  )}
+                  
                   <div className="chat-input-surface">
                     <textarea
                       ref={textareaRef}
@@ -831,7 +838,7 @@ const HomePage = () => {
                         }
                       }}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                      placeholder={activeProject ? `Type to add to ${activeProject.title}...` : "Describe the website you want to build..."}
+                      placeholder="Build a SaaS landing page for an AI email tool..."
                       className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
                       rows={1}
                     />
@@ -845,18 +852,10 @@ const HomePage = () => {
                       </button>
                     )}
                   </div>
+                  
                   {chatStage === "new-chat" && (
-                    <div className="mt-4 w-full max-w-xl mx-auto">
-                      {input.trim() === '' ? (
-                        <>
-                          {!isBuilderVisible && <ModeToggle mode={buildMode} setMode={setBuildMode} />}
-                          <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">
-                            Calmora creates a private space for your thoughts.
-                          </div>
-                        </>
-                      ) : (
-                        showSuggestionList && filteredSuggestions.length > 0 && <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-                      )}
+                    <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">
+                      Calmora creates a private space for your thoughts.
                     </div>
                   )}
                 </div>
@@ -864,7 +863,7 @@ const HomePage = () => {
             </div>
 
             {/* Builder Panel */}
-            {isBuilderVisible && (
+            {isBuilderVisible && appMode === 'chat' && (
               <div className="h-full p-10 animate-in fade-in-0 slide-in-from-right-4 duration-300" style={{ width: '60%' }}>
                 <BuilderPage />
               </div>
