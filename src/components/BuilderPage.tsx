@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
-  Save, Sparkles, Monitor, Tablet, Smartphone
+  Save, Sparkles, Monitor, Tablet, Smartphone, X
 } from 'lucide-react';
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
@@ -199,7 +199,7 @@ function CodePanel({ code, setCode, isGenerating, editorRef }) {
 }
 
 // Stripped down purely to preview container
-function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, isRevealing }) {
+function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, isRevealing, onExitFullscreen }) {
   const sandboxDoc = generateSandboxDoc(code);
   const [isClient, setIsClient] = useState(false);
 
@@ -219,6 +219,16 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
         .skeleton { background: linear-gradient(90deg, #1f1f23 25%, #353540 50%, #1f1f23 75%); background-size: 400% 100%; animation: skeletonLoading 1.5s ease-in-out infinite; }
       `}</style>
       
+      {isFullscreen && (
+          <button 
+              onClick={onExitFullscreen}
+              className="absolute top-4 right-4 z-[1002] w-10 h-10 flex items-center justify-center bg-black/50 rounded-full text-white hover:bg-black/80 transition-colors"
+              title="Exit Fullscreen"
+          >
+              <X size={20} />
+          </button>
+      )}
+
       {isReloading && <div className="preview-loading-bar" />}
 
       <div className="flex-1 bg-[#0f0f12] overflow-hidden flex justify-center items-center relative">
@@ -417,6 +427,7 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
               deviceMode={deviceMode}
               isReloading={isReloading}
               isRevealing={isRevealing}
+              onExitFullscreen={() => setIsFullscreen(false)}
             />
         </div>
     </div>
