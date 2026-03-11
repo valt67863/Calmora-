@@ -728,6 +728,9 @@ const HomePage = () => {
                             </div>
 
                             <div className="w-full max-w-2xl mx-auto mt-12">
+                                <div className="mb-4">
+                                    <ModeToggle mode={buildMode} setMode={setBuildMode} />
+                                </div>
                                 <div className="chat-input-surface">
                                     <textarea
                                     ref={textareaRef}
@@ -747,9 +750,6 @@ const HomePage = () => {
                                         <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
                                     </button>
                                     )}
-                                </div>
-                                <div className="mt-4">
-                                    <ModeToggle mode={buildMode} setMode={setBuildMode} />
                                 </div>
                                 <div className="mt-6">
                                     <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
@@ -890,7 +890,7 @@ const HomePage = () => {
             </div>
 
             {/* Builder Panel */}
-            {isBuilderVisible && appMode === 'chat' && (
+            {isBuilderVisible && (
               <div className="h-full p-10 animate-in fade-in-0 slide-in-from-right-4 duration-300" style={{ width: '60%' }}>
                 <BuilderPage />
               </div>
