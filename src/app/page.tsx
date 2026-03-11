@@ -624,16 +624,18 @@ const HomePage = () => {
           </div>
           
           <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
-            {showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
-              <div className="mb-3">
-                <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-              </div>
-            )}
-            {chatStage === 'new-chat' && (
-              <div className="mb-4">
+            {
+              (chatStage === 'active' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
+                <div className="mb-3">
+                  <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                </div>
+              ) : (chatStage === 'new-chat' && !input.trim()) ? (
+                <div className="mb-4">
                   <ModeToggle mode={buildMode} setMode={setBuildMode} />
-              </div>
-            )}
+                </div>
+              ) : null
+            }
+
             <div className="chat-input-surface">
               <textarea
                 ref={textareaRef}
@@ -658,11 +660,18 @@ const HomePage = () => {
                 </button>
               )}
             </div>
-            {chatStage === 'new-chat' && (
-               <div className="mt-6">
+
+            {
+              (chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
+                <div className="mt-3">
+                  <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                </div>
+              ) : (chatStage === 'new-chat' && !input.trim()) ? (
+                <div className="mt-6">
                   <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
-              </div>
-            )}
+                </div>
+              ) : null
+            }
           </div>
         </div>
         
@@ -863,17 +872,17 @@ const HomePage = () => {
               {appMode === 'chat' && (
                 <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
                   
-                  {showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
-                    <div className="mb-3">
-                      <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-                    </div>
-                  )}
-
-                  {chatStage === 'new-chat' && (
-                    <div className="mb-4">
+                  {
+                    (chatStage === 'active' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
+                      <div className="mb-3">
+                        <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                      </div>
+                    ) : (chatStage === 'new-chat' && !input.trim()) ? (
+                      <div className="mb-4">
                         <ModeToggle mode={buildMode} setMode={setBuildMode} />
-                    </div>
-                  )}
+                      </div>
+                    ) : null
+                  }
 
                   <div className="chat-input-surface">
                     <textarea
@@ -903,11 +912,17 @@ const HomePage = () => {
                     )}
                   </div>
                   
-                  {chatStage === 'new-chat' && (
-                     <div className="mt-6">
+                  {
+                    (chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
+                      <div className="mt-3">
+                        <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                      </div>
+                    ) : (chatStage === 'new-chat' && !input.trim()) ? (
+                      <div className="mt-6">
                         <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
-                    </div>
-                  )}
+                      </div>
+                    ) : null
+                  }
 
                 </div>
               )}
