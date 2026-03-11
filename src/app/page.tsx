@@ -707,10 +707,6 @@ const HomePage = () => {
                 <div className="mt-6">
                   <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
                 </div>
-              ) : (chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant') ? (
-                <div className="mt-6">
-                  <PromptSuggestions suggestions={followUpSuggestions} setPrompt={handleSuggestionClick} />
-                </div>
               ) : null
             }
           </div>
