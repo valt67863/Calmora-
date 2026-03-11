@@ -85,33 +85,6 @@ const HomePage = () => {
 
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
 
-  const templateCards = [
-      { 
-          title: "SaaS Landing Page", 
-          desc: "For your next big idea.",
-          icon: <Zap size={20} />, 
-          prompt: "Build a SaaS landing page for an AI email tool that writes perfect subject lines." 
-      },
-      { 
-          title: "Startup Waitlist", 
-          desc: "Generate early buzz.",
-          icon: <Mail size={20} />,
-          prompt: "Create a startup waitlist page for a new mobile app that tracks personal finance."
-      },
-      { 
-          title: "Developer Portfolio", 
-          desc: "Showcase your best work.",
-          icon: <User size={20} />,
-          prompt: "Generate a personal portfolio website for a frontend developer specializing in React."
-      },
-      { 
-          title: "Product Launch", 
-          desc: "Announce a new feature.",
-          icon: <Flame size={20} />,
-          prompt: "Create a simple landing page to announce a new product launch."
-      }
-  ];
-
   const chipSuggestions = useMemo(() => [
       "Build a SaaS landing page",
       "Create a startup waitlist",
@@ -707,7 +680,7 @@ const HomePage = () => {
           />
             
           <div className={`flex-1 min-h-0 relative flex transition-all duration-300 ease-in-out`}>
-            {/* Chat Panel */}
+            {/* Main content panel */}
             <div className={`h-full relative flex flex-col transition-all duration-300 ease-in-out ${isBuilderVisible ? 'w-[40%]' : 'w-full'}`}>
               <div className="scroll-content custom-scrollbar" ref={scrollRef}>
                 <div className="workspace-container">
@@ -717,88 +690,6 @@ const HomePage = () => {
                             <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] tracking-tight leading-tight max-w-3xl">
                                 Turn your startup idea into a live website with AI.
                             </h1>
-                            <p className="mt-4 text-lg md:text-xl text-[var(--text-secondary)] max-w-3xl">
-                                Describe your vision in plain English. Calmora generates the code, you preview it live, and deploy with one click.
-                            </p>
-
-                            <div className="mt-8 flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-[var(--text-tertiary)]">
-                                <span className="flex items-center gap-2">⚡ Built with AI</span>
-                                <span className="flex items-center gap-2">🚀 Deploy instantly</span>
-                                <span className="flex items-center gap-2">💻 Export real code</span>
-                            </div>
-
-                            <div className="w-full max-w-2xl mx-auto mt-12">
-                                <div className="mb-4">
-                                    <ModeToggle mode={buildMode} setMode={setBuildMode} />
-                                </div>
-                                <div className="chat-input-surface">
-                                    <textarea
-                                    ref={textareaRef}
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                                    placeholder="Example: “Build a SaaS landing page for an AI email assistant”"
-                                    className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
-                                    rows={1}
-                                    />
-                                    {input.trim() ? (
-                                    <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-                                        {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                                    </button>
-                                    ) : (
-                                    <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-                                        <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-                                    </button>
-                                    )}
-                                </div>
-                                <div className="mt-6">
-                                    <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
-                                </div>
-                            </div>
-
-                            <div className="mt-12 w-full">
-                                <h2 className="font-semibold text-lg text-[var(--text-primary)]">Start with a template</h2>
-                                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-                                    {templateCards.map(card => (
-                                        <button key={card.title} onClick={() => handleSuggestionClick(card.prompt)} className="group p-5 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-left hover:border-[var(--accent)] hover:-translate-y-1 transition-all duration-200 flex flex-col items-start h-full">
-                                            <div className="p-2 bg-[var(--accent-subtle)] text-[hsl(var(--accent))] rounded-lg w-min mb-4">
-                                                {card.icon}
-                                            </div>
-                                            <h3 className="font-semibold text-[var(--text-primary)] flex-grow">{card.title}</h3>
-                                            <p className="text-sm text-[var(--text-tertiary)] mt-1">{card.desc}</p>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="w-full my-20 border-b border-[var(--border)]" />
-
-                            <div className="w-full text-center mb-16">
-                                <h2 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">From idea to live site in 3 steps</h2>
-                                <div className="mt-12 grid md:grid-cols-3 gap-8 text-left">
-                                    <div className="flex flex-col">
-                                        <div className="flex items-center gap-3">
-                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-subtle)] text-[hsl(var(--accent))] font-bold text-sm">1</span>
-                                            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Describe your idea</h3>
-                                        </div>
-                                        <p className="mt-2 text-[var(--text-secondary)]">Use the prompt below to describe the website you want to build. Start with a template or write your own.</p>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <div className="flex items-center gap-3">
-                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-subtle)] text-[hsl(var(--accent))] font-bold text-sm">2</span>
-                                            <h3 className="text-lg font-semibold text-[var(--text-primary)]">AI builds the website</h3>
-                                        </div>
-                                        <p className="mt-2 text-[var(--text-secondary)]">Our AI agent designs and codes a complete React component based on your description.</p>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <div className="flex items-center gap-3">
-                                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[var(--accent-subtle)] text-[hsl(var(--accent))] font-bold text-sm">3</span>
-                                            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Preview and deploy</h3>
-                                        </div>
-                                        <p className="mt-2 text-[var(--text-secondary)]">Review the live preview, edit the code, and deploy your site to the web with one click.</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     )}
 
@@ -850,11 +741,18 @@ const HomePage = () => {
                 </div>
               </div>
 
-              {appMode === 'chat' && chatStage === 'active' && (
-                <div className={`chat-input-layer ${isMobile ? 'mobile-input' : ''}`}>
+              {appMode === 'chat' && (
+                <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
+                  
                   {showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
                     <div className="mb-3">
                       <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                    </div>
+                  )}
+
+                  {chatStage === 'new-chat' && (
+                    <div className="mb-4">
+                        <ModeToggle mode={buildMode} setMode={setBuildMode} />
                     </div>
                   )}
 
@@ -871,7 +769,7 @@ const HomePage = () => {
                         }
                       }}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                      placeholder="Ask a follow-up or give a new instruction..."
+                      placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page for an AI email assistant”" : "Ask a follow-up or give a new instruction..."}
                       className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
                       rows={1}
                     />
@@ -885,6 +783,13 @@ const HomePage = () => {
                       </button>
                     )}
                   </div>
+                  
+                  {chatStage === 'new-chat' && (
+                     <div className="mt-6">
+                        <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
+                    </div>
+                  )}
+
                 </div>
               )}
             </div>
@@ -971,7 +876,7 @@ const HomePage = () => {
           onClose={() => setShowSettingsSheet(false)}
           user={user}
           theme={theme}
-          setTheme={changeTheme}
+          setTheme={setTheme}
           onUpdateUser={handleUpdateUser}
         />
       )}
