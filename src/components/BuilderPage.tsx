@@ -184,7 +184,7 @@ MonacoEditor.displayName = 'MonacoEditor';
 // Stripped down purely to editor container
 function CodePanel({ code, setCode, isGenerating, editorRef }) {
   return (
-    <div className="h-full flex flex-col border-r border-[#262626] overflow-hidden bg-[#1c1c1e]">
+    <div className="h-full flex flex-col border-r border-[#2a2a2e] overflow-hidden bg-[#1c1c1e]">
       <div className="flex-1 relative min-h-0 bg-[#1e1e1e]">
         <MonacoEditor 
           ref={editorRef} 
@@ -216,7 +216,7 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
       {isReloading && <div className="preview-loading-bar" />}
 
       <div className="flex-1 bg-[#0f0f12] overflow-hidden flex justify-center relative">
-        <div className={`relative h-full transition-all duration-300 ${deviceMode === 'Mobile' ? 'w-[375px] border-x border-[#262626]' : deviceMode === 'Tablet' ? 'w-[768px] border-x border-[#262626]' : 'w-full'}`}>
+        <div className={`relative h-full transition-all duration-300 ${deviceMode === 'Mobile' ? 'w-[375px] border-x border-[#2a2a2e]' : deviceMode === 'Tablet' ? 'w-[768px] border-x border-[#2a2a2e]' : 'w-full'}`}>
           <iframe key={reloadKey} title="preview" srcDoc={sandboxDoc} className={`w-full h-full border-none bg-white ${isRevealing ? 'preview-reveal' : ''}`} sandbox="allow-scripts allow-modals allow-forms allow-same-origin" />
           
           <div className={`absolute inset-0 bg-[#0f0f12] flex flex-col z-10 transition-opacity duration-[350ms] ease-in-out ${isReloading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
@@ -337,9 +337,9 @@ export default function BuilderPage() {
   }, [code, isGenerating]);
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#1c1c1e]">
-        <header className="flex items-center justify-between px-4 h-[52px] border-b border-[#2a2a2e] bg-[#161618] flex-shrink-0 gap-3">
-            
+    <div className="builder-floating">
+      <div className="builder-window">
+        <header className="builder-header">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-2 text-[13px] text-gray-300 bg-white/5 px-2.5 py-1 rounded border border-white/5 font-mono">
                 <span className="text-[#61dafb] text-[15px]">⚛</span> App.jsx
@@ -399,22 +399,23 @@ export default function BuilderPage() {
             </div>
         </header>
 
-        <div className="grid grid-cols-2 flex-1 overflow-hidden bg-[#1c1c1e]">
+        <div className="builder-body">
             <CodePanel 
-            code={code} 
-            setCode={setCode} 
-            isGenerating={isGenerating}
-            editorRef={editorRef}
+              code={code} 
+              setCode={setCode} 
+              isGenerating={isGenerating}
+              editorRef={editorRef}
             />
             <PreviewPanel 
-            reloadKey={previewKey} 
-            code={debouncedCode}
-            isFullscreen={isFullscreen}
-            deviceMode={deviceMode}
-            isReloading={isReloading}
-            isRevealing={isRevealing}
+              reloadKey={previewKey} 
+              code={debouncedCode}
+              isFullscreen={isFullscreen}
+              deviceMode={deviceMode}
+              isReloading={isReloading}
+              isRevealing={isRevealing}
             />
         </div>
+      </div>
     </div>
   );
 }

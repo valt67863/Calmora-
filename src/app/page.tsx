@@ -299,7 +299,6 @@ const HomePage = () => {
     setThinking(false); 
     setInput(""); 
     setAppMode("chat");
-    // Don't reset buildMode here, let the user control it
     setShowSuggestionList(false);
   };
 
@@ -534,10 +533,11 @@ const HomePage = () => {
     setShowEditProfileModal(false);
   };
 
-  const isBuilderVisible = buildMode === 'builder' && !isMobile;
+  const isBuilderVisible = buildMode === 'builder' && !isMobile && appMode === 'chat';
 
-  const renderStandardMode = () => (
+  return (
     <>
+      <div className="app-root">
         <aside
           className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
         >
@@ -653,219 +653,148 @@ const HomePage = () => {
         </aside>
         
         <main className="app-main">
-          <div className="flex flex-col relative h-full transition-all duration-300 ease-in-out w-full">
-            <Header
-              user={headerUser}
-              isMobile={isMobile}
-              onMenu={() => setSidebarOpen(true)}
-              onSignOut={() => window.location.reload()}
-              theme={theme}
-              setTheme={changeTheme}
-              projects={projects}
-              onOpenProject={handleOpenProject}
-              activeProject={activeProject}
-              onTriggerProjectAction={setProjectActionData}
-              onExitProject={handleExitProject}
-            />
+          <Header
+            user={headerUser}
+            isMobile={isMobile}
+            onMenu={toggleSidebar}
+            onSignOut={() => window.location.reload()}
+            theme={theme}
+            setTheme={changeTheme}
+            projects={projects}
+            onOpenProject={handleOpenProject}
+            activeProject={activeProject}
+            onTriggerProjectAction={setProjectActionData}
+            onExitProject={handleExitProject}
+          />
             
-            <div className="flex-1 min-h-0 relative flex flex-col">
-              <div className="relative flex flex-col h-full min-h-0 w-full">
-                <div className="scroll-content custom-scrollbar" ref={scrollRef} onScroll={handleScroll}>
-                  <div className="workspace-container">
-                    <div className="flex-1 w-full relative">
-                      {appMode === 'chat' && chatStage === 'new-chat' && (
-                        <div className="flex flex-col items-center justify-center h-full">
-                          {/* This space is intentionally left blank for home-mode input */}
-                        </div>
-                      )}
+          <div className="flex-1 min-h-0 relative flex flex-col">
+            <div className="relative flex flex-col h-full min-h-0 w-full">
+              <div className="scroll-content custom-scrollbar" ref={scrollRef} onScroll={handleScroll}>
+                <div className="workspace-container">
+                  <div className="flex-1 w-full relative">
+                    {appMode === 'chat' && chatStage === 'new-chat' && (
+                      <div className="flex flex-col items-center justify-center h-full">
+                        {/* This space is intentionally left blank for home-mode input */}
+                      </div>
+                    )}
 
-                      {appMode === 'chat' && chatStage === 'active' && (
-                        <div className="flex flex-col items-center w-full px-4 py-6 min-h-full relative">
-                          {messages.map((msg) => (
-                            <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-center"} mb-8 animate-message-in`}>
-                              {msg.role === "user" ? (
-                                <div className="bg-[var(--surface-raised)] px-5 py-3 rounded-[20px] rounded-br-sm text-[16px] leading-[1.6] max-w-[85%] md:max-w-[72%] text-[var(--text-primary)] font-sans tracking-normal border border-[var(--border)] backdrop-blur-md shadow-sm">{msg.content}</div>
-                              ) : (
-                                <div className="w-full max-w-[720px] font-sans text-[var(--text-secondary)]">{formatAIResponse(msg.content)}</div>
-                              )}
+                    {appMode === 'chat' && chatStage === 'active' && (
+                      <div className="flex flex-col items-center w-full px-4 py-6 min-h-full relative">
+                        {messages.map((msg) => (
+                          <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-center"} mb-8 animate-message-in`}>
+                            {msg.role === "user" ? (
+                              <div className="bg-[var(--surface-raised)] px-5 py-3 rounded-[20px] rounded-br-sm text-[16px] leading-[1.6] max-w-[85%] md:max-w-[72%] text-[var(--text-primary)] font-sans tracking-normal border border-[var(--border)] backdrop-blur-md shadow-sm">{msg.content}</div>
+                            ) : (
+                              <div className="w-full max-w-[720px] font-sans text-[var(--text-secondary)]">{formatAIResponse(msg.content)}</div>
+                            )}
+                          </div>
+                        ))}
+                        {thinking && (
+                          <div className="w-full flex justify-center mb-6 animate-message-in">
+                            <div className="w-full max-w-[720px] pl-4 md:pl-0 flex items-center gap-2 text-[var(--text-tertiary)]">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.2s]" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.1s]" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce" />
                             </div>
-                          ))}
-                          {thinking && (
-                            <div className="w-full flex justify-center mb-6 animate-message-in">
-                              <div className="w-full max-w-[720px] pl-4 md:pl-0 flex items-center gap-2 text-[var(--text-tertiary)]">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.2s]" />
-                                <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.1s]" />
-                                <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce" />
-                              </div>
-                            </div>
-                          )}
-                          <div ref={messagesEndRef} className="h-24" />
-                        </div>
-                      )}
-                      
-                      {appMode !== 'chat' && (
-                        <>
-                          {appMode === "settings" && <SettingsView 
-                              user={user} 
-                              theme={theme} 
-                              setTheme={changeTheme} 
-                              onShowEditProfile={() => setShowEditProfileModal(true)}
-                              onShowChangePassword={() => setShowChangePasswordModal(true)}
-                              onShowBilling={() => setShowBillingModal(true)}
-                            />}
-                          {appMode === "projects" && <ProjectsView projects={projects} setShowProjectModal={setShowProjectModal} onOpenProject={handleOpenProject} setProjectActionData={setProjectActionData} />}
-                          {appMode === "history" && <HistoryView sessions={threads} onOpenSession={switchThread} />}
-                          {appMode === "goals" && <GoalsView activeGoals={activeGoals} setShowGoalModal={setShowGoalModal} />}
-                          {appMode === "activity" && <ProjectActivityView activities={projectActivities} />}
-                          {appMode === "completed" && <CompletedView achievements={achievements} />}
-                          {appMode === "focus" && <FocusMode steps={FOCUS_DEMO_STEPS} stepIndex={focusStepIndex} setStepIndex={setFocusStepIndex} onExit={() => setAppMode("chat")} />}
-                        </>
-                      )}
-                    </div>
+                          </div>
+                        )}
+                        <div ref={messagesEndRef} className="h-24" />
+                      </div>
+                    )}
+                    
+                    {appMode !== 'chat' && (
+                      <>
+                        {appMode === "settings" && <SettingsView 
+                            user={user} 
+                            theme={theme} 
+                            setTheme={changeTheme} 
+                            onShowEditProfile={() => setShowEditProfileModal(true)}
+                            onShowChangePassword={() => setShowChangePasswordModal(true)}
+                            onShowBilling={() => setShowBillingModal(true)}
+                          />}
+                        {appMode === "projects" && <ProjectsView projects={projects} setShowProjectModal={setShowProjectModal} onOpenProject={handleOpenProject} setProjectActionData={setProjectActionData} />}
+                        {appMode === "history" && <HistoryView sessions={threads} onOpenSession={switchThread} />}
+                        {appMode === "goals" && <GoalsView activeGoals={activeGoals} setShowGoalModal={setShowGoalModal} />}
+                        {appMode === "activity" && <ProjectActivityView activities={projectActivities} />}
+                        {appMode === "completed" && <CompletedView achievements={achievements} />}
+                        {appMode === "focus" && <FocusMode steps={FOCUS_DEMO_STEPS} stepIndex={focusStepIndex} setStepIndex={setFocusStepIndex} onExit={() => setAppMode("chat")} />}
+                      </>
+                    )}
                   </div>
                 </div>
+              </div>
 
-                {appMode === 'chat' && (
-                  <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
-                    {chatStage === 'new-chat' && (
-                      <div className="w-full flex flex-col items-center">
-                        <div className="text-center">
-                          <h1 className="text-2xl font-semibold text-[var(--text-primary)] mb-1">
-                            Build Websites with AI
-                          </h1>
-                          <p className="text-md text-[var(--text-secondary)]">
-                            Design and code websites with AI
-                          </p>
-                        </div>
-                        <div className="my-4">
-                          <ModeToggle mode={buildMode} setMode={(mode) => {
-                            setBuildMode(mode);
-                            if (mode === 'builder') {
-                              setAppMode('chat');
-                              if (chatStage === 'new-chat') {
-                                setMessages([]);
-                                setChatStage('active');
-                              }
+              {appMode === 'chat' && (
+                <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
+                  {chatStage === 'new-chat' && (
+                    <div className="w-full flex flex-col items-center">
+                      <div className="text-center">
+                        <h1 className="text-2xl font-semibold text-[var(--text-primary)] mb-1">
+                          Build Websites with AI
+                        </h1>
+                        <p className="text-md text-[var(--text-secondary)]">
+                          Design and code websites with AI
+                        </p>
+                      </div>
+                      <div className="my-4">
+                        <ModeToggle mode={buildMode} setMode={(mode) => {
+                          setBuildMode(mode);
+                          if (mode === 'builder') {
+                            setAppMode('chat');
+                            if (chatStage === 'new-chat') {
+                              setMessages([]);
+                              setChatStage('active');
                             }
-                          }} />
-                        </div>
-                      </div>
-                    )}
-                    <div className="chat-input-surface">
-                      <textarea
-                        ref={textareaRef}
-                        value={input}
-                        onChange={(e) => {
-                          setInput(e.target.value);
-                          if (e.target.value.trim().length > 0) {
-                            setShowSuggestionList(true);
-                          } else {
-                            setShowSuggestionList(false);
                           }
-                        }}
-                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                        placeholder={activeProject ? `Type to add to ${activeProject.title}...` : "What do you need to finish?"}
-                        className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
-                        rows={1}
-                      />
-                      {input.trim() ? (
-                        <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-                          {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                        </button>
-                      ) : (
-                        <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-                          <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-                        </button>
-                      )}
-                    </div>
-                    {chatStage === "new-chat" && (
-                      <div className="mt-4 w-full max-w-xl mx-auto">
-                        {input.trim() === '' ? (
-                          <>
-                            <PromptSuggestions suggestions={promptSuggestions} setPrompt={handleSuggestionClick} />
-                            <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
-                          </>
-                        ) : (
-                          showSuggestionList && filteredSuggestions.length > 0 && <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </main>
-    </>
-  );
-
-  const renderBuilderMode = () => (
-      <div className="flex w-full h-screen bg-[#0f0f12] text-white">
-          {/* Left Chat Panel */}
-          <div className="w-[440px] flex-shrink-0 bg-[#111214] border-r border-[#2a2a2e] flex flex-col">
-              <div className="h-14 flex-shrink-0 flex items-center justify-between px-4 border-b border-[#2a2a2e]">
-                  <div className="flex items-center gap-2">
-                      <CalmoraLogo size={24} className="text-primary" />
-                      <h2 className="font-semibold text-white">Builder Mode</h2>
-                  </div>
-                  <ModeToggle mode={buildMode} setMode={setBuildMode} />
-              </div>
-              <div className="flex-1 min-h-0 overflow-y-auto p-5 custom-scrollbar" ref={scrollRef}>
-                {messages.map((msg) => (
-                    <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-start"} mb-6 animate-message-in`}>
-                      {msg.role === "user" ? (
-                        <div className="bg-primary/10 border border-primary/20 px-4 py-2.5 rounded-xl rounded-br-sm text-[15px] leading-relaxed max-w-[90%] text-gray-200 font-sans">{msg.content}</div>
-                      ) : (
-                        <div className="w-full max-w-full font-sans text-gray-400">{formatAIResponse(msg.content)}</div>
-                      )}
-                    </div>
-                  ))}
-                  {thinking && (
-                    <div className="w-full flex justify-start mb-6 animate-message-in">
-                      <div className="w-full max-w-[720px] flex items-center gap-2 text-[var(--text-tertiary)]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.2s]" />
-                          <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce [animation-delay:-0.1s]" />
-                          <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] animate-bounce" />
+                        }} />
                       </div>
                     </div>
                   )}
-                  <div ref={messagesEndRef} />
-              </div>
-              <div className="p-4 border-t border-[#2a2a2e]">
                   <div className="chat-input-surface">
-                      <textarea
-                        ref={textareaRef}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                        placeholder="Continue building..."
-                        className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
-                        rows={1}
-                      />
-                      {input.trim() ? (
-                        <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-                          {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                        </button>
-                      ) : (
-                        <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-                          <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-                        </button>
-                      )}
+                    <textarea
+                      ref={textareaRef}
+                      value={input}
+                      onChange={(e) => {
+                        setInput(e.target.value);
+                        if (e.target.value.trim().length > 0) {
+                          setShowSuggestionList(true);
+                        } else {
+                          setShowSuggestionList(false);
+                        }
+                      }}
+                      onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                      placeholder={activeProject ? `Type to add to ${activeProject.title}...` : "What do you need to finish?"}
+                      className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
+                      rows={1}
+                    />
+                    {input.trim() ? (
+                      <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+                        {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                      </button>
+                    ) : (
+                      <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+                        <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+                      </button>
+                    )}
                   </div>
-              </div>
+                  {chatStage === "new-chat" && (
+                    <div className="mt-4 w-full max-w-xl mx-auto">
+                      {input.trim() === '' ? (
+                        <>
+                          <PromptSuggestions suggestions={promptSuggestions} setPrompt={handleSuggestionClick} />
+                          <div className="text-center mt-3 opacity-60 text-[10px] text-[var(--text-tertiary)] font-sans">Calmora creates a private space for your thoughts.</div>
+                        </>
+                      ) : (
+                        showSuggestionList && filteredSuggestions.length > 0 && <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-
-          {/* Right Builder Panel */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-              <BuilderPage />
-          </div>
-      </div>
-  );
-
-  return (
-    <>
-      <div className="app-root">
-        {isBuilderVisible && appMode === 'chat' ? renderBuilderMode() : renderStandardMode()}
+          {isBuilderVisible && <BuilderPage />}
+        </main>
         
         {isMobile && sidebarOpen && (
           <div onTouchStart={() => setSidebarOpen(false)} onMouseDown={() => setSidebarOpen(false)} className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm" style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }} aria-hidden="true" />

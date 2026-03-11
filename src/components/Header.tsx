@@ -61,10 +61,14 @@ const Header: React.FC<Props> = ({
   };
   
   return (
-    <header className={`app-header ${isBuilderMode ? 'py-2 h-14' : 'py-4'}`}>
-      
+    <header className="app-header">
       <div className="header-left-container">
         {isMobile && !activeProject && (
+          <button className="header-btn" onClick={onMenu} title="Open menu">
+            <Menu size={20} strokeWidth={1.5} />
+          </button>
+        )}
+        {!isMobile && (
           <button className="header-btn" onClick={onMenu} title="Open menu">
             <Menu size={20} strokeWidth={1.5} />
           </button>
