@@ -685,14 +685,6 @@ const HomePage = () => {
               <div className="scroll-content custom-scrollbar" ref={scrollRef}>
                 <div className="workspace-container">
                   <div className="flex-1 w-full relative">
-                    {appMode === 'chat' && chatStage === 'new-chat' && (
-                        <div className="flex flex-col items-center text-center w-full max-w-4xl mx-auto px-4 pt-8 md:pt-16 animate-in fade-in-0 duration-500">
-                            <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] tracking-tight leading-tight max-w-3xl">
-                                Turn your startup idea into a live website with AI.
-                            </h1>
-                        </div>
-                    )}
-
                     {appMode === 'chat' && chatStage === 'active' && (
                       <div className="flex flex-col items-center w-full px-4 py-6 min-h-full relative">
                         {messages.map((msg) => (
