@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Copy, Download, Wand2, RefreshCw, Maximize, 
+  Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
   Save, Sparkles, Monitor, Tablet, Smartphone
 } from 'lucide-react';
 
@@ -41,7 +41,7 @@ const initialCode = `function App() {
           Welcome to the future of AI builders. Everything is generated as a single React component, instantly compiled and rendered.
         </p>
         
-        <div className="flex items-center justify-center gap-4 pt-4">
+        <div className="flex items-center justify-center gap-4 paddingTop-4">
           <button className="px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-gray-100 transition-colors">
             Get Started
           </button>
@@ -184,7 +184,7 @@ MonacoEditor.displayName = 'MonacoEditor';
 // Stripped down purely to editor container
 function CodePanel({ code, setCode, isGenerating, editorRef }) {
   return (
-    <div className="h-full flex flex-col border-r border-[#2a2a2e] overflow-hidden bg-[#1c1c1e]">
+    <div className="h-full flex flex-col overflow-hidden bg-[#1c1c1e]">
       <div className="flex-1 relative min-h-0 bg-[#1e1e1e]">
         <MonacoEditor 
           ref={editorRef} 
@@ -202,7 +202,7 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
   const sandboxDoc = generateSandboxDoc(code);
 
   return (
-    <div className={`flex flex-col bg-[#141416] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] relative ${isFullscreen ? 'fixed inset-0 z-50 w-full' : 'w-full'}`}>
+    <div className={`flex flex-col bg-[#141416] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)] relative ${isFullscreen ? 'fixed inset-0 z-[1001] w-full' : 'w-full'}`}>
       <style>{`
         @keyframes previewLoad { 0% { width: 0%; } 40% { width: 60%; } 80% { width: 85%; } 100% { width: 100%; } }
         @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
@@ -338,52 +338,51 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
 
   return (
     <div className="w-full h-full flex flex-col bg-[var(--surface)] overflow-hidden">
-        <header className="builder-header">
-            <div className="flex items-center justify-center gap-4 flex-1">
-              <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-                  <span className="text-[13px] text-green-400 font-medium">Live</span>
-              </div>
-              <div className="flex items-center bg-[#151519] rounded-md p-[3px] border border-white/10">
-                  {['Desktop', 'Tablet', 'Mobile'].map(mode => {
-                  const Icon = mode === 'Desktop' ? Monitor : mode === 'Tablet' ? Tablet : Smartphone;
-                  return (
-                      <button
-                      key={mode}
-                      onClick={() => setDeviceMode(mode)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-[4px] transition-all ${
-                          deviceMode === mode 
-                          ? 'bg-[#2a2a30] text-white shadow-sm border border-white/5' 
-                          : 'text-gray-400 hover:text-white hover:bg-[#2a2a30]/50 border border-transparent'
-                      }`}
-                      >
-                      <Icon size={14} />
-                      <span className="hidden xl:inline">{mode}</span>
-                      </button>
-                  )
-                  })}
-              </div>
-              <div className="flex items-center gap-1">
-                  <button onClick={handleReload} title="Reload Preview" disabled={isReloading} className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-50">
-                    <RefreshCw size={14} className={isReloading ? "animate-spin" : ""} /> 
-                  </button>
-                  <button onClick={() => setIsFullscreen(!isFullscreen)} title="Fullscreen Preview" className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
-                    <Maximize size={14} />
-                  </button>
-              </div>
+        <header className="builder-header justify-between px-4">
+            {/* Left: Device Toggles & Preview Controls */}
+            <div className="flex items-center gap-4">
+                <div className="flex items-center bg-[#151519] rounded-lg p-1 border border-white/10">
+                    {['Desktop', 'Tablet', 'Mobile'].map(mode => {
+                    const Icon = mode === 'Desktop' ? Monitor : mode === 'Tablet' ? Tablet : Smartphone;
+                    return (
+                        <button
+                        key={mode}
+                        onClick={() => setDeviceMode(mode)}
+                        title={mode}
+                        className={`flex items-center justify-center w-9 h-7 rounded-md transition-all ${
+                            deviceMode === mode 
+                            ? 'bg-[#333338] text-white shadow-sm' 
+                            : 'text-gray-400 hover:text-white'
+                        }`}
+                        >
+                        <Icon size={16} />
+                        </button>
+                    )
+                    })}
+                </div>
+                <div className="h-5 w-px bg-white/10" />
+                <div className="flex items-center gap-1">
+                    <button onClick={handleReload} title="Reload Preview" disabled={isReloading} className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50">
+                        <RefreshCw size={16} className={isReloading ? "animate-spin" : ""} /> 
+                    </button>
+                    <button onClick={() => setIsFullscreen(!isFullscreen)} title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Preview"} className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                        {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+                    </button>
+                </div>
             </div>
 
+            {/* Right: Actions */}
             <div className="flex items-center gap-3">
-              <button onClick={handleCopy} title="Copy Code" className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors">
-                <Copy size={14} /> <span className="hidden lg:inline">{copied ? 'Copied!' : 'Copy'}</span>
-              </button>
-              <button onClick={handleDownloadZip} title="Download Project" disabled={isDownloading} className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors disabled:opacity-50">
-                <Download size={14} /> <span className="hidden lg:inline">{isDownloading ? 'Zipping...' : 'Download'}</span>
-              </button>
-              <span className="text-[11px] text-gray-500 font-mono hidden xl:inline">{saveStatus}</span>
-              <button className="flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
-                Deploy
-              </button>
+                <span className="text-[12px] text-gray-500 font-mono hidden xl:inline">{saveStatus}</span>
+                <button onClick={handleCopy} title="Copy Code" className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors">
+                    <Copy size={15} /> <span>{copied ? 'Copied!' : 'Copy'}</span>
+                </button>
+                <button onClick={handleDownloadZip} title="Download as ZIP" disabled={isDownloading} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors disabled:opacity-50">
+                    <Download size={15} /> <span>{isDownloading ? 'Zipping...' : 'Export Code'}</span>
+                </button>
+                <button className="flex items-center gap-2 px-4 py-1.5 text-[14px] font-medium bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
+                    Deploy
+                </button>
             </div>
         </header>
 
