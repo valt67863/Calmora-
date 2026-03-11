@@ -534,7 +534,7 @@ const HomePage = () => {
     setShowEditProfileModal(false);
   };
 
-  const isBuilderVisible = buildMode === 'builder' && !isMobile && appMode === 'chat';
+  const isBuilderVisible = buildMode === 'builder' && appMode === 'chat' && !isMobile;
 
   return (
     <>
@@ -668,7 +668,7 @@ const HomePage = () => {
             onExitProject={handleExitProject}
           />
             
-          <div className="flex-1 min-h-0 relative flex">
+          <div className={`flex-1 min-h-0 relative flex transition-all duration-300 ease-in-out`}>
             {/* Chat Panel */}
             <div className={`h-full relative flex flex-col transition-all duration-300 ease-in-out ${isBuilderVisible ? 'w-[40%]' : 'w-full'}`}>
               <div className="scroll-content custom-scrollbar" ref={scrollRef}>
@@ -793,7 +793,7 @@ const HomePage = () => {
 
             {/* Builder Panel */}
             {isBuilderVisible && (
-              <div className="h-full p-10 pl-0" style={{ width: '60%' }}>
+              <div className="h-full p-10 animate-in fade-in-0 slide-in-from-right-4 duration-300" style={{ width: '60%' }}>
                 <BuilderPage />
               </div>
             )}
