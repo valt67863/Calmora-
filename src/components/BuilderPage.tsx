@@ -6,8 +6,10 @@ import {
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
   Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle,
   AlertCircle, ChevronDown, ChevronUp, Undo, Redo, Loader2,
-  ArrowLeft, MoreHorizontal, Edit3, Trash2
+  ArrowLeft, MoreHorizontal, Edit3, Trash2, Send, CheckCircle2, Circle, Zap,
 } from 'lucide-react';
+import PromptSuggestions from "@/components/PromptSuggestions";
+
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
 if (typeof window !== 'undefined') {
@@ -193,7 +195,95 @@ const MonacoEditor = React.forwardRef(({ value, onChange, readOnly }, ref) => {
 });
 MonacoEditor.displayName = 'MonacoEditor';
 
-// Stripped down purely to editor container
+function ChatPanel({
+  messages,
+  thinking,
+  input,
+  setInput,
+  sendMessage,
+  formatAIResponse,
+  generationSteps,
+  progressStep,
+  followUpSuggestions,
+  onSuggestionClick,
+  messagesEndRef,
+  textareaRef,
+}: any) {
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
+    }
+  }, [input, textareaRef]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, thinking, messagesEndRef]);
+
+  return (
+    <div className="builder-chat-panel">
+      <header className="builder-chat-header">
+        <h3 className="text-sm font-medium text-gray-200">AI Assistant</h3>
+      </header>
+      <div className="builder-chat-messages custom-scrollbar">
+        {messages.map((msg: any) => (
+          <div key={msg.id} className={`w-full flex mb-6 animate-message-in ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+            {msg.role === "user" ? (
+              <div className="user-message">{msg.content}</div>
+            ) : (
+              <div className="ai-message">{formatAIResponse(msg.content)}</div>
+            )}
+          </div>
+        ))}
+        {thinking && (
+           <div className="w-full flex justify-start mb-6 animate-message-in">
+              <div className="ai-message">
+                <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating website</div>
+                <div className="space-y-3">
+                  {generationSteps.map((step: string, index: number) => (
+                    <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
+                      {index < progressStep ? (
+                        <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
+                      ) : index === progressStep ? (
+                        <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
+                      ) : (
+                        <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
+                      )}
+                      <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="builder-chat-input-area">
+        {!thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
+          <div className="mb-4">
+              <PromptSuggestions suggestions={followUpSuggestions} setPrompt={onSuggestionClick} />
+          </div>
+        )}
+        <div className="chat-input-surface">
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+            placeholder="Continue the conversation..."
+            className="flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[120px] overflow-y-auto scrollbar-hide font-sans py-1"
+            rows={1}
+          />
+          <button onClick={sendMessage} disabled={thinking || !input.trim()} className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-8 h-8 rounded-full bg-primary text-primary-foreground disabled:opacity-50 active:scale-95">
+            {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function CodePanel({ code, setCode, isGenerating, editorRef }) {
   return (
     <div className="h-full flex flex-col overflow-hidden bg-[#1c1c1e]">
@@ -332,13 +422,37 @@ export default function BuilderPage({
   activeProject,
   onRename,
   onDuplicate,
-  onDelete
+  onDelete,
+  messages,
+  thinking,
+  input,
+  setInput,
+  sendMessage,
+  formatAIResponse,
+  generationSteps,
+  progressStep,
+  followUpSuggestions,
+  onSuggestionClick,
+  messagesEndRef,
+  textareaRef,
 }: { 
   onExit: () => void;
   activeProject: any;
   onRename: (project: any) => void;
   onDuplicate: (project: any) => void;
   onDelete: (project: any) => void;
+  messages: any[];
+  thinking: boolean;
+  input: string;
+  setInput: (input: string) => void;
+  sendMessage: () => void;
+  formatAIResponse: (text: string) => React.ReactNode[];
+  generationSteps: string[];
+  progressStep: number;
+  followUpSuggestions: string[];
+  onSuggestionClick: (prompt: string) => void;
+  messagesEndRef: React.RefObject<HTMLDivElement>;
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
 }) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
@@ -493,13 +607,13 @@ export default function BuilderPage({
                         <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
                           <MoreHorizontal size={18} />
                         </button>
-                        {showBuilderMenu && (
+                        {showBuilderMenu && activeProject && (
                           <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
                             <div className="p-2">
-                                <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Edit3 size={15} /> Rename</button>
-                                <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Copy size={15} /> Duplicate</button>
+                                <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
+                                <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
                                 <div className="h-px bg-[var(--border)] my-1" />
-                                <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Trash2 size={15} /> Delete</button>
+                                <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
                             </div>
                           </div>
                         )}
@@ -569,14 +683,28 @@ export default function BuilderPage({
             </div>
         </header>
 
-        <div className="builder-body">
+        <div className="builder-body-grid">
+            <ChatPanel 
+              messages={messages}
+              thinking={thinking}
+              input={input}
+              setInput={setInput}
+              sendMessage={sendMessage}
+              formatAIResponse={formatAIResponse}
+              generationSteps={generationSteps}
+              progressStep={progressStep}
+              followUpSuggestions={followUpSuggestions}
+              onSuggestionClick={onSuggestionClick}
+              messagesEndRef={messagesEndRef}
+              textareaRef={textareaRef}
+            />
             <CodePanel 
               code={code} 
               setCode={setCode} 
               isGenerating={isGenerating}
               editorRef={editorRef}
             />
-            <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex flex-col h-full overflow-hidden bg-[var(--bg)]">
                 <div className="flex-1 min-h-0">
                     <PreviewPanel 
                       reloadKey={previewKey} 
@@ -600,5 +728,3 @@ export default function BuilderPage({
     </div>
   );
 }
-
-    

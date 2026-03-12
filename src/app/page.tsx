@@ -129,10 +129,10 @@ const HomePage = () => {
   ], []);
 
   const filteredSuggestions = useMemo(() => {
-    if (!input.trim()) return [];
+    if (!input.trim() || chatStage !== 'new-chat') return [];
     const lowercasedInput = input.toLowerCase();
     return promptSuggestions.filter(s => s.toLowerCase().includes(lowercasedInput));
-  }, [input, promptSuggestions]);
+  }, [input, promptSuggestions, chatStage]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -758,6 +758,18 @@ const HomePage = () => {
           onRename={setRenameProject}
           onDuplicate={handleDuplicateProject}
           onDelete={setDeleteProject}
+          messages={messages}
+          thinking={thinking}
+          input={input}
+          setInput={setInput}
+          sendMessage={sendMessage}
+          formatAIResponse={formatAIResponse}
+          generationSteps={generationSteps}
+          progressStep={progressStep}
+          followUpSuggestions={followUpSuggestions}
+          onSuggestionClick={handleSuggestionClick}
+          messagesEndRef={messagesEndRef}
+          textareaRef={textareaRef}
         />
       ) : (
         <div className="app-root">
@@ -851,13 +863,13 @@ const HomePage = () => {
                         </div>
                     )}
 
-                    {chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
+                    {chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && (
                         <div className="absolute bottom-full mb-3 w-full">
                             <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
                         </div>
                     )}
                     
-                    {chatStage === 'active' && !input && (
+                    {chatStage === 'active' && !input && !isBuilderModeActive && (
                         <div className="mb-4">
                             <ModeToggle mode={buildMode} setMode={setBuildMode} />
                         </div>
@@ -869,9 +881,7 @@ const HomePage = () => {
                         value={input}
                         onChange={(e) => {
                           setInput(e.target.value);
-                          if (chatStage === 'new-chat') {
-                              setShowSuggestionList(e.target.value.trim().length > 0);
-                          }
+                          setShowSuggestionList(e.target.value.trim().length > 0);
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                         placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page for an AI email assistant”" : "Ask a follow-up or give a new instruction..."}
@@ -895,7 +905,7 @@ const HomePage = () => {
                         </div>
                     )}
                     
-                    {chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
+                    {chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && !isBuilderModeActive && (
                         <div className="mt-6">
                             <PromptSuggestions suggestions={followUpSuggestions} setPrompt={handleSuggestionClick} />
                         </div>
@@ -912,15 +922,39 @@ const HomePage = () => {
         </div>
       )}
         
-      {showProjectModal && <NewProjectModal onClose={() => setShowProjectModal(false)} onCreate={(t: string) => { 
-          const newProject = { id: generateId(), icon: 'file-text', title: t, step: 1, lastActive: 'just now', tasks: [] };
-          setProjects([...projects, newProject]); 
-          setShowProjectModal(false);
-          handleOpenProject(newProject);
-      }} />}
-      
-      {showGoalModal && <NewGoalModal onClose={() => setShowGoalModal(false)} onCreate={(t: string) => { setActiveGoals([...activeGoals, { id: generateId(), icon: 'target', title: t, startedDaysAgo: 0, progress: 0, nextStep: 'Get started' }]); setShowGoalModal(false); }} />}
-      
+      {(showProjectModal || renameProject || deleteProject) && (
+        <>
+          {showProjectModal && <NewProjectModal onClose={() => setShowProjectModal(false)} onCreate={(t: string) => { 
+              const newProject = { id: generateId(), icon: 'file-text', title: t, step: 1, lastActive: 'just now', tasks: [] };
+              setProjects([...projects, newProject]); 
+              setShowProjectModal(false);
+              handleOpenProject(newProject);
+          }} />}
+          
+          {renameProject && (
+              <EditNameModal
+                  currentName={(renameProject as any).title}
+                  onSave={(newTitle: string) => {
+                      handleRenameProject((renameProject as any).id, newTitle);
+                      setRenameProject(null);
+                  }}
+                  onClose={() => setRenameProject(null)}
+                  title="Rename Project"
+              />
+          )}
+          {deleteProject && (
+              <DeleteConfirmModal
+                  projectName={(deleteProject as any).title}
+                  onConfirm={() => {
+                      handleDeleteProject((deleteProject as any).id);
+                      setDeleteProject(null);
+                  }}
+                  onClose={() => setDeleteProject(null)}
+              />
+          )}
+        </>
+      )}
+
       {projectActionData && (
           <ProjectActionSheet 
               projectData={projectActionData}
@@ -931,27 +965,6 @@ const HomePage = () => {
                   setProjectActionData(null);
               }}
               onDelete={(project) => { setProjectActionData(null); setDeleteProject(project); }}
-          />
-      )}
-      {renameProject && (
-          <EditNameModal
-              currentName={(renameProject as any).title}
-              onSave={(newTitle: string) => {
-                  handleRenameProject((renameProject as any).id, newTitle);
-                  setRenameProject(null);
-              }}
-              onClose={() => setRenameProject(null)}
-              title="Rename Project"
-          />
-      )}
-      {deleteProject && (
-          <DeleteConfirmModal
-              projectName={(deleteProject as any).title}
-              onConfirm={() => {
-                  handleDeleteProject((deleteProject as any).id);
-                  setDeleteProject(null);
-              }}
-              onClose={() => setDeleteProject(null)}
           />
       )}
 
