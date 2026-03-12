@@ -3,11 +3,11 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
+  Copy, Download, RefreshCw,
   Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle,
-  AlertCircle, ChevronDown, ChevronUp, Undo, Redo, Loader2,
+  AlertTriangle, ChevronDown, ChevronUp, Undo, Redo, Loader2,
   ArrowLeft, MoreHorizontal, Edit3, Trash2, Send, CheckCircle2, Circle, Zap, Mic, Menu,
-  Split, Code2, Eye, Rocket
+  Code2, Eye, Split, Rocket, Clock, Info
 } from 'lucide-react';
 import PromptSuggestions from "@/components/PromptSuggestions";
 
@@ -136,7 +136,8 @@ const MonacoEditor = React.forwardRef(({ value, onChange, readOnly }, ref) => {
         smoothScrolling: true,
         cursorBlinking: "smooth",
         cursorSmoothCaretAnimation: "on",
-        readOnly: readOnly
+        readOnly: readOnly,
+        background: '#111113'
       });
 
       editorRef.current.onDidChangeModelContent(() => {
@@ -178,12 +179,12 @@ const MonacoEditor = React.forwardRef(({ value, onChange, readOnly }, ref) => {
   }, [onChange, readOnly, value]);
 
   return (
-    <div className="relative w-full h-full bg-[#1e1e1e] overflow-hidden">
+    <div className="relative w-full h-full bg-[#111113] overflow-hidden">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center text-[#858585] font-mono text-sm z-10 bg-[#1e1e1e]">
+        <div className="absolute inset-0 flex items-center justify-center text-[#858585] font-mono text-sm z-10 bg-[#111113]">
           <div className="flex items-center gap-3">
             <div className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"/>
-            Loading SaaS Editor...
+            Loading Editor...
           </div>
         </div>
       )}
@@ -195,134 +196,130 @@ MonacoEditor.displayName = 'MonacoEditor';
 
 function ChatPanel({
   messages, thinking, input, setInput, sendMessage, formatAIResponse, generationSteps, progressStep,
-  messagesEndRef, textareaRef, chipSuggestions, onSuggestionClick, onExit, activeProject, onRename, onDuplicate, onDelete
+  messagesEndRef, textareaRef, onExit, activeProject, onRename, onDuplicate, onDelete
 }) {
-  const [chatStage, setChatStage] = useState('new-chat');
-  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
-  const builderMenuRef = useRef(null);
+    const [chatStage, setChatStage] = useState(messages.length > 0 ? 'active' : 'new-chat');
+    const [showBuilderMenu, setShowBuilderMenu] = useState(false);
+    const builderMenuRef = useRef(null);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, thinking, messagesEndRef]);
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages, thinking, messagesEndRef]);
 
-  useEffect(() => {
-    if (messages.length > 0 && chatStage === 'new-chat') {
-        setChatStage('active');
-    }
-  }, [messages, chatStage]);
-  
-  useLayoutEffect(() => {
-    const chatInput = textareaRef.current;
-    if (chatInput) {
-      chatInput.style.height = "auto";
-      chatInput.style.height = `${Math.min(chatInput.scrollHeight, 160)}px`;
-    }
-  }, [input, textareaRef]);
+    useEffect(() => {
+        if (messages.length > 0 && chatStage === 'new-chat') {
+            setChatStage('active');
+        }
+    }, [messages, chatStage]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
-        setShowBuilderMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    useLayoutEffect(() => {
+        const chatInput = textareaRef.current;
+        if (chatInput) {
+            chatInput.style.height = "auto";
+            chatInput.style.height = `${Math.min(chatInput.scrollHeight, 160)}px`;
+        }
+    }, [input, textareaRef]);
 
-  return (
-    <div className="builder-chat-panel">
-      <header className="builder-chat-header">
-        <div className="flex items-center gap-2 flex-1 justify-start min-w-0">
-          <button onClick={onExit} title="Exit Builder" className="control-button -ml-2">
-              <ArrowLeft size={18} />
-          </button>
-          <div className="h-5 w-px bg-white/10" />
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm font-medium text-white truncate">{activeProject?.title || "Untitled Project"}</span>
-            <div className="relative" ref={builderMenuRef}>
-              <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
-                <MoreHorizontal size={18} />
-              </button>
-              {showBuilderMenu && activeProject && (
-                <div className="menu-pop animate-pop-in" style={{ left: 0, right: 'auto', top: 'calc(100% + 8px)', width: '220px' }}>
-                  <div className="p-2">
-                      <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
-                      <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
-                      <div className="h-px bg-[var(--border)] my-1" />
-                      <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
-                  </div>
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
+                setShowBuilderMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    return (
+        <div className="builder-chat-panel">
+            <header className="builder-chat-header">
+                <div className="flex items-center gap-2 flex-1 justify-start min-w-0">
+                    <button onClick={onExit} title="Exit Builder" className="control-button -ml-2">
+                        <ArrowLeft size={18} />
+                    </button>
+                    <div className="h-5 w-px bg-white/10" />
+                    <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-sm font-medium text-white truncate">{activeProject?.title || "Untitled Project"}</span>
+                        <div className="relative" ref={builderMenuRef}>
+                            <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
+                                <MoreHorizontal size={18} />
+                            </button>
+                            {showBuilderMenu && activeProject && (
+                                <div className="menu-pop animate-pop-in" style={{ left: 0, right: 'auto', top: 'calc(100% + 8px)', width: '220px' }}>
+                                    <div className="p-2">
+                                        <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
+                                        <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
+                                        <div className="h-px bg-[var(--border)] my-1" />
+                                        <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+            </header>
 
-      <div className="flex-1 min-h-0 relative flex flex-col">
-        <div className="builder-chat-messages custom-scrollbar">
-          {messages.map((msg: any) => (
-            <div key={msg.id} className={`w-full flex mb-6 animate-message-in ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-              {msg.role === "user" ? (
-                <div className="user-message">{msg.content}</div>
-              ) : (
-                <div className="ai-message">{formatAIResponse(msg.content)}</div>
-              )}
-            </div>
-          ))}
-          {thinking && (
-             <div className="w-full flex justify-start mb-6 animate-message-in">
-                <div className="ai-message">
-                  <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating website</div>
-                  <div className="space-y-3">
-                    {generationSteps.map((step: string, index: number) => (
-                      <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
-                        {index < progressStep ? (
-                          <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
-                        ) : index === progressStep ? (
-                          <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
-                        ) : (
-                          <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
-                        )}
-                        <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
-                      </div>
+            <div className="flex-1 min-h-0 relative flex flex-col">
+                <div className="builder-chat-messages custom-scrollbar">
+                    {messages.map((msg: any) => (
+                        <div key={msg.id} className={`w-full flex mb-6 animate-message-in ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                            {msg.role === "user" ? (
+                                <div className="user-message">{msg.content}</div>
+                            ) : (
+                                <div className="ai-message">{formatAIResponse(msg.content)}</div>
+                            )}
+                        </div>
                     ))}
-                  </div>
+                    {thinking && (
+                        <div className="w-full flex justify-start mb-6 animate-message-in">
+                            <div className="ai-message">
+                                <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating...</div>
+                                <div className="space-y-3">
+                                    {generationSteps.map((step: string, index: number) => (
+                                        <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
+                                            {index < progressStep ? (
+                                                <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
+                                            ) : index === progressStep ? (
+                                                <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
+                                            ) : (
+                                                <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
+                                            )}
+                                            <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} className="h-24" />
                 </div>
-              </div>
-          )}
-          <div ref={messagesEndRef} className="h-24" />
-        </div>
-        
-        <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} !relative !bottom-0 !left-0 !transform-none !max-w-none !p-4`}>
-          {chatStage === 'new-chat' && !input && (
-            <div className="mb-4">
-              <PromptSuggestions suggestions={chipSuggestions} setPrompt={onSuggestionClick} />
+                
+                <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} !relative !bottom-auto !left-auto !transform-none !max-w-none !p-4 !w-full`}>
+                    <div className="chat-input-surface">
+                        <textarea
+                            ref={textareaRef}
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                            placeholder={chatStage === 'new-chat' ? "Start building..." : "Ask a follow-up or give a new instruction..."}
+                            className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
+                            rows={1}
+                        />
+                        {input.trim() ? (
+                            <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+                                {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                            </button>
+                        ) : (
+                            <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+                                <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+
             </div>
-          )}
-          <div className="chat-input-surface">
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-              placeholder={"Ask a follow-up or give a new instruction..."}
-              className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
-              rows={1}
-            />
-            {input.trim() ? (
-              <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-                {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-              </button>
-            ) : (
-              <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-                <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-              </button>
-            )}
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 const CodePanel = React.forwardRef(({ code, onChange, readOnly }, ref) => (
@@ -337,96 +334,90 @@ const CodePanel = React.forwardRef(({ code, onChange, readOnly }, ref) => (
 ));
 CodePanel.displayName = 'CodePanel';
 
-function PreviewPanel({ code, reloadKey, deviceMode, isReloading, isRevealing }) {
+function PreviewPanel({ code, reloadKey, deviceMode }) {
   const sandboxDoc = generateSandboxDoc(code);
-  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const panelContent = (
+  return (
     <div className={`preview-panel`}>
-      <style>{`
-        @keyframes previewLoad { 0% { width: 0%; } 40% { width: 60%; } 80% { width: 85%; } 100% { width: 100%; } }
-        @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        @keyframes previewReveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        .preview-loading-bar { position: absolute; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, #f43f5e, #fb7185, #f43f5e); background-size: 200% 100%; animation: previewLoad 0.8s ease forwards, shine 1s linear infinite; z-index: 50; }
-        .preview-reveal { animation: previewReveal 0.35s ease forwards; }
-        @keyframes skeletonLoading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .skeleton { background: linear-gradient(90deg, #1f1f23 25%, #353540 50%, #1f1f23 75%); background-size: 400% 100%; animation: skeletonLoading 1.5s ease-in-out infinite; }
-      `}</style>
-      
-      {isReloading && <div className="preview-loading-bar" />}
-
-      <div className="flex-1 bg-[#0f0f12] overflow-hidden flex justify-center items-center relative">
-        <div className={`relative h-full transition-all duration-300 ease-in-out ${deviceMode === 'Mobile' ? 'w-[375px] max-w-full border-x border-white/10' : deviceMode === 'Tablet' ? 'w-[768px] max-w-full border-x border-white/10' : 'w-full'}`}>
-          <iframe key={reloadKey} title="preview" srcDoc={sandboxDoc} className={`preview-frame ${isRevealing ? 'preview-reveal' : ''}`} sandbox="allow-scripts allow-modals allow-forms allow-same-origin" />
-        </div>
+      <div className={`relative h-full transition-all duration-300 ease-in-out mx-auto ${deviceMode === 'mobile' ? 'w-[375px] max-w-full border-x border-[#1e1e22]' : deviceMode === 'tablet' ? 'w-[768px] max-w-full border-x border-[#1e1e22]' : 'w-full'}`}>
+        <iframe key={reloadKey} title="preview" srcDoc={sandboxDoc} className="preview-frame" sandbox="allow-scripts allow-modals allow-forms allow-same-origin" />
       </div>
     </div>
   );
-
-  return panelContent;
 }
 
 function ConsolePanel({ error, isOpen, setIsOpen }) {
-  const getTime = () => new Date().toLocaleTimeString('en-US', { hour12: false });
-
   return (
-      <div className="console">
-          <div className="console-header">
-              Console
+      <div className={`console ${!isOpen ? 'collapsed' : ''}`}>
+          <div className="console-header" onClick={() => setIsOpen(!isOpen)}>
+              <h3>Console</h3>
+              <button className="collapse-btn">
+                {isOpen ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+              </button>
           </div>
-          <div className="console-logs">
-              {error ? (
-                  <div className="log error">
-                      Error: {error.message}
-                  </div>
-              ) : (
-                  <div className="log">
-                      Build successful. Live preview is active.
-                  </div>
-              )}
+          <div className="console-body">
+            {error ? (
+              <div className="console-error-view">
+                <div className="error-message">
+                  <XCircle size={16} /> File: src/app/page.tsx - React hook cannot be used in a server component.
+                </div>
+                <div className="error-actions">
+                    <button className="ai-action-btn fix-btn"><Sparkles size={14}/> Fix with AI</button>
+                    <button className="ai-action-btn explain-btn"><Lightbulb size={14}/> Explain Error</button>
+                </div>
+              </div>
+            ) : (
+              <div className="console-log-view">
+                <div className="log-line">
+                  <span className="timestamp">{new Date().toLocaleTimeString()}</span>
+                  <span className="log-text">Build successful. Live preview is active.</span>
+                </div>
+              </div>
+            )}
           </div>
       </div>
   );
 }
 
 function OutputHeader({
-  viewMode, setViewMode, deviceMode, setDeviceMode, onReload, onCopy, copied, onExport, isDownloading, error, onDeploy, saveStatus
+  viewMode, setViewMode, deviceMode, setDeviceMode, onReload, onCopy, copied, onExport, isDownloading, error, saveStatus, onDeploy, onUndo, onRedo
 }) {
   return (
     <div className="output-header">
       <div className="flex items-center gap-4">
-        <div className="device-switch">
-          {[{mode: 'Desktop', icon: Monitor}, {mode: 'Tablet', icon: Tablet}, {mode: 'Mobile', icon: Smartphone}].map(item => (
-            <button key={item.mode} onClick={() => setDeviceMode(item.mode)} className={deviceMode === item.mode ? 'active' : ''}>
-              <item.icon size={16} />
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+            <button onClick={onUndo} className="header-tool-btn"><Undo size={16} /></button>
+            <button onClick={onRedo} className="header-tool-btn"><Redo size={16} /></button>
         </div>
-
-        <div className="view-switch">
-          {[{mode: 'code', icon: Code2}, {mode: 'preview', icon: Eye}, {mode: 'split', icon: Split}].map(item => (
-            <button key={item.mode} onClick={() => setViewMode(item.mode)} className={viewMode === item.mode ? 'active' : ''}>
+        <div className="h-6 w-px bg-[#1e1e22]" />
+        <div className="device-switch">
+          {[{mode: 'desktop', icon: Monitor}, {mode: 'tablet', icon: Tablet}, {mode: 'mobile', icon: Smartphone}].map(item => (
+            <button key={item.mode} onClick={() => setDeviceMode(item.mode)} className={deviceMode === item.mode ? 'active' : ''} title={`Preview on ${item.mode}`}>
               <item.icon size={16} />
             </button>
           ))}
         </div>
       </div>
+      
+      <div className="view-switch">
+        {[{mode: 'code', icon: Code2}, {mode: 'split', icon: Split}, {mode: 'preview', icon: Eye}].map(item => (
+          <button key={item.mode} onClick={() => setViewMode(item.mode)} className={viewMode === item.mode ? 'active' : ''} title={`${item.mode.charAt(0).toUpperCase() + item.mode.slice(1)} view`}>
+            <item.icon size={16} />
+          </button>
+        ))}
+      </div>
 
       <div className="output-actions">
         {error ? (
-          <span className="status error">1 error detected</span>
+          <span className="status error" onClick={() => { /* open console */ }}>● 1 error detected</span>
         ) : (
-          <span className="status">Live preview</span>
+          <span className="status">● Live preview</span>
         )}
-        <span className="status !hidden md:!flex">{saveStatus}</span>
+        <div className="status-badge"><Clock size={12}/>{saveStatus}</div>
         
-        <button onClick={onReload}><RefreshCw size={14}/></button>
-        <button onClick={onCopy}><Copy size={14}/> {copied ? 'Copied!' : 'Copy'}</button>
-        <button onClick={onExport} disabled={isDownloading}><Download size={14}/> {isDownloading ? 'Exporting...' : 'Export'}</button>
+        <button onClick={onReload} className="header-tool-btn"><RefreshCw size={14}/></button>
+        <button onClick={onCopy} className="header-tool-btn">{copied ? <CheckCircle2 size={14}/> : <Copy size={14}/>}</button>
+        <button onClick={onExport} disabled={isDownloading} className="header-tool-btn">{isDownloading ? <Loader2 size={14} className="animate-spin" /> : <Download size={14}/>}</button>
 
         <button className="deploy-btn" onClick={onDeploy}>
           <Rocket size={14}/> Deploy
@@ -438,29 +429,32 @@ function OutputHeader({
 
 function OutputWorkspace({
   code, setCode, isGenerating, debouncedCode, previewKey,
-  setPreviewKey, isReloading, setIsReloading, isRevealing,
-  setIsRevealing, consoleError, setConsoleError, handleCopy, copied,
+  setPreviewKey, consoleError, setConsoleError, handleCopy, copied,
   handleDownloadZip, isDownloading, saveStatus
 }) {
   const [viewMode, setViewMode] = useState('split');
-  const [deviceMode, setDeviceMode] = useState('Desktop');
+  const [deviceMode, setDeviceMode] = useState('desktop');
   const [isConsoleOpen, setIsConsoleOpen] = useState(true);
   const editorRef = useRef(null);
+
+  const [isReloading, setIsReloading] = useState(false);
 
   const handleReload = () => {
     if (isReloading) return;
     setIsReloading(true);
-    setIsRevealing(false);
     setConsoleError(null);
     setTimeout(() => setPreviewKey(k => k + 1), 400);
-    setTimeout(() => { setIsReloading(false); setIsRevealing(true); }, 800);
-    setTimeout(() => setIsRevealing(false), 1200);
+    setTimeout(() => setIsReloading(false), 1200);
   };
   
-  const handleFormat = () => {
-    if (editorRef.current) {
-      (editorRef.current as any).format();
-    }
+  const handleUndo = () => {
+    // Placeholder for undo logic
+    console.log("Undo action triggered");
+  };
+
+  const handleRedo = () => {
+    // Placeholder for redo logic
+    console.log("Redo action triggered");
   };
 
   return (
@@ -476,8 +470,10 @@ function OutputWorkspace({
         onExport={handleDownloadZip}
         isDownloading={isDownloading}
         error={consoleError}
-        onDeploy={() => {}}
         saveStatus={saveStatus}
+        onDeploy={() => {}}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
       />
       <div className="workspace-panels">
         <div className={`panel code-panel ${viewMode === "preview" ? "hidden" : ""}`}>
@@ -493,8 +489,6 @@ function OutputWorkspace({
             code={debouncedCode}
             reloadKey={previewKey}
             deviceMode={deviceMode}
-            isReloading={isReloading}
-            isRevealing={isRevealing}
           />
         </div>
       </div>
@@ -510,20 +504,27 @@ function OutputWorkspace({
 
 export default function BuilderPage({ 
   onExit, activeProject, onRename, onDuplicate, onDelete, messages, thinking, input, setInput, sendMessage,
-  formatAIResponse, generationSteps, progressStep, onSuggestionClick, messagesEndRef, textareaRef, chipSuggestions
+  formatAIResponse, generationSteps, progressStep, messagesEndRef, textareaRef
 }) {
   const [code, setCode] = useState(initialCode);
   const [debouncedCode, setDebouncedCode] = useState(initialCode);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [saveStatus, setSaveStatus] = useState('Auto-saved');
+  const [saveStatus, setSaveStatus] = useState('Saved');
 
   const [copied, setCopied] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
-  const [isReloading, setIsReloading] = useState(false);
-  const [isRevealing, setIsRevealing] = useState(false);
   
   const [consoleError, setConsoleError] = useState(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSaveStatus('Saving...');
+      setDebouncedCode(code);
+      setTimeout(() => setSaveStatus('Saved'), 500);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [code]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -567,7 +568,7 @@ export default function BuilderPage({
       a.href = url;
       a.download = "calmora-project.zip";
       document.body.appendChild(a);
-      a.click();
+a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -576,14 +577,6 @@ export default function BuilderPage({
       setIsDownloading(false);
     }
   };
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedCode(code);
-      setSaveStatus(isGenerating ? 'Saving...' : 'Auto-saved');
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [code, isGenerating]);
   
   return (
     <div className="builder-window animating-in">
@@ -593,15 +586,12 @@ export default function BuilderPage({
               sendMessage={sendMessage} formatAIResponse={formatAIResponse}
               generationSteps={generationSteps} progressStep={progressStep}
               messagesEndRef={messagesEndRef} textareaRef={textareaRef}
-              chipSuggestions={chipSuggestions} onSuggestionClick={onSuggestionClick}
               onExit={onExit} activeProject={activeProject} onRename={onRename}
               onDuplicate={onDuplicate} onDelete={onDelete}
             />
             <OutputWorkspace
               code={code} setCode={setCode} isGenerating={isGenerating} debouncedCode={debouncedCode}
               previewKey={previewKey} setPreviewKey={setPreviewKey}
-              isReloading={isReloading} setIsReloading={setIsReloading}
-              isRevealing={isRevealing} setIsRevealing={setIsRevealing}
               consoleError={consoleError} setConsoleError={setConsoleError}
               handleCopy={handleCopy} copied={copied}
               handleDownloadZip={handleDownloadZip} isDownloading={isDownloading}
