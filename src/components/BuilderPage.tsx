@@ -204,9 +204,6 @@ function ChatPanel({
   formatAIResponse,
   generationSteps,
   progressStep,
-  followUpSuggestions,
-  chipSuggestions,
-  onSuggestionClick,
   messagesEndRef,
   textareaRef,
   activeProject,
@@ -214,7 +211,6 @@ function ChatPanel({
   onRename,
   onDuplicate,
   onDelete,
-  toggleSidebar,
   chatStage,
 }: any) {
   
@@ -246,10 +242,7 @@ function ChatPanel({
     <div className="builder-chat-panel">
       <header className="builder-chat-header flex justify-between">
           <div className="flex items-center gap-1">
-              <button onClick={toggleSidebar} title="Toggle Sidebar" className="control-button -ml-2">
-                <Menu size={18} />
-              </button>
-              <button onClick={onExit} title="Exit Builder" className="control-button">
+              <button onClick={onExit} title="Exit Builder" className="control-button -ml-2">
                   <ArrowLeft size={18} />
               </button>
           </div>
@@ -306,18 +299,6 @@ function ChatPanel({
         <div ref={messagesEndRef} />
       </div>
       <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''}`}>
-        {chatStage === 'new-chat' && !input.trim() && (
-            <div className="mt-6">
-                <PromptSuggestions suggestions={chipSuggestions} setPrompt={onSuggestionClick} />
-            </div>
-        )}
-        
-        {chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
-            <div className="mb-4">
-                <PromptSuggestions suggestions={followUpSuggestions} setPrompt={onSuggestionClick} />
-            </div>
-        )}
-        
         <div className="chat-input-surface">
           <textarea
             ref={textareaRef}
@@ -492,11 +473,9 @@ export default function BuilderPage({
   generationSteps,
   progressStep,
   followUpSuggestions,
-  chipSuggestions,
   onSuggestionClick,
   messagesEndRef,
   textareaRef,
-  toggleSidebar,
 }: { 
   onExit: () => void;
   activeProject: any;
@@ -512,11 +491,9 @@ export default function BuilderPage({
   generationSteps: string[];
   progressStep: number;
   followUpSuggestions: string[];
-  chipSuggestions: string[];
   onSuggestionClick: (prompt: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
-  toggleSidebar: () => void;
 }) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
@@ -746,9 +723,6 @@ export default function BuilderPage({
               formatAIResponse={formatAIResponse}
               generationSteps={generationSteps}
               progressStep={progressStep}
-              followUpSuggestions={followUpSuggestions}
-              chipSuggestions={chipSuggestions}
-              onSuggestionClick={onSuggestionClick}
               messagesEndRef={messagesEndRef}
               textareaRef={textareaRef}
               activeProject={activeProject}
@@ -756,7 +730,6 @@ export default function BuilderPage({
               onRename={onRename}
               onDuplicate={onDuplicate}
               onDelete={onDelete}
-              toggleSidebar={toggleSidebar}
               chatStage={chatStage}
             />
             <CodePanel 

@@ -759,30 +759,30 @@ const HomePage = () => {
   return (
     <>
       <div className={`app-root ${isBuilderModeActive ? 'builder-active' : ''}`}>
-        {sidebarComponent}
+        {!isBuilderModeActive && sidebarComponent}
 
         {isBuilderModeActive ? (
-          <BuilderPage
-            onExit={() => setBuildMode('chat')}
-            activeProject={activeProject}
-            onRename={setRenameProject}
-            onDuplicate={handleDuplicateProject}
-            onDelete={setDeleteProject}
-            messages={messages}
-            thinking={thinking}
-            input={input}
-            setInput={setInput}
-            sendMessage={sendMessage}
-            formatAIResponse={formatAIResponse}
-            generationSteps={generationSteps}
-            progressStep={progressStep}
-            followUpSuggestions={followUpSuggestions}
-            chipSuggestions={chipSuggestions}
-            onSuggestionClick={handleSuggestionClick}
-            messagesEndRef={messagesEndRef}
-            textareaRef={textareaRef}
-            toggleSidebar={toggleSidebar}
-          />
+          <div className="builder-floating animate-in fade-in duration-300">
+            <BuilderPage
+              onExit={() => setBuildMode('chat')}
+              activeProject={activeProject}
+              onRename={setRenameProject}
+              onDuplicate={handleDuplicateProject}
+              onDelete={setDeleteProject}
+              messages={messages}
+              thinking={thinking}
+              input={input}
+              setInput={setInput}
+              sendMessage={sendMessage}
+              formatAIResponse={formatAIResponse}
+              generationSteps={generationSteps}
+              progressStep={progressStep}
+              followUpSuggestions={followUpSuggestions}
+              onSuggestionClick={handleSuggestionClick}
+              messagesEndRef={messagesEndRef}
+              textareaRef={textareaRef}
+            />
+          </div>
         ) : (
           <main className="app-main">
             <Header
