@@ -25,7 +25,8 @@ import {
   Copy,
   Trash2,
   CheckCircle2,
-  Circle
+  Circle,
+  Pin
 } from "lucide-react";
 import { safeLocalStorage, generateId, normalizeStatus, triggerConfetti, generateBasicTasks, aiSystemInstruction, FOCUS_DEMO_STEPS } from "@/lib/calmora-utils";
 import {
@@ -47,6 +48,7 @@ import {
     ChangePasswordModal,
     BillingModal,
     SettingsSheet,
+    ThreadActionSheet,
 } from "@/components/calmora";
 import Header from "@/components/Header";
 import ModeToggle from "@/components/ModeToggle";
@@ -94,6 +96,9 @@ const HomePage = () => {
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
   const [showBuilderMenu, setShowBuilderMenu] = useState(false);
   const builderMenuRef = useRef(null);
+
+  const [threadActionData, setThreadActionData] = useState<any>(null);
+  const [renameThread, setRenameThread] = useState<any>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -213,9 +218,9 @@ const HomePage = () => {
         } else {
             const now = Date.now();
             setThreads([
-                { id: generateId(), title: "SaaS landing page idea", createdAt: now, updatedAt: now },
-                { id: generateId(), title: "Thoughts on resume builder", createdAt: now - 86400000, updatedAt: now - 86400000 },
-                { id: generateId(), title: "AI portfolio concepts", createdAt: now - 604800000, updatedAt: now - 604800000 },
+                { id: generateId(), title: "SaaS landing page idea", createdAt: now, updatedAt: now, pinned: false },
+                { id: generateId(), title: "Thoughts on resume builder", createdAt: now - 86400000, updatedAt: now - 86400000, pinned: false },
+                { id: generateId(), title: "AI portfolio concepts", createdAt: now - 604800000, updatedAt: now - 604800000, pinned: false },
             ]);
         }
 
@@ -398,6 +403,7 @@ const HomePage = () => {
                 title: userText.slice(0, 40) + (userText.length > 40 ? "..." : ""),
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
+                pinned: false,
             };
             newThreads.unshift(newThread);
 
@@ -516,6 +522,11 @@ const HomePage = () => {
     }
   };
 
+  const handleDuplicateProject = (project: any) => {
+    const newProject = { ...project, id: generateId(), title: `${project.title} (Copy)` };
+    setProjects(prev => [newProject, ...prev]);
+  };
+
   const handleExitProject = () => {
     setActiveProject(null);
     setAppMode('projects'); 
@@ -584,6 +595,31 @@ const HomePage = () => {
       }
   };
 
+  const handleRenameThread = (threadId: string, newTitle: string) => {
+    setThreads(prev => prev.map(t => t.id === threadId ? { ...t, title: newTitle, updatedAt: Date.now() } : t).sort((a,b) => b.updatedAt - a.updatedAt));
+    setRenameThread(null);
+  };
+
+  const handleDeleteThread = (threadId: string) => {
+      setThreads(prev => prev.filter(t => t.id !== threadId));
+      setHistoryStore(prev => {
+          const newHistory = { ...prev };
+          delete newHistory[threadId];
+          return newHistory;
+      });
+      if (activeThreadId === threadId) {
+          startNewChat();
+      }
+  };
+
+  const handlePinThread = (threadId: string) => {
+      setThreads(prev => prev.map(t => t.id === threadId ? { ...t, pinned: !t.pinned } : t).sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          return b.updatedAt - a.updatedAt;
+      }));
+  };
+
   const handleUpdateUser = (updatedUser: any) => {
     setUser(updatedUser);
     setShowEditProfileModal(false);
@@ -600,7 +636,7 @@ const HomePage = () => {
             <button onClick={() => setBuildMode('chat')} title="Exit Builder" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
                 <ArrowLeft size={18} />
             </button>
-            <span className="text-sm font-medium text-white truncate">SaaS Landing Page</span>
+            <span className="text-sm font-medium text-white truncate">{activeProject?.title || "SaaS Landing Page"}</span>
             <div className="relative" ref={builderMenuRef}>
                 <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
                   <MoreHorizontal size={18} />
@@ -608,10 +644,10 @@ const HomePage = () => {
                 {showBuilderMenu && (
                   <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
                     <div className="p-2">
-                        <button className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
-                        <button className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
+                        <button onClick={() => { setRenameProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
+                        <button onClick={() => { handleDuplicateProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
                         <div className="h-px bg-[var(--border)] my-1" />
-                        <button className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
+                        <button onClick={() => { setDeleteProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
                     </div>
                   </div>
                 )}
@@ -661,19 +697,7 @@ const HomePage = () => {
           </div>
           
           <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
-            {
-              (chatStage === 'active' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
-                <div className="mb-3">
-                  <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-                </div>
-              ) : (chatStage === 'new-chat' && !input.trim()) ? (
-                <div className="mb-4">
-                  <ModeToggle mode={buildMode} setMode={setBuildMode} />
-                </div>
-              ) : null
-            }
-
-            <div className="chat-input-surface">
+             <div className="chat-input-surface">
               <textarea
                 ref={textareaRef}
                 value={input}
@@ -697,23 +721,11 @@ const HomePage = () => {
                 </button>
               )}
             </div>
-
-            {
-              (chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
-                <div className="mt-3">
-                  <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-                </div>
-              ) : (chatStage === 'new-chat' && !input.trim()) ? (
-                <div className="mt-6">
-                  <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
-                </div>
-              ) : null
-            }
           </div>
         </div>
         
         {/* Right Panel: Builder */}
-        <div className="flex-1 h-full min-w-0 animate-in fade-in-0 slide-in-from-right-4 duration-300">
+        <div className="flex-1 h-full min-w-0">
           <BuilderPage onExit={() => setBuildMode('chat')} />
         </div>
       </div>
@@ -763,13 +775,6 @@ const HomePage = () => {
                     onClick={() => { setAppMode('projects'); if(isMobile) setSidebarOpen(false); }} 
                     active={appMode === 'projects' || appMode === 'project-view'} 
                 />
-                <NavItem 
-                    icon={History} 
-                    label="History" 
-                    collapsed={isCollapsed}
-                    onClick={() => { setAppMode('history'); if(isMobile) setSidebarOpen(false); }} 
-                    active={appMode === 'history'}
-                />
             </div>
             
             <div className="sidebar-scroll-wrapper" ref={scrollWrapperRef}>
@@ -777,7 +782,11 @@ const HomePage = () => {
                 <div className="px-3 pb-3">
                     {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
                     <div className="space-y-1">
-                    {threads.sort((a,b) => b.updatedAt - a.updatedAt).slice(0, 5).map(thread => (
+                    {threads.sort((a,b) => {
+                         if (a.pinned && !b.pinned) return -1;
+                         if (!a.pinned && b.pinned) return 1;
+                         return b.updatedAt - a.updatedAt;
+                    }).slice(0, 10).map(thread => (
                         isCollapsed ? (
                             <button
                                 key={thread.id}
@@ -791,15 +800,27 @@ const HomePage = () => {
                                 <MessageSquare size={18} strokeWidth={activeThreadId === thread.id && appMode === 'chat' ? 2 : 1.5} />
                             </button>
                         ) : (
-                            <button
-                                key={thread.id}
-                                onClick={() => switchThread(thread.id)}
-                                className={`sidebar-list-item ${activeThreadId === thread.id && appMode === 'chat' ? 'active' : ''}`}
-                                title={thread.title}
-                            >
-                                <MessageSquare size={16} className="mr-2 flex-shrink-0" />
-                                <span className="truncate">{thread.title}</span>
-                            </button>
+                          <div key={thread.id} className="group relative">
+                              <button
+                                  onClick={() => switchThread(thread.id)}
+                                  className={`sidebar-list-item pr-10 ${activeThreadId === thread.id && appMode === 'chat' ? 'active' : ''}`}
+                                  title={thread.title}
+                              >
+                                  {thread.pinned && <Pin size={12} className="absolute left-2 top-2.5 text-[hsl(var(--accent))] opacity-60" />}
+                                  <MessageSquare size={16} className="mr-2 flex-shrink-0" />
+                                  <span className="truncate">{thread.title}</span>
+                              </button>
+                              <button
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                      const rect = e.currentTarget.getBoundingClientRect();
+                                      setThreadActionData({ thread, position: { x: rect.left, y: rect.bottom + 5 } });
+                                  }}
+                                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md text-[var(--text-secondary)] opacity-0 group-hover:opacity-100 hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] transition-opacity"
+                              >
+                                  <MoreHorizontal size={16} />
+                              </button>
+                          </div>
                         )
                     ))}
                     {threads.length === 0 && !isCollapsed && (
@@ -919,17 +940,11 @@ const HomePage = () => {
               {appMode === 'chat' && (
                 <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
                   
-                  {
-                    (chatStage === 'active' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
-                      <div className="mb-3">
-                        <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-                      </div>
-                    ) : (chatStage === 'new-chat' && !input.trim()) ? (
+                  {(chatStage === 'new-chat' && !input.trim()) && (
                       <div className="mb-4">
-                        <ModeToggle mode={buildMode} setMode={setBuildMode} />
+                          <ModeToggle mode={buildMode} setMode={setBuildMode} />
                       </div>
-                    ) : null
-                  }
+                  )}
 
                   <div className="chat-input-surface">
                     <textarea
@@ -937,11 +952,7 @@ const HomePage = () => {
                       value={input}
                       onChange={(e) => {
                         setInput(e.target.value);
-                        if (e.target.value.trim().length > 0) {
-                          setShowSuggestionList(true);
-                        } else {
-                          setShowSuggestionList(false);
-                        }
+                        setShowSuggestionList(e.target.value.trim().length > 0);
                       }}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                       placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page for an AI email assistant”" : "Ask a follow-up or give a new instruction..."}
@@ -959,21 +970,23 @@ const HomePage = () => {
                     )}
                   </div>
                   
-                  {
-                    (chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim()) ? (
+                   {chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
                       <div className="mt-3">
-                        <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                          <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
                       </div>
-                    ) : (chatStage === 'new-chat' && !input.trim()) ? (
+                  )}
+
+                  {chatStage === 'new-chat' && !input.trim() && (
                       <div className="mt-6">
-                        <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
+                          <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
                       </div>
-                    ) : (chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant') ? (
+                  )}
+
+                  {(chatStage === 'active' && !isBuilderModeActive && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant') && (
                       <div className="mt-6">
-                        <PromptSuggestions suggestions={followUpSuggestions} setPrompt={handleSuggestionClick} />
+                          <PromptSuggestions suggestions={followUpSuggestions} setPrompt={handleSuggestionClick} />
                       </div>
-                    ) : null
-                  }
+                  )}
 
                 </div>
               )}
@@ -1001,8 +1014,7 @@ const HomePage = () => {
               onClose={() => setProjectActionData(null)}
               onRename={(project) => { setProjectActionData(null); setRenameProject(project); }}
               onDuplicate={(project) => {
-                  const newProject = { ...project, id: generateId(), title: `${project.title} (Copy)` };
-                  setProjects(prev => [newProject, ...prev]);
+                  handleDuplicateProject(project);
                   setProjectActionData(null);
               }}
               onDelete={(project) => { setProjectActionData(null); setDeleteProject(project); }}
@@ -1016,6 +1028,7 @@ const HomePage = () => {
                   setRenameProject(null);
               }}
               onClose={() => setRenameProject(null)}
+              title="Rename Project"
           />
       )}
       {deleteProject && (
@@ -1026,6 +1039,24 @@ const HomePage = () => {
                   setDeleteProject(null);
               }}
               onClose={() => setDeleteProject(null)}
+          />
+      )}
+
+      {threadActionData && (
+          <ThreadActionSheet
+              threadData={threadActionData}
+              onClose={() => setThreadActionData(null)}
+              onRename={(thread) => { setThreadActionData(null); setRenameThread(thread); }}
+              onDelete={(thread) => { setThreadActionData(null); handleDeleteThread(thread.id); }}
+              onPin={(thread) => { setThreadActionData(null); handlePinThread(thread.id); }}
+          />
+      )}
+      {renameThread && (
+          <EditNameModal
+              currentName={renameThread.title}
+              onSave={(newTitle: string) => handleRenameThread(renameThread.id, newTitle)}
+              onClose={() => setRenameThread(null)}
+              title="Rename Chat"
           />
       )}
       

@@ -118,7 +118,7 @@ export const renderIcon = (iconName: string, props = {}) => {
     }
   };
   
-  export const EditNameModal = ({ currentName, onSave, onClose }: any) => {
+  export const EditNameModal = ({ currentName, onSave, onClose, title }: any) => {
     const [name, setName] = useState(currentName);
   
     const handleSave = () => {
@@ -131,19 +131,19 @@ export const renderIcon = (iconName: string, props = {}) => {
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           <div className="modal-header">
-            <h3 className="modal-title">Edit Project Name</h3>
+            <h3 className="modal-title">{title || "Edit Project Name"}</h3>
             <button className="modal-close" onClick={onClose}>
               <X size={18} strokeWidth={2} />
             </button>
           </div>
           <div className="modal-body">
-            <label className="modal-label">Project Name</label>
+            <label className="modal-label">Name</label>
             <input
               type="text"
               className="modal-input"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter project name"
+              placeholder="Enter name"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             />
@@ -631,6 +631,51 @@ export const renderIcon = (iconName: string, props = {}) => {
         </div>
       );
   };
+
+  export const ThreadActionSheet = ({ threadData, onClose, onRename, onDelete, onPin }: any) => {
+    const sheetRef = useRef(null);
+    const { thread, position } = threadData;
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (sheetRef.current && !(sheetRef.current as any).contains(e.target)) {
+                onClose();
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [onClose]);
+
+    const style: React.CSSProperties = {
+        top: position.y,
+        left: position.x,
+        transformOrigin: "top left",
+        position: "fixed",
+        zIndex: 201,
+    };
+    
+    if (typeof window !== 'undefined') {
+        if (position.x > window.innerWidth - 250) style.left = position.x - 240;
+        if (position.y > window.innerHeight - 200) style.top = position.y - 150;
+    }
+
+    return (
+      <div ref={sheetRef} style={style} className="menu-pop w-[240px] animate-pop-in">
+        <div className="p-2">
+          <button onClick={() => { onPin(thread); onClose(); }} className="menu-item w-full text-left flex items-center gap-3">
+              <Pin size={15} /> {thread.pinned ? 'Unpin' : 'Pin to top'}
+          </button>
+          <button onClick={() => { onRename(thread); onClose(); }} className="menu-item w-full text-left flex items-center gap-3">
+              <Edit3 size={15} /> Rename
+          </button>
+          <div className="h-px bg-[var(--border)] my-1" />
+          <button onClick={() => { onDelete(thread); onClose(); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3">
+              <Trash2 size={15} /> Delete
+          </button>
+        </div>
+      </div>
+    );
+};
   
   export const GoalRow = ({ goal, isRecommended }: any) => {
     return (
@@ -1555,6 +1600,7 @@ export const SettingsView = ({ user, theme, setTheme, onShowEditProfile, onShowC
 
 
     
+
 
 
 
