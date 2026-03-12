@@ -196,7 +196,7 @@
             flex-direction: column;
             overflow: hidden;
             width: 260px;
-            transition: width 300ms cubic-bezier(0.16,1,0.3,1);
+            transition: width 300ms cubic-bezier(0.16,1,0.3,1), transform 300ms cubic-bezier(0.16,1,0.3,1);
             background: var(--sidebar);
             border-right: 1px solid var(--border);
             z-index: 50;
@@ -217,6 +217,7 @@
             min-width: 0;
             position: relative;
             height: 100%;
+            transition: width 300ms cubic-bezier(0.16,1,0.3,1);
         }
 
         /* The Scrollable Area: Consumes remaining space */
@@ -2379,10 +2380,11 @@
 .builder-body-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(350px, 1fr) 2fr 2fr;
+  grid-template-columns: minmax(350px, 1fr) 3fr;
   gap: 1px;
   background-color: var(--border);
   overflow: hidden;
+  transition: grid-template-columns 300ms cubic-bezier(0.16,1,0.3,1);
 }
 
 .builder-chat-panel {
@@ -2395,12 +2397,13 @@
 }
 
 .builder-chat-header {
-  height: 44px;
+  height: 52px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
 }
 
 .builder-chat-messages {
@@ -2452,6 +2455,9 @@
   background: var(--surface);
   overflow: hidden;
   pointer-events: auto;
+}
+
+.builder-window.animating-in {
   animation: builderFloat .25s ease-out forwards;
 }
 
@@ -2617,4 +2623,172 @@
 .ai-action-btn.explain-btn:hover {
   color: var(--text-primary);
   border-color: var(--text-secondary);
+}
+.builder-workspace{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  overflow: hidden;
+}
+
+.workspace-panels{
+  display:flex;
+  flex:1;
+  overflow:hidden;
+}
+
+.panel{
+  flex:1;
+  height:100%;
+}
+
+.panel.hidden{
+  display:none;
+}
+
+.code-panel{
+  height:100%;
+  background:#0e0e0e;
+}
+
+.preview-panel{
+  height:100%;
+  background:#111;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-frame{
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+.output-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;
+  border-bottom:1px solid #333338;
+  background:#1e1e1e;
+  flex-shrink: 0;
+}
+
+.device-switch,
+.view-switch {
+  display:flex;
+  align-items: center;
+  gap: 2px;
+  background: #2a2a2e;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.device-switch button,
+.view-switch button{
+  padding:6px;
+  border-radius:6px;
+  color: #a0a0b0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.device-switch button:hover,
+.view-switch button:hover {
+  color: #ffffff;
+}
+
+.device-switch button.active,
+.view-switch button.active {
+  background: #3a3a40;
+  color: #ffffff;
+}
+
+.output-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.output-actions .status {
+  font-size: 12px;
+  color: #a0a0b0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.output-actions .status.error {
+  color: #ff5a5a;
+}
+.output-actions .status::before {
+  content: '●';
+  color: #2ecc71; /* --color-success */
+  animation: blink 1.5s infinite;
+}
+.output-actions .status.error::before {
+  color: #ff5a5a;
+}
+
+
+.output-actions button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #2a2a2e;
+    border: none;
+    color: #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.output-actions button:hover {
+  background: #3a3a40;
+}
+
+.deploy-btn{
+  background:#ff2d7a;
+  padding:6px 14px;
+  border-radius:8px;
+  color: white;
+}
+.deploy-btn:hover {
+  background: #e91e63;
+}
+
+
+.console{
+  height:160px;
+  border-top:1px solid #333338;
+  background:#1a1a1c;
+  display: flex;
+  flex-direction: column;
+}
+
+.console-header{
+  padding:6px 10px;
+  font-size:12px;
+  color:#aaa;
+  border-bottom: 1px solid #333338;
+}
+
+.console-logs{
+  padding:10px;
+  font-family:monospace;
+  font-size:12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.log {
+  margin-bottom: 4px;
+}
+
+.log.error{
+  color:#ff5a5a;
 }
