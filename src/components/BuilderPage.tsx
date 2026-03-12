@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
-  Save, Sparkles, Monitor, Tablet, Smartphone, X
+  Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle
 } from 'lucide-react';
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
@@ -198,7 +198,6 @@ function CodePanel({ code, setCode, isGenerating, editorRef }) {
   );
 }
 
-// Stripped down purely to preview container
 function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, isRevealing, onExitFullscreen }) {
   const sandboxDoc = generateSandboxDoc(code);
   const [isClient, setIsClient] = useState(false);
@@ -269,6 +268,43 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
   );
 }
 
+function ConsolePanel({ error }) {
+    const getTime = () => new Date().toLocaleTimeString('en-US', { hour12: false });
+
+    return (
+        <div className="console-panel">
+            <header className="console-header">
+                <h3>Console</h3>
+            </header>
+            <div className="console-body custom-scrollbar">
+                {error ? (
+                    <div className="console-error-view">
+                        <div className="error-message">
+                            <XCircle size={16} className="text-red-500 flex-shrink-0" />
+                            <span>{error.message}</span>
+                        </div>
+                        <div className="error-actions">
+                            <button className="ai-action-btn fix-btn">
+                                <Wand2 size={14} /> Fix with AI
+                            </button>
+                            <button className="ai-action-btn explain-btn">
+                                <Lightbulb size={14} /> Explain Error
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="console-log-view">
+                        <span className="log-line">
+                            <span className="timestamp">{getTime()}</span>
+                            <span className="log-text">Build successful. Preview updated.</span>
+                        </span>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
@@ -285,6 +321,15 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   const [deviceMode, setDeviceMode] = useState('Desktop');
   const [isReloading, setIsReloading] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
+  const [consoleError, setConsoleError] = useState(null);
+
+  useEffect(() => {
+    // Simulate an error appearing in the console after 5 seconds for demonstration
+    const timer = setTimeout(() => {
+        setConsoleError({ message: "TypeError: Cannot read properties of undefined (reading 'map')" });
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Editor Actions
   const handleCopy = () => {
@@ -349,6 +394,7 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
     if (isReloading) return;
     setIsReloading(true);
     setIsRevealing(false);
+    setConsoleError(null); // Clear error on reload
     setTimeout(() => setPreviewKey(k => k + 1), 400);
     setTimeout(() => { setIsReloading(false); setIsRevealing(true); }, 800);
     setTimeout(() => setIsRevealing(false), 1200);
@@ -420,15 +466,22 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
               isGenerating={isGenerating}
               editorRef={editorRef}
             />
-            <PreviewPanel 
-              reloadKey={previewKey} 
-              code={debouncedCode}
-              isFullscreen={isFullscreen}
-              deviceMode={deviceMode}
-              isReloading={isReloading}
-              isRevealing={isRevealing}
-              onExitFullscreen={() => setIsFullscreen(false)}
-            />
+            <div className="flex flex-col h-full overflow-hidden">
+                <div className="flex-1 min-h-0">
+                    <PreviewPanel 
+                      reloadKey={previewKey} 
+                      code={debouncedCode}
+                      isFullscreen={isFullscreen}
+                      deviceMode={deviceMode}
+                      isReloading={isReloading}
+                      isRevealing={isRevealing}
+                      onExitFullscreen={() => setIsFullscreen(false)}
+                    />
+                </div>
+                <div className="flex-shrink-0 h-[250px] border-t border-[var(--border)]">
+                     <ConsolePanel error={consoleError} />
+                </div>
+            </div>
         </div>
     </div>
   );
