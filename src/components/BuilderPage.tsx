@@ -1,12 +1,13 @@
 
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
   Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle,
   AlertCircle, ChevronDown, ChevronUp, Undo, Redo, Loader2,
   ArrowLeft, MoreHorizontal, Edit3, Trash2, Send, CheckCircle2, Circle, Zap, Mic, Menu,
+  Split, Code2, MonitorPlay,
 } from 'lucide-react';
 import PromptSuggestions from "@/components/PromptSuggestions";
 
@@ -206,33 +207,11 @@ function ChatPanel({
   progressStep,
   messagesEndRef,
   textareaRef,
-  activeProject,
-  onExit,
-  onRename,
-  onDuplicate,
-  onDelete,
   chatStage,
+  onSuggestionClick,
+  followUpSuggestions,
+  chipSuggestions,
 }: any) {
-  
-  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
-  const builderMenuRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
-        setShowBuilderMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-  
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
-    }
-  }, [input, textareaRef]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -240,31 +219,6 @@ function ChatPanel({
 
   return (
     <div className="builder-chat-panel">
-      <header className="builder-chat-header flex justify-between">
-          <div className="flex items-center gap-1">
-              <button onClick={onExit} title="Exit Builder" className="control-button -ml-2">
-                  <ArrowLeft size={18} />
-              </button>
-          </div>
-          <div className="flex items-center gap-1 min-w-0">
-              <span className="text-sm font-medium text-white truncate">{activeProject?.title || "Untitled Project"}</span>
-              <div className="relative" ref={builderMenuRef}>
-                  <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
-                    <MoreHorizontal size={18} />
-                  </button>
-                  {showBuilderMenu && activeProject && (
-                    <div className="menu-pop animate-pop-in" style={{ left: 'auto', right: 0, top: 'calc(100% + 8px)', width: '220px' }}>
-                      <div className="p-2">
-                          <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
-                          <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
-                          <div className="h-px bg-[var(--border)] my-1" />
-                          <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
-                      </div>
-                    </div>
-                  )}
-              </div>
-          </div>
-      </header>
       <div className="builder-chat-messages custom-scrollbar">
         {messages.map((msg: any) => (
           <div key={msg.id} className={`w-full flex mb-6 animate-message-in ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -296,30 +250,43 @@ function ChatPanel({
               </div>
             </div>
         )}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} className="h-24" />
       </div>
-      <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''}`}>
-        <div className="chat-input-surface">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-            placeholder={chatStage === 'new-chat' ? "Start with a high-level goal..." : "Ask a follow-up or give a new instruction..."}
-            className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[120px] overflow-y-auto scrollbar-hide font-sans py-1"
-            rows={1}
-          />
-          {input.trim() ? (
-            <button onClick={handleSendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-              {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-            </button>
-          ) : (
-            <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-              <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-            </button>
+
+       <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''}`}>
+          <div className="chat-input-surface">
+            <textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+              placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page”" : "Ask a follow-up..."}
+              className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
+              rows={1}
+            />
+            {input.trim() ? (
+              <button onClick={handleSendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+                {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              </button>
+            ) : (
+              <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+                <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+              </button>
+            )}
+          </div>
+          
+          {chatStage === 'new-chat' && !input.trim() && (
+              <div className="mt-6">
+                  {/* No suggestions in builder mode */}
+              </div>
+          )}
+          
+          {chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
+              <div className="mt-6">
+                 {/* No suggestions in builder mode */}
+              </div>
           )}
         </div>
-      </div>
     </div>
   );
 }
@@ -476,6 +443,7 @@ export default function BuilderPage({
   onSuggestionClick,
   messagesEndRef,
   textareaRef,
+  chipSuggestions,
 }: { 
   onExit: () => void;
   activeProject: any;
@@ -494,6 +462,7 @@ export default function BuilderPage({
   onSuggestionClick: (prompt: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
+  chipSuggestions: string[];
 }) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
@@ -521,6 +490,10 @@ export default function BuilderPage({
   // Menu State
   const [showBuilderMenu, setShowBuilderMenu] = useState(false);
   const builderMenuRef = useRef(null);
+
+  // View Mode State
+  const [viewMode, setViewMode] = useState('split'); // 'split', 'code', 'preview'
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -643,15 +616,42 @@ export default function BuilderPage({
     return () => clearTimeout(handler);
   }, [code, isGenerating]);
   
+  useLayoutEffect(() => {
+    const chatInput = textareaRef.current;
+    if (chatInput) {
+      chatInput.style.height = "auto";
+      chatInput.style.height = `${Math.min(chatInput.scrollHeight, 160)}px`;
+    }
+  }, [input, textareaRef]);
+
   return (
     <div className="builder-window w-full h-full flex-1 min-w-0">
         <header className="builder-header justify-between px-4">
-            {/* Left placeholder */}
             <div className="flex items-center gap-2 flex-1 justify-start">
-               
+              <button onClick={onExit} title="Exit Builder" className="control-button -ml-2">
+                  <ArrowLeft size={18} />
+              </button>
+              <div className="h-5 w-px bg-white/10" />
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-sm font-medium text-white truncate">{activeProject?.title || "Untitled Project"}</span>
+                <div className="relative" ref={builderMenuRef}>
+                    <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
+                      <MoreHorizontal size={18} />
+                    </button>
+                    {showBuilderMenu && activeProject && (
+                      <div className="menu-pop animate-pop-in" style={{ left: 'auto', right: 'auto', top: 'calc(100% + 8px)', width: '220px' }}>
+                        <div className="p-2">
+                            <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
+                            <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
+                            <div className="h-px bg-[var(--border)] my-1" />
+                            <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </div>
             </div>
 
-            {/* Center: Device Toggles & Preview Controls */}
             <div className="flex items-center gap-4">
                 <div className="flex items-center bg-[#151519] rounded-lg p-1 border border-white/10">
                     {['Desktop', 'Tablet', 'Mobile'].map(mode => {
@@ -672,6 +672,29 @@ export default function BuilderPage({
                     )
                     })}
                 </div>
+                
+                <div className="h-5 w-px bg-white/10" />
+
+                <div className="flex items-center bg-[#151519] rounded-lg p-1 border border-white/10">
+                  {[{mode: 'split', icon: Split, title: 'Split View'}, {mode: 'code', icon: Code2, title: 'Code Only'}, {mode: 'preview', icon: MonitorPlay, title: 'Preview Only'}].map(item => {
+                      const Icon = item.icon;
+                      return (
+                          <button
+                              key={item.mode}
+                              onClick={() => setViewMode(item.mode)}
+                              title={item.title}
+                              className={`flex items-center justify-center w-9 h-7 rounded-md transition-all ${
+                                  viewMode === item.mode 
+                                  ? 'bg-[#333338] text-white shadow-sm' 
+                                  : 'text-gray-400 hover:text-white'
+                              }`}
+                          >
+                              <Icon size={16} />
+                          </button>
+                      );
+                  })}
+                </div>
+
                 <div className="h-5 w-px bg-white/10" />
                 <div className="flex items-center gap-1">
                   <button onClick={handleUndo} title="Undo" disabled={isUndoing || isRedoing} className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50">
@@ -701,7 +724,6 @@ export default function BuilderPage({
                 )}
             </div>
 
-            {/* Right: Actions */}
             <div className="flex items-center gap-3 flex-1 justify-end">
                 <span className="text-[12px] text-gray-500 font-mono hidden xl:inline">{saveStatus}</span>
                 <button onClick={handleCopy} title="Copy Code" className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors">
@@ -713,7 +735,9 @@ export default function BuilderPage({
             </div>
         </header>
 
-        <div className="builder-body-grid">
+        <div className={`builder-body-grid grid transition-all duration-300 ${
+              viewMode === 'split' ? 'grid-cols-[minmax(350px,1fr)_2fr_2fr]' : 'grid-cols-[minmax(350px,1fr)_4fr]'
+          }`}>
             <ChatPanel 
               messages={messages}
               thinking={thinking}
@@ -725,39 +749,43 @@ export default function BuilderPage({
               progressStep={progressStep}
               messagesEndRef={messagesEndRef}
               textareaRef={textareaRef}
-              activeProject={activeProject}
-              onExit={onExit}
-              onRename={onRename}
-              onDuplicate={onDuplicate}
-              onDelete={onDelete}
               chatStage={chatStage}
+              onSuggestionClick={onSuggestionClick}
+              followUpSuggestions={followUpSuggestions}
+              chipSuggestions={chipSuggestions}
             />
-            <CodePanel 
-              code={code} 
-              setCode={setCode} 
-              isGenerating={isGenerating}
-              editorRef={editorRef}
-            />
-            <div className="flex flex-col h-full overflow-hidden bg-[var(--bg)]">
-                <div className="flex-1 min-h-0">
-                    <PreviewPanel 
-                      reloadKey={previewKey} 
-                      code={debouncedCode}
-                      isFullscreen={isFullscreen}
-                      deviceMode={deviceMode}
-                      isReloading={isReloading}
-                      isRevealing={isRevealing}
-                      onExitFullscreen={() => setIsFullscreen(false)}
-                    />
-                </div>
-                <div className="flex-shrink-0 border-t border-[var(--border)]">
-                     <ConsolePanel 
-                        error={consoleError} 
-                        isOpen={isConsoleOpen} 
-                        setIsOpen={setIsConsoleOpen} 
-                    />
-                </div>
-            </div>
+
+            {viewMode !== 'preview' && (
+              <CodePanel 
+                code={code} 
+                setCode={setCode} 
+                isGenerating={isGenerating}
+                editorRef={editorRef}
+              />
+            )}
+            
+            {viewMode !== 'code' && (
+              <div className="flex flex-col h-full overflow-hidden bg-[var(--bg)]">
+                  <div className="flex-1 min-h-0">
+                      <PreviewPanel 
+                        reloadKey={previewKey} 
+                        code={debouncedCode}
+                        isFullscreen={isFullscreen}
+                        deviceMode={deviceMode}
+                        isReloading={isReloading}
+                        isRevealing={isRevealing}
+                        onExitFullscreen={() => setIsFullscreen(false)}
+                      />
+                  </div>
+                  <div className="flex-shrink-0 border-t border-[var(--border)]">
+                       <ConsolePanel 
+                          error={consoleError} 
+                          isOpen={isConsoleOpen} 
+                          setIsOpen={setIsConsoleOpen} 
+                      />
+                  </div>
+              </div>
+            )}
         </div>
     </div>
   );
