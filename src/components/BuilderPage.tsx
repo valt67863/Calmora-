@@ -5,7 +5,8 @@ import { createPortal } from 'react-dom';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
   Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle,
-  AlertCircle, ChevronDown, ChevronUp, Undo, Redo, Loader2
+  AlertCircle, ChevronDown, ChevronUp, Undo, Redo, Loader2,
+  ArrowLeft, MoreHorizontal, Edit3, Trash2
 } from 'lucide-react';
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
@@ -326,7 +327,19 @@ function ConsolePanel({ error, isOpen, setIsOpen }) {
     );
 }
 
-export default function BuilderPage({ onExit }: { onExit: () => void; }) {
+export default function BuilderPage({ 
+  onExit,
+  activeProject,
+  onRename,
+  onDuplicate,
+  onDelete
+}: { 
+  onExit: () => void;
+  activeProject: any;
+  onRename: (project: any) => void;
+  onDuplicate: (project: any) => void;
+  onDelete: (project: any) => void;
+}) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
   const [debouncedCode, setDebouncedCode] = useState(initialCode);
@@ -348,6 +361,20 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   // Console State
   const [consoleError, setConsoleError] = useState(null);
   const [isConsoleOpen, setIsConsoleOpen] = useState(true);
+
+  // Menu State
+  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
+  const builderMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
+        setShowBuilderMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     // Simulate an error appearing in the console after 5 seconds for demonstration
@@ -454,7 +481,33 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   return (
     <div className="w-full h-full flex flex-col bg-[var(--surface)] overflow-hidden">
         <header className="builder-header justify-between px-4">
-            {/* Left: Device Toggles & Preview Controls */}
+            {/* Left: Project Title & Menu */}
+            <div className="flex items-center gap-2 flex-1 justify-start">
+                <button onClick={onExit} title="Exit Builder" className="control-button">
+                    <ArrowLeft size={18} />
+                </button>
+                <div className="w-px h-6 bg-[var(--border)]" />
+                <div className="flex items-center gap-1">
+                    <span className="text-sm font-medium text-white truncate">{activeProject?.title || "Untitled Project"}</span>
+                    <div className="relative" ref={builderMenuRef}>
+                        <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
+                          <MoreHorizontal size={18} />
+                        </button>
+                        {showBuilderMenu && (
+                          <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
+                            <div className="p-2">
+                                <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Edit3 size={15} /> Rename</button>
+                                <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Copy size={15} /> Duplicate</button>
+                                <div className="h-px bg-[var(--border)] my-1" />
+                                <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Trash2 size={15} /> Delete</button>
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Center: Device Toggles & Preview Controls */}
             <div className="flex items-center gap-4">
                 <div className="flex items-center bg-[#151519] rounded-lg p-1 border border-white/10">
                     {['Desktop', 'Tablet', 'Mobile'].map(mode => {
@@ -505,16 +558,13 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1 justify-end">
                 <span className="text-[12px] text-gray-500 font-mono hidden xl:inline">{saveStatus}</span>
                 <button onClick={handleCopy} title="Copy Code" className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors">
                     <Copy size={15} /> <span>{copied ? 'Copied!' : 'Copy'}</span>
                 </button>
                 <button onClick={handleDownloadZip} title="Download as ZIP" disabled={isDownloading} className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-300 hover:text-white hover:bg-white/10 rounded-md transition-colors disabled:opacity-50">
                     <Download size={15} /> <span>{isDownloading ? 'Zipping...' : 'Export Code'}</span>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-1.5 text-[14px] font-medium bg-white text-black rounded-md hover:bg-gray-200 transition-colors">
-                    Deploy
                 </button>
             </div>
         </header>

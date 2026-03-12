@@ -95,21 +95,9 @@ const HomePage = () => {
   const scrollContentRef = useRef<HTMLDivElement>(null);
 
   const [showSettingsSheet, setShowSettingsSheet] = useState(false);
-  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
-  const builderMenuRef = useRef(null);
 
   const [threadActionData, setThreadActionData] = useState<any>(null);
   const [renameThread, setRenameThread] = useState<any>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
-        setShowBuilderMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const chipSuggestions = useMemo(() => [
       "Build a SaaS landing page",
@@ -764,116 +752,13 @@ const HomePage = () => {
   return (
     <>
       {isBuilderModeActive ? (
-        <div className="app-root">
-          {sidebarComponent}
-          <div className="flex-1 flex flex-row min-w-0">
-            {/* Left Panel: Chat */}
-            <div className="w-[500px] h-full flex flex-col bg-[var(--sidebar)] relative">
-              <header className="h-[52px] bg-[var(--surface-raised)] border-b border-[var(--border)] flex items-center justify-between px-2 gap-2 flex-shrink-0">
-                <div className="flex items-center gap-1">
-                  <button onClick={toggleSidebar} title="Toggle Sidebar" className="control-button">
-                    <Menu size={18} />
-                  </button>
-                  <button onClick={() => setBuildMode('chat')} title="Exit Builder" className="control-button">
-                      <ArrowLeft size={18} />
-                  </button>
-                </div>
-                <div className="flex-1 flex items-center gap-2 min-w-0">
-                  <span className="text-sm font-medium text-white truncate">{activeProject?.title || "SaaS Landing Page"}</span>
-                </div>
-                <div className="relative" ref={builderMenuRef}>
-                    <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
-                      <MoreHorizontal size={18} />
-                    </button>
-                    {showBuilderMenu && (
-                      <div className="menu-pop animate-pop-in" style={{ right: 0, top: 'calc(100% + 8px)', width: '220px' }}>
-                        <div className="p-2">
-                            <button onClick={() => { setRenameProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Edit3 size={15} /> Rename</button>
-                            <button onClick={() => { handleDuplicateProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Copy size={15} /> Duplicate</button>
-                            <div className="h-px bg-[var(--border)] my-1" />
-                            <button onClick={() => { setDeleteProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Trash2 size={15} /> Delete</button>
-                        </div>
-                      </div>
-                    )}
-                </div>
-              </header>
-
-              <div className="scroll-content custom-scrollbar" ref={scrollRef}>
-                <div className="workspace-container">
-                  <div className="flex-1 w-full relative">
-                    {chatStage === 'active' && (
-                      <div className="flex flex-col items-center w-full px-4 py-6 min-h-full relative">
-                        {messages.map((msg) => (
-                          <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-center"} mb-8 animate-message-in`}>
-                            {msg.role === "user" ? (
-                              <div className="bg-[var(--surface-raised)] px-5 py-3 rounded-[20px] rounded-br-sm text-[16px] leading-[1.6] max-w-[85%] md:max-w-[72%] text-[var(--text-primary)] font-sans tracking-normal border border-[var(--border)] backdrop-blur-md shadow-sm">{msg.content}</div>
-                            ) : (
-                              <div className="w-full max-w-[720px] font-sans text-[var(--text-secondary)]">{formatAIResponse(msg.content)}</div>
-                            )}
-                          </div>
-                        ))}
-                        {thinking && (
-                          <div className="w-full flex justify-center mb-6 animate-message-in">
-                            <div className="w-full max-w-[720px]">
-                              <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating website</div>
-                              <div className="space-y-3">
-                                {generationSteps.map((step, index) => (
-                                  <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
-                                    {index < progressStep ? (
-                                      <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
-                                    ) : index === progressStep ? (
-                                      <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
-                                    ) : (
-                                      <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
-                                    )}
-                                    <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        <div ref={messagesEndRef} className="h-24" />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
-                <div className="chat-input-surface">
-                  <textarea
-                    ref={textareaRef}
-                    value={input}
-                    onChange={(e) => {
-                      setInput(e.target.value);
-                      if (e.target.value.trim().length > 0) setShowSuggestionList(true);
-                      else setShowSuggestionList(false);
-                    }}
-                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                    placeholder="Example: “Build a SaaS landing page for an AI email assistant”"
-                    className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
-                    rows={1}
-                  />
-                  {input.trim() ? (
-                    <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-                      {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                    </button>
-                  ) : (
-                    <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-                      <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            {/* Right Panel: Builder */}
-            <div className="flex-1 h-full min-w-0">
-              <BuilderPage onExit={() => setBuildMode('chat')} />
-            </div>
-          </div>
-        </div>
+        <BuilderPage
+          onExit={() => setBuildMode('chat')}
+          activeProject={activeProject}
+          onRename={setRenameProject}
+          onDuplicate={handleDuplicateProject}
+          onDelete={setDeleteProject}
+        />
       ) : (
         <div className="app-root">
           {sidebarComponent}
@@ -969,6 +854,12 @@ const HomePage = () => {
                     {chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
                         <div className="absolute bottom-full mb-3 w-full">
                             <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
+                        </div>
+                    )}
+                    
+                    {chatStage === 'active' && !input && (
+                        <div className="mb-4">
+                            <ModeToggle mode={buildMode} setMode={setBuildMode} />
                         </div>
                     )}
 
