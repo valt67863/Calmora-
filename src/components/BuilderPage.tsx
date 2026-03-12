@@ -210,7 +210,6 @@ function ChatPanel({
   chatStage,
   onSuggestionClick,
   followUpSuggestions,
-  chipSuggestions,
 }: any) {
 
   useEffect(() => {
@@ -253,40 +252,28 @@ function ChatPanel({
         <div ref={messagesEndRef} className="h-24" />
       </div>
 
-       <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''}`}>
-          <div className="chat-input-surface">
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
-              placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page”" : "Ask a follow-up..."}
-              className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
-              rows={1}
-            />
-            {input.trim() ? (
-              <button onClick={handleSendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-                {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-              </button>
-            ) : (
-              <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-                <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-              </button>
-            )}
-          </div>
-          
-          {chatStage === 'new-chat' && !input.trim() && (
-              <div className="mt-6">
-                  {/* No suggestions in builder mode */}
-              </div>
-          )}
-          
-          {chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
-              <div className="mt-6">
-                 {/* No suggestions in builder mode */}
-              </div>
+      <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''}`}>
+        <div className="chat-input-surface">
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+            placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page”" : "Ask a follow-up..."}
+            className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
+            rows={1}
+          />
+          {input.trim() ? (
+            <button onClick={handleSendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+              {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            </button>
+          ) : (
+            <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+              <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+            </button>
           )}
         </div>
+      </div>
     </div>
   );
 }
@@ -519,10 +506,10 @@ export default function BuilderPage({
 
   const handleSendMessage = () => {
     if (input.trim()) {
-        sendMessage();
-        if (chatStage === 'new-chat') {
-            setChatStage('active');
-        }
+      if (chatStage === 'new-chat') {
+        setChatStage('active');
+      }
+      sendMessage();
     }
   };
 
@@ -639,7 +626,7 @@ export default function BuilderPage({
                       <MoreHorizontal size={18} />
                     </button>
                     {showBuilderMenu && activeProject && (
-                      <div className="menu-pop animate-pop-in" style={{ left: 'auto', right: 'auto', top: 'calc(100% + 8px)', width: '220px' }}>
+                      <div className="menu-pop animate-pop-in" style={{ left: 0, right: 'auto', top: 'calc(100% + 8px)', width: '220px' }}>
                         <div className="p-2">
                             <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
                             <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
@@ -736,7 +723,7 @@ export default function BuilderPage({
         </header>
 
         <div className={`builder-body-grid grid transition-all duration-300 ${
-              viewMode === 'split' ? 'grid-cols-[minmax(350px,1fr)_2fr_2fr]' : 'grid-cols-[minmax(350px,1fr)_4fr]'
+              viewMode === 'split' ? 'grid-cols-[minmax(350px,1fr)_2fr_2fr]' : 'grid-cols-[minmax(350px,1fr)_1fr]'
           }`}>
             <ChatPanel 
               messages={messages}
@@ -752,7 +739,6 @@ export default function BuilderPage({
               chatStage={chatStage}
               onSuggestionClick={onSuggestionClick}
               followUpSuggestions={followUpSuggestions}
-              chipSuggestions={chipSuggestions}
             />
 
             {viewMode !== 'preview' && (
