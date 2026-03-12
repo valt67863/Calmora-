@@ -99,11 +99,6 @@ const HomePage = () => {
   const [threadActionData, setThreadActionData] = useState<any>(null);
   const [renameThread, setRenameThread] = useState<any>(null);
   
-  // State for builder sidebar
-  const [isBuilderSidebarOpen, setIsBuilderSidebarOpen] = useState(true);
-  const toggleBuilderSidebar = () => setIsBuilderSidebarOpen(prev => !prev);
-
-
   const chipSuggestions = useMemo(() => [
       "Build a SaaS landing page",
       "Create a startup waitlist",
@@ -366,9 +361,7 @@ const HomePage = () => {
   };
 
   const toggleSidebar = () => { 
-    if(appMode === 'chat' && buildMode === 'builder') {
-      toggleBuilderSidebar();
-    } else if (isMobile) {
+    if (isMobile) {
       setSidebarOpen(!sidebarOpen);
     } else {
       setDesktopSidebarOpen(!desktopSidebarOpen);
@@ -630,11 +623,10 @@ const HomePage = () => {
   };
 
   const isBuilderModeActive = buildMode === 'builder' && appMode === 'chat' && !isMobile;
-  const currentSidebarOpen = isBuilderModeActive ? isBuilderSidebarOpen : desktopSidebarOpen;
-
+  
   const sidebarComponent = (
     <aside
-      className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (currentSidebarOpen ? 'w-260' : 'w-72')}`}
+      className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
     >
       <div className="h-16 flex items-center justify-between px-6 border-b border-[var(--border)] min-w-0 transition-all duration-300 flex-shrink-0">
           {!isCollapsed ? (
@@ -645,7 +637,7 @@ const HomePage = () => {
                 </div>
                 <span className="font-medium text-[var(--text-primary)] tracking-wide font-sans truncate text-sm">Calmora</span>
               </div>
-              {!isMobile && !isBuilderModeActive && (
+              {!isMobile && (
                 <button onClick={() => setDesktopSidebarOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all p-1 rounded-md hover:bg-[var(--surface-hover)]">
                   <ChevronLeft size={18} />
                 </button>
@@ -655,7 +647,7 @@ const HomePage = () => {
               )}
             </>
           ) : (
-            <button onClick={() => isBuilderModeActive ? toggleBuilderSidebar() : setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
+            <button onClick={() => setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
                 <CalmoraLogo size={24} />
             </button>
           )}
@@ -785,11 +777,11 @@ const HomePage = () => {
             generationSteps={generationSteps}
             progressStep={progressStep}
             followUpSuggestions={followUpSuggestions}
+            chipSuggestions={chipSuggestions}
             onSuggestionClick={handleSuggestionClick}
             messagesEndRef={messagesEndRef}
             textareaRef={textareaRef}
-            isBuilderSidebarOpen={isBuilderSidebarOpen}
-            toggleBuilderSidebar={toggleBuilderSidebar}
+            toggleSidebar={toggleSidebar}
           />
         ) : (
           <main className="app-main">
@@ -897,7 +889,7 @@ const HomePage = () => {
                         value={input}
                         onChange={(e) => {
                           setInput(e.target.value);
-                          setShowSuggestionList(e.target.value.trim().length > 0);
+                          setShowSuggestionList(e.target.value.trim().length > 0 && chatStage === 'new-chat');
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                         placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page for an AI email assistant”" : "Ask a follow-up or give a new instruction..."}

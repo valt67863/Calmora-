@@ -200,11 +200,12 @@ function ChatPanel({
   thinking,
   input,
   setInput,
-  sendMessage,
+  handleSendMessage,
   formatAIResponse,
   generationSteps,
   progressStep,
   followUpSuggestions,
+  chipSuggestions,
   onSuggestionClick,
   messagesEndRef,
   textareaRef,
@@ -214,6 +215,7 @@ function ChatPanel({
   onDuplicate,
   onDelete,
   toggleSidebar,
+  chatStage,
 }: any) {
   
   const [showBuilderMenu, setShowBuilderMenu] = useState(false);
@@ -303,24 +305,31 @@ function ChatPanel({
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="builder-chat-input-area">
-        {!thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
-          <div className="mb-4">
-              <PromptSuggestions suggestions={followUpSuggestions} setPrompt={onSuggestionClick} />
-          </div>
+      <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''}`}>
+        {chatStage === 'new-chat' && !input.trim() && (
+            <div className="mt-6">
+                <PromptSuggestions suggestions={chipSuggestions} setPrompt={onSuggestionClick} />
+            </div>
         )}
+        
+        {chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
+            <div className="mb-4">
+                <PromptSuggestions suggestions={followUpSuggestions} setPrompt={onSuggestionClick} />
+            </div>
+        )}
+        
         <div className="chat-input-surface">
           <textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-            placeholder="Ask a follow-up or give a new instruction..."
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } }}
+            placeholder={chatStage === 'new-chat' ? "Start with a high-level goal..." : "Ask a follow-up or give a new instruction..."}
             className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[120px] overflow-y-auto scrollbar-hide font-sans py-1"
             rows={1}
           />
           {input.trim() ? (
-            <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+            <button onClick={handleSendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
               {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             </button>
           ) : (
@@ -483,11 +492,11 @@ export default function BuilderPage({
   generationSteps,
   progressStep,
   followUpSuggestions,
+  chipSuggestions,
   onSuggestionClick,
   messagesEndRef,
   textareaRef,
-  isBuilderSidebarOpen,
-  toggleBuilderSidebar,
+  toggleSidebar,
 }: { 
   onExit: () => void;
   activeProject: any;
@@ -503,11 +512,11 @@ export default function BuilderPage({
   generationSteps: string[];
   progressStep: number;
   followUpSuggestions: string[];
+  chipSuggestions: string[];
   onSuggestionClick: (prompt: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
-  isBuilderSidebarOpen: boolean;
-  toggleBuilderSidebar: () => void;
+  toggleSidebar: () => void;
 }) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
@@ -515,6 +524,7 @@ export default function BuilderPage({
   const [isGenerating, setIsGenerating] = useState(false);
   const [saveStatus, setSaveStatus] = useState('Auto-saved just now');
   const editorRef = useRef(null);
+  const [chatStage, setChatStage] = useState('new-chat');
   
   // Header Tools State
   const [copied, setCopied] = useState(false);
@@ -556,6 +566,15 @@ export default function BuilderPage({
     }, 5000);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleSendMessage = () => {
+    if (input.trim()) {
+        sendMessage();
+        if (chatStage === 'new-chat') {
+            setChatStage('active');
+        }
+    }
+  };
 
   // Editor Actions
   const handleCopy = () => {
@@ -647,10 +666,8 @@ export default function BuilderPage({
     return () => clearTimeout(handler);
   }, [code, isGenerating]);
   
-  const chatPanelGridClass = isBuilderSidebarOpen ? 'minmax(350px, 420px)' : 'minmax(350px, 1fr)';
-
   return (
-    <div className="w-full h-full flex flex-col bg-[var(--surface)] overflow-hidden">
+    <div className="builder-window w-full h-full flex-1 min-w-0">
         <header className="builder-header justify-between px-4">
             {/* Left placeholder */}
             <div className="flex items-center gap-2 flex-1 justify-start">
@@ -719,17 +736,18 @@ export default function BuilderPage({
             </div>
         </header>
 
-        <div className="builder-body-grid" style={{gridTemplateColumns: `${chatPanelGridClass} 2fr 2fr`}}>
+        <div className="builder-body-grid">
             <ChatPanel 
               messages={messages}
               thinking={thinking}
               input={input}
               setInput={setInput}
-              sendMessage={sendMessage}
+              handleSendMessage={handleSendMessage}
               formatAIResponse={formatAIResponse}
               generationSteps={generationSteps}
               progressStep={progressStep}
               followUpSuggestions={followUpSuggestions}
+              chipSuggestions={chipSuggestions}
               onSuggestionClick={onSuggestionClick}
               messagesEndRef={messagesEndRef}
               textareaRef={textareaRef}
@@ -738,7 +756,8 @@ export default function BuilderPage({
               onRename={onRename}
               onDuplicate={onDuplicate}
               onDelete={onDelete}
-              toggleSidebar={toggleBuilderSidebar}
+              toggleSidebar={toggleSidebar}
+              chatStage={chatStage}
             />
             <CodePanel 
               code={code} 
