@@ -523,6 +523,7 @@ const HomePage = () => {
   };
 
   const handleDuplicateProject = (project: any) => {
+    if (!project) return;
     const newProject = { ...project, id: generateId(), title: `${project.title} (Copy)` };
     setProjects(prev => [newProject, ...prev]);
   };
@@ -644,10 +645,10 @@ const HomePage = () => {
                 {showBuilderMenu && (
                   <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
                     <div className="p-2">
-                        <button onClick={() => { setRenameProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
-                        <button onClick={() => { handleDuplicateProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
+                        <button onClick={() => { setRenameProject(activeProject); setShowBuilderMenu(false); }} disabled={!activeProject} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Edit3 size={15} /> Rename</button>
+                        <button onClick={() => { handleDuplicateProject(activeProject); setShowBuilderMenu(false); }} disabled={!activeProject} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Copy size={15} /> Duplicate</button>
                         <div className="h-px bg-[var(--border)] my-1" />
-                        <button onClick={() => { setDeleteProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
+                        <button onClick={() => { setDeleteProject(activeProject); setShowBuilderMenu(false); }} disabled={!activeProject} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Trash2 size={15} /> Delete</button>
                     </div>
                   </div>
                 )}
@@ -774,6 +775,13 @@ const HomePage = () => {
                     collapsed={isCollapsed} 
                     onClick={() => { setAppMode('projects'); if(isMobile) setSidebarOpen(false); }} 
                     active={appMode === 'projects' || appMode === 'project-view'} 
+                />
+                <NavItem 
+                    icon={History} 
+                    label="History" 
+                    collapsed={isCollapsed} 
+                    onClick={() => { setAppMode('history'); if(isMobile) setSidebarOpen(false); }} 
+                    active={appMode === 'history'}
                 />
             </div>
             
