@@ -4,7 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
-  Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle
+  Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle,
+  AlertCircle, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
@@ -74,7 +75,16 @@ const generateSandboxDoc = (code) => {
 <body>
   <div id="root"></div>
   <script type="text/babel" data-type="module">
-    ${code}
+    try {
+      ${code}
+    } catch (e) {
+      const errorDiv = document.createElement('div');
+      errorDiv.style.color = '#ff6b6b';
+      errorDiv.style.padding = '20px';
+      errorDiv.style.fontFamily = 'monospace';
+      errorDiv.innerText = 'Render Error: ' + e.message;
+      document.getElementById('root').appendChild(errorDiv);
+    }
   </script>
 </body>
 </html>`;
@@ -268,39 +278,50 @@ function PreviewPanel({ code, reloadKey, isFullscreen, deviceMode, isReloading, 
   );
 }
 
-function ConsolePanel({ error }) {
+function ConsolePanel({ error, isOpen, setIsOpen }) {
     const getTime = () => new Date().toLocaleTimeString('en-US', { hour12: false });
 
     return (
         <div className="console-panel">
-            <header className="console-header">
-                <h3>Console</h3>
+            <header className="console-header justify-between">
+                <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-medium text-gray-300">Console</h3>
+                    {error && <span className="w-2 h-2 rounded-full bg-red-500" />}
+                </div>
+                <button onClick={() => setIsOpen(!isOpen)} title={isOpen ? 'Collapse Console' : 'Expand Console'} className="p-1 text-gray-400 hover:text-white rounded-md hover:bg-white/10">
+                    {isOpen ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                </button>
             </header>
-            <div className="console-body custom-scrollbar">
-                {error ? (
-                    <div className="console-error-view">
-                        <div className="error-message">
-                            <XCircle size={16} className="text-red-500 flex-shrink-0" />
-                            <span>{error.message}</span>
+            {isOpen && (
+                <div className="console-body custom-scrollbar">
+                    {error ? (
+                        <div className="console-error-view">
+                            <div className="error-message">
+                                <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
+                                <div>
+                                    <div className="text-red-400 font-medium">{error.message}</div>
+                                    <div className="text-xs text-gray-500 mt-1">File: {error.file} &nbsp;&nbsp; Line: {error.line}</div>
+                                </div>
+                            </div>
+                            <div className="error-actions">
+                                <button className="ai-action-btn fix-btn">
+                                    <Wand2 size={14} /> Fix with AI
+                                </button>
+                                <button className="ai-action-btn explain-btn">
+                                    <Lightbulb size={14} /> Explain Error
+                                </button>
+                            </div>
                         </div>
-                        <div className="error-actions">
-                            <button className="ai-action-btn fix-btn">
-                                <Wand2 size={14} /> Fix with AI
-                            </button>
-                            <button className="ai-action-btn explain-btn">
-                                <Lightbulb size={14} /> Explain Error
-                            </button>
+                    ) : (
+                        <div className="console-log-view">
+                            <div className="log-line">
+                                <span className="timestamp">{getTime()}</span>
+                                <span className="log-text">Build successful. Preview updated.</span>
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="console-log-view">
-                        <span className="log-line">
-                            <span className="timestamp">{getTime()}</span>
-                            <span className="log-text">Build successful. Preview updated.</span>
-                        </span>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
@@ -321,12 +342,19 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   const [deviceMode, setDeviceMode] = useState('Desktop');
   const [isReloading, setIsReloading] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
+  
+  // Console State
   const [consoleError, setConsoleError] = useState(null);
+  const [isConsoleOpen, setIsConsoleOpen] = useState(true);
 
   useEffect(() => {
     // Simulate an error appearing in the console after 5 seconds for demonstration
     const timer = setTimeout(() => {
-        setConsoleError({ message: "TypeError: Cannot read properties of undefined (reading 'map')" });
+        setConsoleError({ 
+            message: "TypeError: Cannot read properties of undefined (reading 'map')",
+            file: "src/App.jsx",
+            line: 42,
+        });
     }, 5000);
     return () => clearTimeout(timer);
   }, []);
@@ -442,6 +470,15 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
                         {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
                     </button>
                 </div>
+                {consoleError && (
+                    <>
+                        <div className="h-5 w-px bg-white/10" />
+                        <button onClick={() => setIsConsoleOpen(true)} className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 font-medium px-2 py-1 rounded-md hover:bg-red-500/10">
+                            <span className="w-2 h-2 rounded-full bg-red-500" />
+                            1 error detected
+                        </button>
+                    </>
+                )}
             </div>
 
             {/* Right: Actions */}
@@ -478,11 +515,17 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
                       onExitFullscreen={() => setIsFullscreen(false)}
                     />
                 </div>
-                <div className="flex-shrink-0 h-[250px] border-t border-[var(--border)]">
-                     <ConsolePanel error={consoleError} />
+                <div className="flex-shrink-0 border-t border-[var(--border)]">
+                     <ConsolePanel 
+                        error={consoleError} 
+                        isOpen={isConsoleOpen} 
+                        setIsOpen={setIsConsoleOpen} 
+                    />
                 </div>
             </div>
         </div>
     </div>
   );
 }
+
+    
