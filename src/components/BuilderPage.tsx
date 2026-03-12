@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { 
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
   Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle,
-  AlertCircle, ChevronDown, ChevronUp
+  AlertCircle, ChevronDown, ChevronUp, Undo, Redo, Loader2
 } from 'lucide-react';
 
 // Suppress benign ResizeObserver errors caused by Monaco Editor's automaticLayout
@@ -342,6 +342,8 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
   const [deviceMode, setDeviceMode] = useState('Desktop');
   const [isReloading, setIsReloading] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
+  const [isUndoing, setIsUndoing] = useState(false);
+  const [isRedoing, setIsRedoing] = useState(false);
   
   // Console State
   const [consoleError, setConsoleError] = useState(null);
@@ -427,6 +429,18 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
     setTimeout(() => { setIsReloading(false); setIsRevealing(true); }, 800);
     setTimeout(() => setIsRevealing(false), 1200);
   };
+  
+  const handleUndo = () => {
+    setIsUndoing(true);
+    // In a real app, you'd update the code from a history stack
+    setTimeout(() => setIsUndoing(false), 800);
+  };
+
+  const handleRedo = () => {
+    setIsRedoing(true);
+    // In a real app, you'd update the code from a history stack
+    setTimeout(() => setIsRedoing(false), 800);
+  };
 
   // Debounced Compilation Hook
   useEffect(() => {
@@ -460,6 +474,15 @@ export default function BuilderPage({ onExit }: { onExit: () => void; }) {
                         </button>
                     )
                     })}
+                </div>
+                <div className="h-5 w-px bg-white/10" />
+                <div className="flex items-center gap-1">
+                  <button onClick={handleUndo} title="Undo" disabled={isUndoing || isRedoing} className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50">
+                      {isUndoing ? <Loader2 size={16} className="animate-spin" /> : <Undo size={16} />}
+                  </button>
+                  <button onClick={handleRedo} title="Redo" disabled={isUndoing || isRedoing} className="flex items-center justify-center w-8 h-8 rounded-md text-gray-400 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50">
+                      {isRedoing ? <Loader2 size={16} className="animate-spin" /> : <Redo size={16} />}
+                  </button>
                 </div>
                 <div className="h-5 w-px bg-white/10" />
                 <div className="flex items-center gap-1">

@@ -26,7 +26,8 @@ import {
   Trash2,
   CheckCircle2,
   Circle,
-  Pin
+  Pin,
+  Menu
 } from "lucide-react";
 import { safeLocalStorage, generateId, normalizeStatus, triggerConfetti, generateBasicTasks, aiSystemInstruction, FOCUS_DEMO_STEPS } from "@/lib/calmora-utils";
 import {
@@ -628,240 +629,254 @@ const HomePage = () => {
 
   const isBuilderModeActive = buildMode === 'builder' && appMode === 'chat' && !isMobile;
 
+  const sidebarComponent = (
+    <aside
+      className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
+    >
+      <div className="h-16 flex items-center justify-between px-6 border-b border-[var(--border)] min-w-0 transition-all duration-300 flex-shrink-0">
+          {!isCollapsed ? (
+            <>
+              <div className="flex items-center gap-3 overflow-hidden text-[var(--accent)]">
+                <div className="w-8 h-8 flex-none rounded-lg bg-[var(--accent-subtle)] border border-[var(--accent-glow)] flex items-center justify-center">
+                  <CalmoraLogo size={20} />
+                </div>
+                <span className="font-medium text-[var(--text-primary)] tracking-wide font-sans truncate text-sm">Calmora</span>
+              </div>
+              {!isMobile && (
+                <button onClick={() => setDesktopSidebarOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all p-1 rounded-md hover:bg-[var(--surface-hover)]">
+                  <ChevronLeft size={18} />
+                </button>
+              )}
+              {isMobile && (
+                  <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"><X size={20} /></button>
+              )}
+            </>
+          ) : (
+            <button onClick={() => setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
+                <CalmoraLogo size={24} />
+            </button>
+          )}
+      </div>
+      
+        <div className="p-3 space-y-1 flex-shrink-0">
+            <button onClick={startNewChat} title="Start New Session" className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
+                <Plus size={16} strokeWidth={2.5} />
+                {!isCollapsed && <span className="text-sm font-semibold font-sans">Start New Session</span>}
+            </button>
+            <NavItem 
+                icon={Folder} 
+                label="Projects" 
+                collapsed={isCollapsed} 
+                onClick={() => { setAppMode('projects'); if(isMobile) setSidebarOpen(false); }} 
+                active={appMode === 'projects' || appMode === 'project-view'} 
+            />
+            <NavItem 
+                icon={History} 
+                label="History" 
+                collapsed={isCollapsed} 
+                onClick={() => { setAppMode('history'); if(isMobile) setSidebarOpen(false); }} 
+                active={appMode === 'history'}
+            />
+        </div>
+        
+        <div className="sidebar-scroll-wrapper" ref={scrollWrapperRef}>
+            <div className="sidebar-scroll-content custom-scrollbar" ref={scrollContentRef}>
+            <div className="px-3 pb-3">
+                {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
+                <div className="space-y-1">
+                {threads.sort((a,b) => {
+                     if (a.pinned && !b.pinned) return -1;
+                     if (!a.pinned && b.pinned) return 1;
+                     return b.updatedAt - a.updatedAt;
+                }).slice(0, 10).map(thread => (
+                    isCollapsed ? (
+                        <button
+                            key={thread.id}
+                            onClick={() => switchThread(thread.id)}
+                            className={`
+                                w-10 h-10 mx-auto flex items-center justify-center rounded-lg transition-all duration-200
+                                ${activeThreadId === thread.id && appMode === 'chat' ? "sidebar-list-item active" : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}
+                            `}
+                            title={thread.title}
+                        >
+                            <MessageSquare size={18} strokeWidth={activeThreadId === thread.id && appMode === 'chat' ? 2 : 1.5} />
+                        </button>
+                    ) : (
+                      <div key={thread.id} className="group relative">
+                          <button
+                              onClick={() => switchThread(thread.id)}
+                              className={`sidebar-list-item pr-10 ${activeThreadId === thread.id && appMode === 'chat' ? 'active' : ''}`}
+                              title={thread.title}
+                          >
+                              {thread.pinned && <Pin size={12} className="absolute left-2 top-2.5 text-[hsl(var(--accent))] opacity-60" />}
+                              <MessageSquare size={16} className="mr-2 flex-shrink-0" />
+                              <span className="truncate">{thread.title}</span>
+                          </button>
+                          <button
+                              onClick={(e) => {
+                                  e.stopPropagation();
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setThreadActionData({ thread, position: { x: rect.left, y: rect.bottom + 5 } });
+                              }}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md text-[var(--text-secondary)] opacity-0 group-hover:opacity-100 hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] transition-opacity"
+                          >
+                              <MoreHorizontal size={16} />
+                          </button>
+                      </div>
+                    )
+                ))}
+                {threads.length === 0 && !isCollapsed && (
+                    <div className="px-3 py-4 text-center text-xs text-[var(--text-tertiary)]">
+                        No history yet.
+                    </div>
+                )}
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div className="sidebar-bottom">
+          <NavItem 
+            icon={Settings} 
+            label="Settings" 
+            collapsed={isCollapsed}
+            onClick={() => {
+              if (isMobile) {
+                setShowSettingsSheet(true);
+              } else {
+                setAppMode('settings');
+              }
+              if (isMobile && sidebarOpen) setSidebarOpen(false);
+            }}
+            active={appMode === 'settings'}
+          />
+          <NavItem 
+            icon={LogOut} 
+            label="Sign out" 
+            collapsed={isCollapsed}
+            onClick={() => window.location.reload()}
+            danger
+          />
+        </div>
+    </aside>
+  );
+
   return (
     <>
       {isBuilderModeActive ? (
         <div className="app-root">
-          {/* Left Panel: Chat */}
-          <div className="w-[500px] h-full flex flex-col bg-[var(--sidebar)] relative">
-            <header className="h-[52px] bg-[var(--surface-raised)] border-b border-[var(--border)] flex items-center px-4 gap-3 flex-shrink-0">
-              <button onClick={() => setBuildMode('chat')} title="Exit Builder" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
-                  <ArrowLeft size={18} />
-              </button>
-              <span className="text-sm font-medium text-white truncate">{activeProject?.title || "SaaS Landing Page"}</span>
-              <div className="relative" ref={builderMenuRef}>
-                  <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-white/10 transition-colors text-gray-300">
-                    <MoreHorizontal size={18} />
+          {sidebarComponent}
+          <div className="flex-1 flex flex-row min-w-0">
+            {/* Left Panel: Chat */}
+            <div className="w-[500px] h-full flex flex-col bg-[var(--sidebar)] relative">
+              <header className="h-[52px] bg-[var(--surface-raised)] border-b border-[var(--border)] flex items-center justify-between px-2 gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1">
+                  <button onClick={toggleSidebar} title="Toggle Sidebar" className="control-button">
+                    <Menu size={18} />
                   </button>
-                  {showBuilderMenu && (
-                    <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
-                      <div className="p-2">
-                          <button onClick={() => { setRenameProject(activeProject); setShowBuilderMenu(false); }} disabled={!activeProject} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Edit3 size={15} /> Rename</button>
-                          <button onClick={() => { handleDuplicateProject(activeProject); setShowBuilderMenu(false); }} disabled={!activeProject} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Copy size={15} /> Duplicate</button>
-                          <div className="h-px bg-[var(--border)] my-1" />
-                          <button onClick={() => { setDeleteProject(activeProject); setShowBuilderMenu(false); }} disabled={!activeProject} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Trash2 size={15} /> Delete</button>
-                      </div>
-                    </div>
-                  )}
-              </div>
-            </header>
-
-            <div className="scroll-content custom-scrollbar" ref={scrollRef}>
-              <div className="workspace-container">
-                <div className="flex-1 w-full relative">
-                  {chatStage === 'active' && (
-                    <div className="flex flex-col items-center w-full px-4 py-6 min-h-full relative">
-                      {messages.map((msg) => (
-                        <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-center"} mb-8 animate-message-in`}>
-                          {msg.role === "user" ? (
-                            <div className="bg-[var(--surface-raised)] px-5 py-3 rounded-[20px] rounded-br-sm text-[16px] leading-[1.6] max-w-[85%] md:max-w-[72%] text-[var(--text-primary)] font-sans tracking-normal border border-[var(--border)] backdrop-blur-md shadow-sm">{msg.content}</div>
-                          ) : (
-                            <div className="w-full max-w-[720px] font-sans text-[var(--text-secondary)]">{formatAIResponse(msg.content)}</div>
-                          )}
+                  <button onClick={() => setBuildMode('chat')} title="Exit Builder" className="control-button">
+                      <ArrowLeft size={18} />
+                  </button>
+                </div>
+                <div className="flex-1 flex items-center gap-2 min-w-0">
+                  <span className="text-sm font-medium text-white truncate">{activeProject?.title || "SaaS Landing Page"}</span>
+                </div>
+                <div className="relative" ref={builderMenuRef}>
+                    <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
+                      <MoreHorizontal size={18} />
+                    </button>
+                    {showBuilderMenu && (
+                      <div className="menu-pop animate-pop-in" style={{ right: 0, top: 'calc(100% + 8px)', width: '220px' }}>
+                        <div className="p-2">
+                            <button onClick={() => { setRenameProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Edit3 size={15} /> Rename</button>
+                            <button onClick={() => { handleDuplicateProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Copy size={15} /> Duplicate</button>
+                            <div className="h-px bg-[var(--border)] my-1" />
+                            <button onClick={() => { setDeleteProject(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"><Trash2 size={15} /> Delete</button>
                         </div>
-                      ))}
-                      {thinking && (
-                         <div className="w-full flex justify-center mb-6 animate-message-in">
-                          <div className="w-full max-w-[720px]">
-                            <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating website</div>
-                            <div className="space-y-3">
-                              {generationSteps.map((step, index) => (
-                                <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
-                                  {index < progressStep ? (
-                                    <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
-                                  ) : index === progressStep ? (
-                                    <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
-                                  ) : (
-                                    <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
-                                  )}
-                                  <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
-                                </div>
-                              ))}
+                      </div>
+                    )}
+                </div>
+              </header>
+
+              <div className="scroll-content custom-scrollbar" ref={scrollRef}>
+                <div className="workspace-container">
+                  <div className="flex-1 w-full relative">
+                    {chatStage === 'active' && (
+                      <div className="flex flex-col items-center w-full px-4 py-6 min-h-full relative">
+                        {messages.map((msg) => (
+                          <div key={msg.id} className={`w-full flex ${msg.role === "user" ? "justify-end" : "justify-center"} mb-8 animate-message-in`}>
+                            {msg.role === "user" ? (
+                              <div className="bg-[var(--surface-raised)] px-5 py-3 rounded-[20px] rounded-br-sm text-[16px] leading-[1.6] max-w-[85%] md:max-w-[72%] text-[var(--text-primary)] font-sans tracking-normal border border-[var(--border)] backdrop-blur-md shadow-sm">{msg.content}</div>
+                            ) : (
+                              <div className="w-full max-w-[720px] font-sans text-[var(--text-secondary)]">{formatAIResponse(msg.content)}</div>
+                            )}
+                          </div>
+                        ))}
+                        {thinking && (
+                          <div className="w-full flex justify-center mb-6 animate-message-in">
+                            <div className="w-full max-w-[720px]">
+                              <div className="text-lg font-medium text-[var(--text-primary)] mb-4">Generating website</div>
+                              <div className="space-y-3">
+                                {generationSteps.map((step, index) => (
+                                  <div key={index} className={`flex items-center gap-3 transition-all duration-500 ${index <= progressStep ? 'opacity-100' : 'opacity-40'}`}>
+                                    {index < progressStep ? (
+                                      <CheckCircle2 size={18} className="text-green-500 flex-shrink-0" />
+                                    ) : index === progressStep ? (
+                                      <Zap size={18} className="text-yellow-400 flex-shrink-0 animate-pulse" />
+                                    ) : (
+                                      <Circle size={18} className="text-[var(--text-tertiary)] flex-shrink-0" />
+                                    )}
+                                    <span className={`text-base ${index <= progressStep ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>{step}</span>
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                      <div ref={messagesEndRef} className="h-24" />
-                    </div>
+                        )}
+                        <div ref={messagesEndRef} className="h-24" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
+                <div className="chat-input-surface">
+                  <textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      if (e.target.value.trim().length > 0) setShowSuggestionList(true);
+                      else setShowSuggestionList(false);
+                    }}
+                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+                    placeholder="Example: “Build a SaaS landing page for an AI email assistant”"
+                    className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
+                    rows={1}
+                  />
+                  {input.trim() ? (
+                    <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+                      {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                    </button>
+                  ) : (
+                    <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+                      <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+                    </button>
                   )}
                 </div>
               </div>
             </div>
             
-            <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
-               <div className="chat-input-surface">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => {
-                    setInput(e.target.value);
-                    if (e.target.value.trim().length > 0) setShowSuggestionList(true);
-                    else setShowSuggestionList(false);
-                  }}
-                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Example: “Build a SaaS landing page for an AI email assistant”"
-                  className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[160px] overflow-y-auto scrollbar-hide font-sans py-1"
-                  rows={1}
-                />
-                {input.trim() ? (
-                  <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
-                    {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                  </button>
-                ) : (
-                  <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
-                    <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
-                  </button>
-                )}
-              </div>
+            {/* Right Panel: Builder */}
+            <div className="flex-1 h-full min-w-0">
+              <BuilderPage onExit={() => setBuildMode('chat')} />
             </div>
-          </div>
-          
-          {/* Right Panel: Builder */}
-          <div className="flex-1 h-full min-w-0">
-            <BuilderPage onExit={() => setBuildMode('chat')} />
           </div>
         </div>
       ) : (
         <div className="app-root">
-          <aside
-            className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
-          >
-            <div className="h-16 flex items-center justify-between px-6 border-b border-[var(--border)] min-w-0 transition-all duration-300 flex-shrink-0">
-                {!isCollapsed ? (
-                  <>
-                    <div className="flex items-center gap-3 overflow-hidden text-[var(--accent)]">
-                      <div className="w-8 h-8 flex-none rounded-lg bg-[var(--accent-subtle)] border border-[var(--accent-glow)] flex items-center justify-center">
-                        <CalmoraLogo size={20} />
-                      </div>
-                      <span className="font-medium text-[var(--text-primary)] tracking-wide font-sans truncate text-sm">Calmora</span>
-                    </div>
-                    {!isMobile && (
-                      <button onClick={() => setDesktopSidebarOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all p-1 rounded-md hover:bg-[var(--surface-hover)]">
-                        <ChevronLeft size={18} />
-                      </button>
-                    )}
-                    {isMobile && (
-                        <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all"><X size={20} /></button>
-                    )}
-                  </>
-                ) : (
-                  <button onClick={() => setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
-                      <CalmoraLogo size={24} />
-                  </button>
-                )}
-            </div>
-            
-              <div className="p-3 space-y-1 flex-shrink-0">
-                  <button onClick={startNewChat} title="Start New Session" className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all group active:scale-[0.98] shadow-lg shadow-primary/20">
-                      <Plus size={16} strokeWidth={2.5} />
-                      {!isCollapsed && <span className="text-sm font-semibold font-sans">Start New Session</span>}
-                  </button>
-                  <NavItem 
-                      icon={Folder} 
-                      label="Projects" 
-                      collapsed={isCollapsed} 
-                      onClick={() => { setAppMode('projects'); if(isMobile) setSidebarOpen(false); }} 
-                      active={appMode === 'projects' || appMode === 'project-view'} 
-                  />
-                  <NavItem 
-                      icon={History} 
-                      label="History" 
-                      collapsed={isCollapsed} 
-                      onClick={() => { setAppMode('history'); if(isMobile) setSidebarOpen(false); }} 
-                      active={appMode === 'history'}
-                  />
-              </div>
-              
-              <div className="sidebar-scroll-wrapper" ref={scrollWrapperRef}>
-                  <div className="sidebar-scroll-content custom-scrollbar" ref={scrollContentRef}>
-                  <div className="px-3 pb-3">
-                      {!isCollapsed && <div className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] mb-2 mt-4 px-3 font-semibold font-sans">Recent Chats</div>}
-                      <div className="space-y-1">
-                      {threads.sort((a,b) => {
-                           if (a.pinned && !b.pinned) return -1;
-                           if (!a.pinned && b.pinned) return 1;
-                           return b.updatedAt - a.updatedAt;
-                      }).slice(0, 10).map(thread => (
-                          isCollapsed ? (
-                              <button
-                                  key={thread.id}
-                                  onClick={() => switchThread(thread.id)}
-                                  className={`
-                                      w-10 h-10 mx-auto flex items-center justify-center rounded-lg transition-all duration-200
-                                      ${activeThreadId === thread.id && appMode === 'chat' ? "sidebar-list-item active" : "hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}
-                                  `}
-                                  title={thread.title}
-                              >
-                                  <MessageSquare size={18} strokeWidth={activeThreadId === thread.id && appMode === 'chat' ? 2 : 1.5} />
-                              </button>
-                          ) : (
-                            <div key={thread.id} className="group relative">
-                                <button
-                                    onClick={() => switchThread(thread.id)}
-                                    className={`sidebar-list-item pr-10 ${activeThreadId === thread.id && appMode === 'chat' ? 'active' : ''}`}
-                                    title={thread.title}
-                                >
-                                    {thread.pinned && <Pin size={12} className="absolute left-2 top-2.5 text-[hsl(var(--accent))] opacity-60" />}
-                                    <MessageSquare size={16} className="mr-2 flex-shrink-0" />
-                                    <span className="truncate">{thread.title}</span>
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        const rect = e.currentTarget.getBoundingClientRect();
-                                        setThreadActionData({ thread, position: { x: rect.left, y: rect.bottom + 5 } });
-                                    }}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-md text-[var(--text-secondary)] opacity-0 group-hover:opacity-100 hover:bg-[var(--surface-hover)] hover:text-[var(--text-primary)] transition-opacity"
-                                >
-                                    <MoreHorizontal size={16} />
-                                </button>
-                            </div>
-                          )
-                      ))}
-                      {threads.length === 0 && !isCollapsed && (
-                          <div className="px-3 py-4 text-center text-xs text-[var(--text-tertiary)]">
-                              No history yet.
-                          </div>
-                      )}
-                      </div>
-                  </div>
-                  </div>
-              </div>
-
-              <div className="sidebar-bottom">
-                <NavItem 
-                  icon={Settings} 
-                  label="Settings" 
-                  collapsed={isCollapsed}
-                  onClick={() => {
-                    if (isMobile) {
-                      setShowSettingsSheet(true);
-                    } else {
-                      setAppMode('settings');
-                    }
-                    if (isMobile && sidebarOpen) setSidebarOpen(false);
-                  }}
-                  active={appMode === 'settings'}
-                />
-                <NavItem 
-                  icon={LogOut} 
-                  label="Sign out" 
-                  collapsed={isCollapsed}
-                  onClick={() => window.location.reload()}
-                  danger
-                />
-              </div>
-          </aside>
+          {sidebarComponent}
           
           <main className="app-main">
             <Header
@@ -945,9 +960,15 @@ const HomePage = () => {
                 {appMode === 'chat' && (
                   <div className={`chat-input-layer ${chatStage === 'new-chat' ? 'home-mode' : ''} ${isMobile ? 'mobile-input' : ''}`}>
                     
-                    {(chatStage === 'new-chat' && !input.trim()) && (
+                    {chatStage === 'new-chat' && !input && (
                         <div className="mb-4">
                             <ModeToggle mode={buildMode} setMode={setBuildMode} />
+                        </div>
+                    )}
+
+                    {chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
+                        <div className="absolute bottom-full mb-3 w-full">
+                            <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
                         </div>
                     )}
 
@@ -957,7 +978,9 @@ const HomePage = () => {
                         value={input}
                         onChange={(e) => {
                           setInput(e.target.value);
-                          setShowSuggestionList(e.target.value.trim().length > 0);
+                          if (chatStage === 'new-chat') {
+                              setShowSuggestionList(e.target.value.trim().length > 0);
+                          }
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                         placeholder={chatStage === 'new-chat' ? "Example: “Build a SaaS landing page for an AI email assistant”" : "Ask a follow-up or give a new instruction..."}
@@ -975,24 +998,17 @@ const HomePage = () => {
                       )}
                     </div>
                     
-                     {chatStage === 'new-chat' && showSuggestionList && filteredSuggestions.length > 0 && input.trim() && (
-                        <div className="mt-3">
-                            <PromptSuggestionList suggestions={filteredSuggestions} onSelect={handleSuggestionClick} />
-                        </div>
-                    )}
-
                     {chatStage === 'new-chat' && !input.trim() && (
                         <div className="mt-6">
                             <PromptSuggestions suggestions={chipSuggestions} setPrompt={handleSuggestionClick} />
                         </div>
                     )}
-
-                    {(chatStage === 'active' && !isBuilderModeActive && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant') && (
+                    
+                    {chatStage === 'active' && !thinking && messages.length > 0 && messages[messages.length - 1].role === 'assistant' && (
                         <div className="mt-6">
                             <PromptSuggestions suggestions={followUpSuggestions} setPrompt={handleSuggestionClick} />
                         </div>
                     )}
-
                   </div>
                 )}
               </div>
