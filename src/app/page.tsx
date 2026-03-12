@@ -98,6 +98,11 @@ const HomePage = () => {
 
   const [threadActionData, setThreadActionData] = useState<any>(null);
   const [renameThread, setRenameThread] = useState<any>(null);
+  
+  // State for builder sidebar
+  const [isBuilderSidebarOpen, setIsBuilderSidebarOpen] = useState(true);
+  const toggleBuilderSidebar = () => setIsBuilderSidebarOpen(prev => !prev);
+
 
   const chipSuggestions = useMemo(() => [
       "Build a SaaS landing page",
@@ -360,7 +365,15 @@ const HomePage = () => {
     if (isMobile) setSidebarOpen(false);
   };
 
-  const toggleSidebar = () => { if (isMobile) setSidebarOpen(!sidebarOpen); else setDesktopSidebarOpen(!desktopSidebarOpen); };
+  const toggleSidebar = () => { 
+    if(appMode === 'chat' && buildMode === 'builder') {
+      toggleBuilderSidebar();
+    } else if (isMobile) {
+      setSidebarOpen(!sidebarOpen);
+    } else {
+      setDesktopSidebarOpen(!desktopSidebarOpen);
+    }
+  };
     
   const handleScroll = () => { if (scrollRef.current) { const { scrollTop, scrollHeight, clientHeight } = scrollRef.current; setShowScrollButton(scrollHeight - scrollTop - clientHeight < 150); } };
   const scrollToBottom = () => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); };
@@ -534,6 +547,7 @@ const HomePage = () => {
         setActiveProject(null);
         setAppMode('projects');
     }
+    setDeleteProject(null);
   };
 
   const handleAddTask = (title: string) => {
@@ -616,10 +630,11 @@ const HomePage = () => {
   };
 
   const isBuilderModeActive = buildMode === 'builder' && appMode === 'chat' && !isMobile;
+  const currentSidebarOpen = isBuilderModeActive ? isBuilderSidebarOpen : desktopSidebarOpen;
 
   const sidebarComponent = (
     <aside
-      className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (desktopSidebarOpen ? 'w-260' : 'w-72')}`}
+      className={`app-sidebar ${isMobile ? (sidebarOpen ? 'open' : '') : (currentSidebarOpen ? 'w-260' : 'w-72')}`}
     >
       <div className="h-16 flex items-center justify-between px-6 border-b border-[var(--border)] min-w-0 transition-all duration-300 flex-shrink-0">
           {!isCollapsed ? (
@@ -630,7 +645,7 @@ const HomePage = () => {
                 </div>
                 <span className="font-medium text-[var(--text-primary)] tracking-wide font-sans truncate text-sm">Calmora</span>
               </div>
-              {!isMobile && (
+              {!isMobile && !isBuilderModeActive && (
                 <button onClick={() => setDesktopSidebarOpen(false)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all p-1 rounded-md hover:bg-[var(--surface-hover)]">
                   <ChevronLeft size={18} />
                 </button>
@@ -640,7 +655,7 @@ const HomePage = () => {
               )}
             </>
           ) : (
-            <button onClick={() => setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
+            <button onClick={() => isBuilderModeActive ? toggleBuilderSidebar() : setDesktopSidebarOpen(true)} className="p-2 hover:bg-[var(--surface-hover)] rounded-md transition-colors text-[hsl(var(--accent))]" title="Expand Sidebar">
                 <CalmoraLogo size={24} />
             </button>
           )}
@@ -751,30 +766,32 @@ const HomePage = () => {
 
   return (
     <>
-      {isBuilderModeActive ? (
-        <BuilderPage
-          onExit={() => setBuildMode('chat')}
-          activeProject={activeProject}
-          onRename={setRenameProject}
-          onDuplicate={handleDuplicateProject}
-          onDelete={setDeleteProject}
-          messages={messages}
-          thinking={thinking}
-          input={input}
-          setInput={setInput}
-          sendMessage={sendMessage}
-          formatAIResponse={formatAIResponse}
-          generationSteps={generationSteps}
-          progressStep={progressStep}
-          followUpSuggestions={followUpSuggestions}
-          onSuggestionClick={handleSuggestionClick}
-          messagesEndRef={messagesEndRef}
-          textareaRef={textareaRef}
-        />
-      ) : (
-        <div className="app-root">
-          {sidebarComponent}
-          
+      <div className={`app-root ${isBuilderModeActive ? 'builder-active' : ''}`}>
+        {sidebarComponent}
+
+        {isBuilderModeActive ? (
+          <BuilderPage
+            onExit={() => setBuildMode('chat')}
+            activeProject={activeProject}
+            onRename={setRenameProject}
+            onDuplicate={handleDuplicateProject}
+            onDelete={setDeleteProject}
+            messages={messages}
+            thinking={thinking}
+            input={input}
+            setInput={setInput}
+            sendMessage={sendMessage}
+            formatAIResponse={formatAIResponse}
+            generationSteps={generationSteps}
+            progressStep={progressStep}
+            followUpSuggestions={followUpSuggestions}
+            onSuggestionClick={handleSuggestionClick}
+            messagesEndRef={messagesEndRef}
+            textareaRef={textareaRef}
+            isBuilderSidebarOpen={isBuilderSidebarOpen}
+            toggleBuilderSidebar={toggleBuilderSidebar}
+          />
+        ) : (
           <main className="app-main">
             <Header
               user={headerUser}
@@ -791,7 +808,6 @@ const HomePage = () => {
             />
               
             <div className="flex-1 min-h-0 relative flex">
-              {/* Main content panel */}
               <div className={`h-full relative flex flex-col transition-all duration-300 ease-in-out w-full`}>
                 <div className="scroll-content custom-scrollbar" ref={scrollRef}>
                   <div className="content-container">
@@ -915,12 +931,12 @@ const HomePage = () => {
               </div>
             </div>
           </main>
+        )}
           
-          {isMobile && sidebarOpen && (
+          {isMobile && sidebarOpen && !isBuilderModeActive && (
             <div onTouchStart={() => setSidebarOpen(false)} onMouseDown={() => setSidebarOpen(false)} className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm" style={{ WebkitTapHighlightColor: "transparent", touchAction: "manipulation" }} aria-hidden="true" />
           )}
-        </div>
-      )}
+      </div>
         
       {(showProjectModal || renameProject || deleteProject) && (
         <>
@@ -945,10 +961,7 @@ const HomePage = () => {
           {deleteProject && (
               <DeleteConfirmModal
                   projectName={(deleteProject as any).title}
-                  onConfirm={() => {
-                      handleDeleteProject((deleteProject as any).id);
-                      setDeleteProject(null);
-                  }}
+                  onConfirm={() => handleDeleteProject((deleteProject as any).id)}
                   onClose={() => setDeleteProject(null)}
               />
           )}

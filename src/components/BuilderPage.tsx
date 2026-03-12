@@ -6,7 +6,7 @@ import {
   Copy, Download, Wand2, RefreshCw, Maximize, Minimize,
   Save, Sparkles, Monitor, Tablet, Smartphone, X, Lightbulb, XCircle,
   AlertCircle, ChevronDown, ChevronUp, Undo, Redo, Loader2,
-  ArrowLeft, MoreHorizontal, Edit3, Trash2, Send, CheckCircle2, Circle, Zap,
+  ArrowLeft, MoreHorizontal, Edit3, Trash2, Send, CheckCircle2, Circle, Zap, Mic, Menu,
 } from 'lucide-react';
 import PromptSuggestions from "@/components/PromptSuggestions";
 
@@ -208,11 +208,31 @@ function ChatPanel({
   onSuggestionClick,
   messagesEndRef,
   textareaRef,
+  activeProject,
+  onExit,
+  onRename,
+  onDuplicate,
+  onDelete,
+  toggleSidebar,
 }: any) {
+  
+  const [showBuilderMenu, setShowBuilderMenu] = useState(false);
+  const builderMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (builderMenuRef.current && !(builderMenuRef.current as any).contains(event.target)) {
+        setShowBuilderMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 160)}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [input, textareaRef]);
 
@@ -222,8 +242,33 @@ function ChatPanel({
 
   return (
     <div className="builder-chat-panel">
-      <header className="builder-chat-header">
-        <h3 className="text-sm font-medium text-gray-200">AI Assistant</h3>
+      <header className="builder-chat-header flex justify-between">
+          <div className="flex items-center gap-1">
+              <button onClick={toggleSidebar} title="Toggle Sidebar" className="control-button -ml-2">
+                <Menu size={18} />
+              </button>
+              <button onClick={onExit} title="Exit Builder" className="control-button">
+                  <ArrowLeft size={18} />
+              </button>
+          </div>
+          <div className="flex items-center gap-1 min-w-0">
+              <span className="text-sm font-medium text-white truncate">{activeProject?.title || "Untitled Project"}</span>
+              <div className="relative" ref={builderMenuRef}>
+                  <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
+                    <MoreHorizontal size={18} />
+                  </button>
+                  {showBuilderMenu && activeProject && (
+                    <div className="menu-pop animate-pop-in" style={{ left: 'auto', right: 0, top: 'calc(100% + 8px)', width: '220px' }}>
+                      <div className="p-2">
+                          <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
+                          <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
+                          <div className="h-px bg-[var(--border)] my-1" />
+                          <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
+                      </div>
+                    </div>
+                  )}
+              </div>
+          </div>
       </header>
       <div className="builder-chat-messages custom-scrollbar">
         {messages.map((msg: any) => (
@@ -270,13 +315,19 @@ function ChatPanel({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-            placeholder="Continue the conversation..."
-            className="flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[120px] overflow-y-auto scrollbar-hide font-sans py-1"
+            placeholder="Ask a follow-up or give a new instruction..."
+            className="relative z-10 flex-1 bg-transparent outline-none resize-none text-[15px] leading-relaxed text-[var(--text-primary)] placeholder-[var(--text-tertiary)] min-h-[24px] max-h-[120px] overflow-y-auto scrollbar-hide font-sans py-1"
             rows={1}
           />
-          <button onClick={sendMessage} disabled={thinking || !input.trim()} className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-8 h-8 rounded-full bg-primary text-primary-foreground disabled:opacity-50 active:scale-95">
-            {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-          </button>
+          {input.trim() ? (
+            <button onClick={sendMessage} disabled={thinking} className={`flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full bg-primary text-primary-foreground shadow-md active:scale-95 hover:scale-105`}>
+              {thinking ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            </button>
+          ) : (
+            <button className="flex-shrink-0 flex items-center justify-center transition-all duration-200 w-9 h-9 rounded-full text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] active:scale-95">
+              <Mic size={20} className="opacity-70 hover:opacity-100 transition-opacity" />
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -435,6 +486,8 @@ export default function BuilderPage({
   onSuggestionClick,
   messagesEndRef,
   textareaRef,
+  isBuilderSidebarOpen,
+  toggleBuilderSidebar,
 }: { 
   onExit: () => void;
   activeProject: any;
@@ -453,6 +506,8 @@ export default function BuilderPage({
   onSuggestionClick: (prompt: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
+  isBuilderSidebarOpen: boolean;
+  toggleBuilderSidebar: () => void;
 }) {
   // Global Application State
   const [code, setCode] = useState(initialCode);
@@ -591,34 +646,15 @@ export default function BuilderPage({
     }, 500);
     return () => clearTimeout(handler);
   }, [code, isGenerating]);
+  
+  const chatPanelGridClass = isBuilderSidebarOpen ? 'minmax(350px, 420px)' : 'minmax(350px, 1fr)';
 
   return (
     <div className="w-full h-full flex flex-col bg-[var(--surface)] overflow-hidden">
         <header className="builder-header justify-between px-4">
-            {/* Left: Project Title & Menu */}
+            {/* Left placeholder */}
             <div className="flex items-center gap-2 flex-1 justify-start">
-                <button onClick={onExit} title="Exit Builder" className="control-button">
-                    <ArrowLeft size={18} />
-                </button>
-                <div className="w-px h-6 bg-[var(--border)]" />
-                <div className="flex items-center gap-1">
-                    <span className="text-sm font-medium text-white truncate">{activeProject?.title || "Untitled Project"}</span>
-                    <div className="relative" ref={builderMenuRef}>
-                        <button onClick={() => setShowBuilderMenu(v => !v)} title="Options" className="control-button" disabled={!activeProject}>
-                          <MoreHorizontal size={18} />
-                        </button>
-                        {showBuilderMenu && activeProject && (
-                          <div className="menu-pop animate-pop-in" style={{ left: 0, top: 'calc(100% + 8px)', width: '220px' }}>
-                            <div className="p-2">
-                                <button onClick={() => { onRename(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Edit3 size={15} /> Rename</button>
-                                <button onClick={() => { onDuplicate(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left flex items-center gap-3"><Copy size={15} /> Duplicate</button>
-                                <div className="h-px bg-[var(--border)] my-1" />
-                                <button onClick={() => { onDelete(activeProject); setShowBuilderMenu(false); }} className="menu-item w-full text-left !text-[var(--danger)] flex items-center gap-3"><Trash2 size={15} /> Delete</button>
-                            </div>
-                          </div>
-                        )}
-                    </div>
-                </div>
+               
             </div>
 
             {/* Center: Device Toggles & Preview Controls */}
@@ -683,7 +719,7 @@ export default function BuilderPage({
             </div>
         </header>
 
-        <div className="builder-body-grid">
+        <div className="builder-body-grid" style={{gridTemplateColumns: `${chatPanelGridClass} 2fr 2fr`}}>
             <ChatPanel 
               messages={messages}
               thinking={thinking}
@@ -697,6 +733,12 @@ export default function BuilderPage({
               onSuggestionClick={onSuggestionClick}
               messagesEndRef={messagesEndRef}
               textareaRef={textareaRef}
+              activeProject={activeProject}
+              onExit={onExit}
+              onRename={onRename}
+              onDuplicate={onDuplicate}
+              onDelete={onDelete}
+              toggleSidebar={toggleBuilderSidebar}
             />
             <CodePanel 
               code={code} 
