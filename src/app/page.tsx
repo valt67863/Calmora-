@@ -85,6 +85,12 @@ export default function AppDashboard() {
                     <span>Home</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Projects" className="text-muted-foreground hover:text-white hover:bg-white/5 transition-colors">
+                    <FolderPlus className="h-4 w-4" />
+                    <span>Projects</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
 
@@ -166,21 +172,9 @@ export default function AppDashboard() {
           </div>
 
           <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center">
-            <h1 className="text-4xl font-semibold text-white mb-6 tracking-tight text-center">
+            <h1 className="text-4xl font-semibold text-white mb-10 tracking-tight text-center">
               Let's build something, Valt
             </h1>
-
-            <div className="flex gap-4 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              <Button 
-                variant="outline" 
-                className="bg-white/5 border-white/10 hover:bg-white/10 text-white rounded-2xl px-6 py-6 h-auto flex flex-col items-center gap-2 group transition-all"
-              >
-                <div className="p-3 rounded-xl bg-white/5 group-hover:bg-[#B34DE6]/20 transition-colors">
-                  <FolderPlus className="h-6 w-6 text-[#B34DE6]" />
-                </div>
-                <span className="text-sm font-medium">New Project</span>
-              </Button>
-            </div>
 
             <div className="w-full bg-[#1e1f20]/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-2 shadow-2xl flex items-center gap-2 group focus-within:border-white/20 transition-all">
               <DropdownMenu>

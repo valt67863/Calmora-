@@ -18,7 +18,8 @@ import {
   Moon,
   Sun,
   Monitor,
-  Check
+  Check,
+  FolderPlus
 } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -139,6 +140,12 @@ export default function SettingsPage() {
                       <span>Home</span>
                     </SidebarMenuButton>
                   </Link>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Projects" className="text-muted-foreground hover:text-white hover:bg-white/5 transition-colors">
+                    <FolderPlus className="h-4 w-4" />
+                    <span>Projects</span>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
