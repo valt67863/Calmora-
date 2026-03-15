@@ -25,7 +25,8 @@ import {
   FileText,
   Code2,
   Lightbulb,
-  ChevronRight
+  ChevronRight,
+  LayoutGrid
 } from 'lucide-react';
 import { 
   Sidebar, 
@@ -54,26 +55,28 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
+const FALLBACK_IMAGE = "https://picsum.photos/seed/fallback/400/250";
+
 const TEMPLATES = [
   {
     title: "Write a blog post",
     description: "Generate engaging content for your audience",
     icon: <FileText className="h-4 w-4 text-blue-400" />,
-    image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || '',
+    image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
     imageHint: "blog content"
   },
   {
     title: "Code generation",
     description: "Build functions and fix bugs quickly",
     icon: <Code2 className="h-4 w-4 text-green-400" />,
-    image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || '',
+    image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
     imageHint: "software coding"
   },
   {
     title: "Brainstorm ideas",
     description: "Creative concepts for your next project",
     icon: <Lightbulb className="h-4 w-4 text-yellow-400" />,
-    image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || '',
+    image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
     imageHint: "creative brainstorming"
   },
 ];
@@ -149,7 +152,7 @@ export default function AppDashboard() {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton tooltip="Projects" className="text-muted-foreground hover:text-white hover:bg-white/5 transition-colors">
-                    <FolderPlus className="h-4 w-4" />
+                    <LayoutGrid className="h-4 w-4" />
                     <span>Projects</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
