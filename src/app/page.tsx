@@ -50,10 +50,9 @@ export default function AppDashboard() {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-[#131314] text-foreground overflow-hidden">
-        {/* Sidebar with collapsible icon support */}
         <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#1e1f20]">
-          <SidebarHeader className="p-4 bg-[#1e1f20]">
-            <div className="flex items-center justify-between mb-4 group-data-[collapsible=icon]:justify-center">
+          <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2">
+            <div className="flex items-center justify-between mb-4 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mb-0">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#B34DE6] to-[#5E8EDD] flex items-center justify-center shadow-lg shrink-0">
                 <div className="w-2.5 h-2.5 bg-white rounded-full" />
               </div>
@@ -63,20 +62,20 @@ export default function AppDashboard() {
             <SidebarMenu className="group-data-[collapsible=icon]:hidden">
               <SidebarMenuItem>
                 <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
-                  <div className="flex items-center gap-2 w-full">
-                    <Avatar className="h-5 w-5 rounded-sm">
+                  <div className="flex items-center gap-2 w-full overflow-hidden">
+                    <Avatar className="h-5 w-5 rounded-sm shrink-0">
                       <AvatarImage src="https://picsum.photos/seed/valt-brand/20/20" />
                       <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
-                    <ChevronDown className="h-3 w-3 opacity-50" />
+                    <ChevronDown className="h-3 w-3 opacity-50 shrink-0" />
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarHeader>
 
-          <SidebarContent className="px-2 bg-[#1e1f20]">
+          <SidebarContent className="px-2 group-data-[collapsible=icon]:px-0">
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -103,14 +102,14 @@ export default function AppDashboard() {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="p-4 border-t border-white/5 bg-[#1e1f20]">
+          <SidebarFooter className="p-4 border-t border-white/5 group-data-[collapsible=icon]:p-2">
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10">
-                      <div className="flex items-center gap-3 w-full overflow-hidden text-left">
-                        <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6">
+                    <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
+                      <div className="flex items-center gap-3 w-full overflow-hidden text-left group-data-[collapsible=icon]:justify-center">
+                        <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7 shrink-0">
                           <AvatarImage src="https://picsum.photos/seed/valt-user/80/80" />
                           <AvatarFallback className="bg-[#B34DE6] text-white font-bold">V</AvatarFallback>
                         </Avatar>
@@ -161,18 +160,15 @@ export default function AppDashboard() {
         </Sidebar>
 
         <main className="relative flex-1 flex flex-col items-center justify-center overflow-hidden">
-          {/* Background Gradient Effect */}
           <div className="absolute inset-0 z-0">
             <div className="absolute bottom-[-20%] left-[-10%] w-[120%] h-[80%] rounded-full lovable-gradient" />
           </div>
 
-          {/* Central Content */}
           <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center">
             <h1 className="text-4xl font-semibold text-white mb-10 tracking-tight text-center">
               Let's build something, Valt
             </h1>
 
-            {/* Compact Prompt Bar */}
             <div className="w-full bg-[#1e1f20]/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-2 shadow-2xl flex items-center gap-2 group focus-within:border-white/20 transition-all">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

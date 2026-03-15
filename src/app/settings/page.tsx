@@ -72,10 +72,9 @@ export default function SettingsPage() {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-[#131314] text-foreground overflow-hidden">
-        {/* Sidebar Replicated from Main Dashboard */}
         <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#1e1f20]">
-          <SidebarHeader className="p-4 bg-[#1e1f20]">
-            <div className="flex items-center justify-between mb-4 group-data-[collapsible=icon]:justify-center">
+          <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2">
+            <div className="flex items-center justify-between mb-4 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mb-0">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#B34DE6] to-[#5E8EDD] flex items-center justify-center shadow-lg shrink-0">
                 <div className="w-2.5 h-2.5 bg-white rounded-full" />
               </div>
@@ -84,20 +83,20 @@ export default function SettingsPage() {
             <SidebarMenu className="group-data-[collapsible=icon]:hidden">
               <SidebarMenuItem>
                 <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
-                  <div className="flex items-center gap-2 w-full">
-                    <Avatar className="h-5 w-5 rounded-sm">
+                  <div className="flex items-center gap-2 w-full overflow-hidden">
+                    <Avatar className="h-5 w-5 rounded-sm shrink-0">
                       <AvatarImage src="https://picsum.photos/seed/valt-brand/20/20" />
                       <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
-                    <ChevronDown className="h-3 w-3 opacity-50" />
+                    <ChevronDown className="h-3 w-3 opacity-50 shrink-0" />
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarHeader>
 
-          <SidebarContent className="px-2 bg-[#1e1f20]">
+          <SidebarContent className="px-2 group-data-[collapsible=icon]:px-0">
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -126,14 +125,14 @@ export default function SettingsPage() {
             </SidebarGroup>
           </SidebarContent>
 
-          <SidebarFooter className="p-4 border-t border-white/5 bg-[#1e1f20]">
+          <SidebarFooter className="p-4 border-t border-white/5 group-data-[collapsible=icon]:p-2">
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10">
-                      <div className="flex items-center gap-3 w-full overflow-hidden text-left">
-                        <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6">
+                    <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
+                      <div className="flex items-center gap-3 w-full overflow-hidden text-left group-data-[collapsible=icon]:justify-center">
+                        <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7 shrink-0">
                           <AvatarImage src="https://picsum.photos/seed/valt-user/80/80" />
                           <AvatarFallback className="bg-[#B34DE6] text-white font-bold">V</AvatarFallback>
                         </Avatar>
@@ -183,10 +182,8 @@ export default function SettingsPage() {
           <SidebarRail />
         </Sidebar>
 
-        {/* Main Settings Content - Adjusted width for better UI experience */}
         <main className="flex-1 overflow-y-auto bg-[#131314]">
           <div className="max-w-5xl mx-auto px-6 py-12 space-y-10">
-            {/* Header Section */}
             <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-muted-foreground/60">Account center</p>
@@ -207,7 +204,6 @@ export default function SettingsPage() {
               </div>
             </header>
 
-            {/* Tabs Navigation */}
             <Tabs defaultValue="profile" className="w-full">
               <TabsList className="bg-[#1e1f20] p-1.5 h-auto rounded-[20px] w-full grid grid-cols-5 border border-white/5">
                 <TabsTrigger value="profile" className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all">Profile</TabsTrigger>
@@ -217,7 +213,6 @@ export default function SettingsPage() {
                 <TabsTrigger value="billing" className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all">Billing</TabsTrigger>
               </TabsList>
 
-              {/* Profile Tab Content */}
               <TabsContent value="profile" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-4 pt-8 px-8">
@@ -276,7 +271,6 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
 
-              {/* Notifications Tab Content */}
               <TabsContent value="notifications" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
@@ -305,7 +299,6 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
 
-              {/* Appearance Tab Content */}
               <TabsContent value="appearance" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
@@ -352,7 +345,6 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
 
-              {/* Security Tab Content */}
               <TabsContent value="security" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
@@ -390,7 +382,6 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
 
-              {/* Billing Tab Content */}
               <TabsContent value="billing" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
