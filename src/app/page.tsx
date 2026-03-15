@@ -22,7 +22,9 @@ import {
   Building2,
   Check,
   ChevronRight,
-  LayoutGrid
+  LayoutGrid,
+  Search,
+  Filter
 } from 'lucide-react';
 import { 
   Sidebar, 
@@ -56,50 +58,61 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { cn } from '@/lib/utils';
 
 const FALLBACK_IMAGE = "https://picsum.photos/seed/fallback/400/250";
 
 export default function AppDashboard() {
   const [hasPlan, setHasPlan] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const categories = ["All", "Content", "Creative", "Code", "Business"];
 
   const templates = useMemo(() => [
     {
       title: "Write a blog post",
       description: "Generate engaging and SEO-friendly content for your audience",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "writing blog"
+      imageHint: "writing blog",
+      category: "Content"
     },
     {
       title: "Code generation",
       description: "Efficiently build complex functions and fix logic bugs quickly",
       image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "software coding"
+      imageHint: "software coding",
+      category: "Code"
     },
     {
       title: "Brainstorm ideas",
       description: "Explore creative and unique concepts for your next project",
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "creative brainstorming"
+      imageHint: "creative brainstorming",
+      category: "Creative"
     },
     {
       title: "Marketing Copy",
       description: "Draft persuasive copy that converts visitors into customers",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "marketing copy"
+      imageHint: "marketing copy",
+      category: "Business"
     },
     {
       title: "Video Scripts",
       description: "Outline and write engaging scripts for your YouTube videos",
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "video script"
+      imageHint: "video script",
+      category: "Creative"
     },
     {
       title: "Social Media",
       description: "Generate trendy and viral-ready posts for all your platforms",
       image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "social media"
+      imageHint: "social media",
+      category: "Content"
     },
   ], []);
 
@@ -109,27 +122,40 @@ export default function AppDashboard() {
       title: "Email Drafts",
       description: "Professional and concise emails for any business situation",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "email writing"
+      imageHint: "email writing",
+      category: "Business"
     },
     {
       title: "Presentation Outline",
       description: "Structure your ideas into compelling slides and narratives",
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "presentation slides"
+      imageHint: "presentation slides",
+      category: "Creative"
     },
     {
       title: "Product Descriptions",
       description: "Compelling copy that highlights features and benefits",
       image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "e-commerce product"
+      imageHint: "e-commerce product",
+      category: "Business"
     },
     {
       title: "FAQ Generator",
       description: "Quickly answer common customer queries with clarity",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "customer support"
+      imageHint: "customer support",
+      category: "Content"
     }
   ], [templates]);
+
+  const filteredTemplates = useMemo(() => {
+    return allTemplates.filter(t => {
+      const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           t.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = activeCategory === "All" || t.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [allTemplates, searchQuery, activeCategory]);
 
   return (
     <SidebarProvider>
@@ -352,33 +378,90 @@ export default function AppDashboard() {
                     <ChevronRight className="h-2.5 w-2.5 transition-transform group-hover:translate-x-0.5" />
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-[90vw] w-full h-[85vh] bg-[#1e1f20]/90 backdrop-blur-xl border-white/10 p-0 overflow-hidden rounded-[2rem] flex flex-col">
-                  <DialogHeader className="p-8 pb-4">
-                    <DialogTitle className="text-2xl font-semibold text-white">Explore All Templates</DialogTitle>
+                <DialogContent className="max-w-[95vw] md:max-w-[85vw] w-full h-[90vh] bg-[#1e1f20]/90 backdrop-blur-3xl border-white/10 p-0 overflow-hidden rounded-[2.5rem] flex flex-col shadow-2xl transition-all duration-300">
+                  <DialogHeader className="p-8 pb-6 border-b border-white/5 space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <DialogTitle className="text-3xl font-semibold text-white tracking-tight">Explore Templates</DialogTitle>
+                        <p className="text-sm text-muted-foreground/60 mt-1">Accelerate your workflow with pre-built AI configurations.</p>
+                      </div>
+                      
+                      <div className="relative w-full md:w-80 group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-[#B34DE6] transition-colors" />
+                        <Input 
+                          placeholder="Search templates..." 
+                          className="bg-white/5 border-white/10 focus-visible:ring-[#B34DE6]/30 h-11 pl-10 rounded-xl text-sm"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <ScrollArea className="w-full">
+                      <div className="flex items-center gap-2 pb-2">
+                        {categories.map((cat) => (
+                          <Button 
+                            key={cat}
+                            variant={activeCategory === cat ? "default" : "outline"}
+                            size="sm"
+                            className={cn(
+                              "rounded-full px-5 h-8 text-xs font-medium transition-all",
+                              activeCategory === cat 
+                                ? "bg-[#B34DE6] hover:bg-[#B34DE6]/90 border-transparent shadow-[0_0_15px_rgba(179,77,230,0.3)]" 
+                                : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10 hover:text-white"
+                            )}
+                            onClick={() => setActiveCategory(cat)}
+                          >
+                            {cat}
+                          </Button>
+                        ))}
+                      </div>
+                      <ScrollBar orientation="horizontal" className="h-0" />
+                    </ScrollArea>
                   </DialogHeader>
-                  <ScrollArea className="flex-1 px-8 pb-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-4">
-                      {allTemplates.map((template, idx) => (
-                        <button 
-                          key={idx}
-                          className="flex flex-col bg-[#131314]/40 hover:bg-[#131314]/80 border border-white/5 hover:border-white/10 rounded-[1.5rem] overflow-hidden text-left transition-all group shadow-md"
-                        >
-                          <div className="relative w-full aspect-[16/10] overflow-hidden">
-                            <Image 
-                              src={template.image || FALLBACK_IMAGE} 
-                              alt={template.title}
-                              fill
-                              className="object-cover transition-transform duration-500 group-hover:scale-105"
-                              data-ai-hint={template.imageHint}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#131314]/80 to-transparent opacity-60" />
+
+                  <ScrollArea className="flex-1 px-8 pb-8 pt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {filteredTemplates.length > 0 ? (
+                        filteredTemplates.map((template, idx) => (
+                          <button 
+                            key={idx}
+                            className="flex flex-col bg-[#131314]/40 hover:bg-[#131314]/80 border border-white/5 hover:border-white/10 rounded-[1.8rem] overflow-hidden text-left transition-all group shadow-md hover:shadow-xl hover:-translate-y-1 duration-300"
+                          >
+                            <div className="relative w-full aspect-[16/10] overflow-hidden">
+                              <Image 
+                                src={template.image || FALLBACK_IMAGE} 
+                                alt={template.title}
+                                fill
+                                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                data-ai-hint={template.imageHint}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-[#131314]/90 via-transparent to-transparent opacity-60" />
+                              <div className="absolute top-3 left-3">
+                                <span className="bg-black/40 backdrop-blur-md text-[10px] font-bold text-white/70 px-2.5 py-1 rounded-full border border-white/10 tracking-wide uppercase">
+                                  {template.category}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-5 flex flex-col flex-1">
+                              <h3 className="text-[13px] font-bold text-white mb-2 uppercase tracking-wider group-hover:text-[#B34DE6] transition-colors">{template.title}</h3>
+                              <p className="text-[11px] text-muted-foreground/60 leading-relaxed line-clamp-2 mb-4 flex-1">{template.description}</p>
+                              <div className="flex items-center justify-between mt-auto pt-2 border-t border-white/5">
+                                <span className="text-[10px] font-medium text-muted-foreground/40">Free</span>
+                                <Plus className="h-3.5 w-3.5 text-muted-foreground/40 group-hover:text-white transition-colors" />
+                              </div>
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+                          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                            <Search className="h-6 w-6 text-muted-foreground/40" />
                           </div>
-                          <div className="p-4">
-                            <h3 className="text-xs font-bold text-white mb-1.5 uppercase tracking-wider opacity-90">{template.title}</h3>
-                            <p className="text-[10px] text-muted-foreground/60 leading-relaxed line-clamp-2">{template.description}</p>
-                          </div>
-                        </button>
-                      ))}
+                          <h3 className="text-white font-medium">No templates found</h3>
+                          <p className="text-sm text-muted-foreground/60 mt-1">Try adjusting your search or category filters.</p>
+                        </div>
+                      )}
                     </div>
                   </ScrollArea>
                 </DialogContent>
