@@ -30,7 +30,8 @@ import {
   SidebarMenuItem, 
   SidebarProvider,
   SidebarTrigger,
-  SidebarFooter
+  SidebarFooter,
+  SidebarRail
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,17 +50,17 @@ export default function AppDashboard() {
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-[#131314] text-foreground overflow-hidden">
-        {/* Sidebar with Google-inspired dark background */}
-        <Sidebar className="border-r border-white/5 bg-[#1e1f20]">
-          <SidebarHeader className="p-4 pt-6 bg-[#1e1f20]">
-            <div className="flex items-center justify-between mb-6">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#B34DE6] to-[#5E8EDD] flex items-center justify-center shadow-lg">
+        {/* Sidebar with collapsible icon support */}
+        <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#1e1f20]">
+          <SidebarHeader className="p-4 bg-[#1e1f20]">
+            <div className="flex items-center justify-between mb-4 group-data-[collapsible=icon]:justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#B34DE6] to-[#5E8EDD] flex items-center justify-center shadow-lg shrink-0">
                 <div className="w-2.5 h-2.5 bg-white rounded-full" />
               </div>
-              <SidebarTrigger className="text-muted-foreground hover:text-white" />
+              <SidebarTrigger className="text-muted-foreground hover:text-white group-data-[collapsible=icon]:hidden" />
             </div>
             
-            <SidebarMenu>
+            <SidebarMenu className="group-data-[collapsible=icon]:hidden">
               <SidebarMenuItem>
                 <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
                   <div className="flex items-center gap-2 w-full">
@@ -88,11 +89,11 @@ export default function AppDashboard() {
             </SidebarGroup>
 
             <SidebarGroup className="mt-4">
-              <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 px-3 mb-2">Projects</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 px-3 mb-2 group-data-[collapsible=icon]:hidden">Projects</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
+                    <SidebarMenuButton tooltip="All projects" className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
                       <LayoutGrid className="h-4 w-4" />
                       <span>All projects</span>
                     </SidebarMenuButton>
@@ -107,17 +108,17 @@ export default function AppDashboard() {
               <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2">
+                    <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10">
                       <div className="flex items-center gap-3 w-full overflow-hidden text-left">
-                        <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5">
+                        <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-6 group-data-[collapsible=icon]:w-6">
                           <AvatarImage src="https://picsum.photos/seed/valt-user/80/80" />
                           <AvatarFallback className="bg-[#B34DE6] text-white font-bold">V</AvatarFallback>
                         </Avatar>
-                        <div className="flex flex-col flex-1 min-w-0">
+                        <div className="flex flex-col flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
                           <span className="text-sm font-semibold text-white truncate">Valt</span>
                           <span className="text-xs text-muted-foreground/60 truncate">valt@example.com</span>
                         </div>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+                        <ChevronDown className="h-4 w-4 text-muted-foreground/40 shrink-0 group-data-[collapsible=icon]:hidden" />
                       </div>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
@@ -156,6 +157,7 @@ export default function AppDashboard() {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarFooter>
+          <SidebarRail />
         </Sidebar>
 
         <main className="relative flex-1 flex flex-col items-center justify-center overflow-hidden">
