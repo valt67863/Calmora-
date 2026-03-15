@@ -340,7 +340,7 @@ export default function AppDashboard() {
               <div className="absolute bottom-[-20%] left-[-10%] w-[120%] h-[80%] rounded-full lovable-gradient opacity-30" />
             </div>
 
-            <div className="relative z-10 w-full max-w-2xl flex flex-col items-center">
+            <div className="relative z-10 w-full max-w-3xl flex flex-col items-center">
               <h1 className="text-4xl font-semibold text-white mb-10 tracking-tight text-center">
                 Let's build something, Valt
               </h1>
@@ -396,8 +396,8 @@ export default function AppDashboard() {
           </div>
 
           {/* Template Section below the fold */}
-          <div className="w-full max-w-4xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex items-center justify-between px-2 mb-4">
+          <div className="w-full max-w-6xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex items-center justify-between px-2 mb-6">
               <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Templates</h2>
               
               <Dialog>
@@ -498,7 +498,7 @@ export default function AppDashboard() {
               </Dialog>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {templates.map((template, idx) => (
                 <button 
                   key={idx}
@@ -515,8 +515,8 @@ export default function AppDashboard() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1e1f20]/80 to-transparent opacity-60" />
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-xs font-bold text-white mb-1.5 uppercase tracking-wider opacity-90">{template.title}</h3>
+                  <div className="p-5">
+                    <h3 className="text-xs font-bold text-white mb-2 uppercase tracking-wider opacity-90">{template.title}</h3>
                     <p className="text-[10px] text-muted-foreground/60 leading-relaxed line-clamp-2">{template.description}</p>
                   </div>
                 </button>
