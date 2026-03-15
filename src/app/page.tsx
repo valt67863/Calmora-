@@ -21,9 +21,6 @@ import {
   PlusCircle,
   Building2,
   Check,
-  FileText,
-  Code2,
-  Lightbulb,
   ChevronRight,
   LayoutGrid
 } from 'lucide-react';
@@ -62,22 +59,19 @@ export default function AppDashboard() {
   const templates = useMemo(() => [
     {
       title: "Write a blog post",
-      description: "Generate engaging content for your audience",
-      icon: <FileText className="h-4 w-4 text-blue-400" />,
+      description: "Generate engaging and SEO-friendly content for your audience",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "blog content"
     },
     {
       title: "Code generation",
-      description: "Build functions and fix bugs quickly",
-      icon: <Code2 className="h-4 w-4 text-green-400" />,
+      description: "Efficiently build complex functions and fix logic bugs quickly",
       image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "software coding"
     },
     {
       title: "Brainstorm ideas",
-      description: "Creative concepts for your next project",
-      icon: <Lightbulb className="h-4 w-4 text-yellow-400" />,
+      description: "Explore creative and unique concepts for your next project",
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "creative brainstorming"
     },
@@ -102,7 +96,7 @@ export default function AppDashboard() {
                     <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
                       <div className="flex items-center gap-2 w-full overflow-hidden">
                         <Avatar className="h-5 w-5 rounded-sm shrink-0">
-                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-brand')?.imageUrl} />
+                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-brand')?.imageUrl || null} />
                           <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
                         </Avatar>
                         <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
@@ -181,7 +175,7 @@ export default function AppDashboard() {
                     <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
                       <div className="flex items-center gap-3 w-full overflow-hidden text-left group-data-[collapsible=icon]:justify-center">
                         <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7 shrink-0">
-                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-user')?.imageUrl} />
+                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-user')?.imageUrl || null} />
                           <AvatarFallback className="bg-[#B34DE6] text-white font-bold">V</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
@@ -316,14 +310,11 @@ export default function AppDashboard() {
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       data-ai-hint={template.imageHint}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1e1f20] to-transparent opacity-60" />
-                    <div className="absolute bottom-4 left-4 w-9 h-9 rounded-xl bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10">
-                      {template.icon}
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1e1f20] to-transparent opacity-40" />
                   </div>
                   <div className="p-6">
-                    <h3 className="text-base font-semibold text-white mb-2">{template.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{template.description}</p>
+                    <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wide opacity-90">{template.title}</h3>
+                    <p className="text-xs text-muted-foreground/70 leading-relaxed line-clamp-2">{template.description}</p>
                   </div>
                 </button>
               ))}
