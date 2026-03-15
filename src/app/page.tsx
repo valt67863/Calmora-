@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -18,7 +18,6 @@ import {
   X,
   Calendar,
   FileUp,
-  FolderPlus,
   PlusCircle,
   Building2,
   Check,
@@ -57,32 +56,32 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const FALLBACK_IMAGE = "https://picsum.photos/seed/fallback/400/250";
 
-const TEMPLATES = [
-  {
-    title: "Write a blog post",
-    description: "Generate engaging content for your audience",
-    icon: <FileText className="h-4 w-4 text-blue-400" />,
-    image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
-    imageHint: "blog content"
-  },
-  {
-    title: "Code generation",
-    description: "Build functions and fix bugs quickly",
-    icon: <Code2 className="h-4 w-4 text-green-400" />,
-    image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
-    imageHint: "software coding"
-  },
-  {
-    title: "Brainstorm ideas",
-    description: "Creative concepts for your next project",
-    icon: <Lightbulb className="h-4 w-4 text-yellow-400" />,
-    image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
-    imageHint: "creative brainstorming"
-  },
-];
-
 export default function AppDashboard() {
   const [hasPlan, setHasPlan] = useState(false);
+
+  const templates = useMemo(() => [
+    {
+      title: "Write a blog post",
+      description: "Generate engaging content for your audience",
+      icon: <FileText className="h-4 w-4 text-blue-400" />,
+      image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "blog content"
+    },
+    {
+      title: "Code generation",
+      description: "Build functions and fix bugs quickly",
+      icon: <Code2 className="h-4 w-4 text-green-400" />,
+      image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "software coding"
+    },
+    {
+      title: "Brainstorm ideas",
+      description: "Creative concepts for your next project",
+      icon: <Lightbulb className="h-4 w-4 text-yellow-400" />,
+      image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "creative brainstorming"
+    },
+  ], []);
 
   return (
     <SidebarProvider>
@@ -304,14 +303,14 @@ export default function AppDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {TEMPLATES.map((template, idx) => (
+              {templates.map((template, idx) => (
                 <button 
                   key={idx}
                   className="flex flex-col bg-[#1e1f20]/50 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-[2rem] overflow-hidden text-left transition-all group shadow-lg"
                 >
                   <div className="relative w-full aspect-[16/10] overflow-hidden">
                     <Image 
-                      src={template.image} 
+                      src={template.image || FALLBACK_IMAGE} 
                       alt={template.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
