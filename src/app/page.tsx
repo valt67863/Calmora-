@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { 
   Home, 
   LayoutGrid, 
@@ -134,9 +135,11 @@ export default function AppDashboard() {
                       <CreditCard className="mr-3 h-4 w-4" />
                       <span className="text-sm font-medium">Subscription</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5 focus:bg-white/10 focus:text-white">
-                      <Settings className="mr-3 h-4 w-4" />
-                      <span className="text-sm font-medium">Settings</span>
+                    <DropdownMenuItem asChild className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5 focus:bg-white/10 focus:text-white">
+                      <Link href="/settings">
+                        <Settings className="mr-3 h-4 w-4" />
+                        <span className="text-sm font-medium">Settings</span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-white/5 my-1.5 mx-1" />
                     <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5 focus:bg-white/10 focus:text-white">
