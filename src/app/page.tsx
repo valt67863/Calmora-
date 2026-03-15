@@ -75,6 +75,24 @@ export default function AppDashboard() {
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "creative brainstorming"
     },
+    {
+      title: "Marketing Copy",
+      description: "Draft persuasive copy that converts visitors into customers",
+      image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "marketing copy"
+    },
+    {
+      title: "Video Scripts",
+      description: "Outline and write engaging scripts for your YouTube videos",
+      image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "video script"
+    },
+    {
+      title: "Social Media",
+      description: "Generate trendy and viral-ready posts for all your platforms",
+      image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "social media"
+    },
   ], []);
 
   return (
@@ -286,7 +304,7 @@ export default function AppDashboard() {
             </div>
           </div>
 
-          {/* Template Section below the fold - adjusted for a more compact size */}
+          {/* Template Section below the fold */}
           <div className="w-full max-w-4xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex items-center justify-between px-2 mb-4">
               <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Templates</h2>
