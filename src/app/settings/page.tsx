@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { 
   Bell, 
   ChevronDown, 
@@ -31,6 +31,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { Slider } from "@/components/ui/slider"
+import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
   SidebarContent,
@@ -56,12 +58,45 @@ import {
 import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
+  // Functional States from User Input
   const [fullName, setFullName] = useState("Valt Parker")
   const [email, setEmail] = useState("valt@lovable.ai")
   const [workspaceName, setWorkspaceName] = useState("Lovable Labs")
   const [timeZone, setTimeZone] = useState("UTC-8")
   const [bio, setBio] = useState("Product builder focused on AI-assisted creative workflows.")
+  
+  const [notifications, setNotifications] = useState({
+    productNews: true,
+    securityAlerts: true,
+    usageTips: true,
+    marketingEmails: false,
+    desktopPush: true,
+  })
+
+  const [privacy, setPrivacy] = useState({
+    twoFactor: true,
+    discoverableProfile: false,
+    analyticsTracking: true,
+  })
+
+  const [theme, setTheme] = useState<"dark" | "light" | "system">("dark")
+  const [aiCreativity, setAiCreativity] = useState([72])
+  const [plan, setPlan] = useState("pro")
   const [saving, setSaving] = useState(false)
+
+  // Completion Logic
+  const completion = useMemo(() => {
+    const profileDone = Number(Boolean(fullName && email && workspaceName)) * 40
+    const securityDone = Number(privacy.twoFactor) * 30
+    const notifDone = Number(notifications.securityAlerts && notifications.desktopPush) * 30
+    return profileDone + securityDone + notifDone
+  }, [email, fullName, notifications.desktopPush, notifications.securityAlerts, privacy.twoFactor, workspaceName])
+
+  const applyTheme = (nextTheme: "dark" | "light" | "system") => {
+    setTheme(nextTheme)
+    const isDark = nextTheme === "dark" || (nextTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+    document.documentElement.classList.toggle("dark", isDark)
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -138,7 +173,7 @@ export default function SettingsPage() {
                         </Avatar>
                         <div className="flex flex-col flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
                           <span className="text-sm font-semibold text-white truncate">Valt</span>
-                          <span className="text-xs text-muted-foreground/60 truncate">valt@example.com</span>
+                          <span className="text-xs text-muted-foreground/60 truncate">{email}</span>
                         </div>
                         <ChevronDown className="h-4 w-4 text-muted-foreground/40 shrink-0 group-data-[collapsible=icon]:hidden" />
                       </div>
@@ -192,7 +227,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center gap-4">
                 <Badge variant="secondary" className="bg-[#1e1f20] text-muted-foreground border-none rounded-full px-4 py-1.5 text-xs font-semibold">
-                  100% setup complete
+                  {completion}% setup complete
                 </Badge>
                 <Button 
                   onClick={handleSave} 
@@ -213,6 +248,7 @@ export default function SettingsPage() {
                 <TabsTrigger value="billing" className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all">Billing</TabsTrigger>
               </TabsList>
 
+              {/* Profile Content */}
               <TabsContent value="profile" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-4 pt-8 px-8">
@@ -231,7 +267,7 @@ export default function SettingsPage() {
                         <AvatarFallback className="bg-[#B34DE6] text-white text-xl font-bold">VP</AvatarFallback>
                       </Avatar>
                       <div className="space-y-0.5">
-                        <p className="text-xl font-semibold text-white">Valt Parker</p>
+                        <p className="text-xl font-semibold text-white">{fullName}</p>
                         <p className="text-sm font-medium text-muted-foreground/50">Admin • Verified founder</p>
                       </div>
                     </div>
@@ -271,6 +307,7 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
 
+              {/* Notifications Content */}
               <TabsContent value="notifications" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
@@ -284,67 +321,84 @@ export default function SettingsPage() {
                   </CardHeader>
                   <CardContent className="space-y-3 px-8 pb-10">
                     {[
-                      { id: "product", label: "Product updates", defaultChecked: true },
-                      { id: "security", label: "Security alerts", defaultChecked: true },
-                      { id: "usage", label: "Usage tips", defaultChecked: true },
-                      { id: "marketing", label: "Marketing emails", defaultChecked: false },
-                      { id: "push", label: "Desktop push", defaultChecked: true },
+                      { id: "productNews", label: "Product updates" },
+                      { id: "securityAlerts", label: "Security alerts" },
+                      { id: "usageTips", label: "Usage tips" },
+                      { id: "marketingEmails", label: "Marketing emails" },
+                      { id: "desktopPush", label: "Desktop push" },
                     ].map((item) => (
                       <div key={item.id} className="flex items-center justify-between p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03]">
                         <Label htmlFor={item.id} className="text-base font-medium text-white cursor-pointer">{item.label}</Label>
-                        <Switch id={item.id} defaultChecked={item.defaultChecked} className="data-[state=checked]:bg-[#9c78d6]" />
+                        <Switch 
+                          id={item.id} 
+                          checked={notifications[item.id as keyof typeof notifications]}
+                          onCheckedChange={(checked) => setNotifications(prev => ({ ...prev, [item.id]: checked }))}
+                          className="data-[state=checked]:bg-[#9c78d6]" 
+                        />
                       </div>
                     ))}
                   </CardContent>
                 </Card>
               </TabsContent>
 
+              {/* Appearance Content */}
               <TabsContent value="appearance" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
                     <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-white">
                       <Palette className="w-6 h-6 text-muted-foreground" /> 
-                      Appearance
+                      Appearance & AI defaults
                     </CardTitle>
                     <CardDescription className="text-muted-foreground/60 text-base">
                       Customize how the studio looks and feels on your screen.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6 px-8 pb-10">
+                  <CardContent className="space-y-8 px-8 pb-10">
                     <div className="grid grid-cols-3 gap-4">
                       {[
                         { id: "light", label: "Light", icon: Sun },
-                        { id: "dark", label: "Dark", icon: Moon, active: true },
+                        { id: "dark", label: "Dark", icon: Moon },
                         { id: "system", label: "System", icon: Monitor },
-                      ].map((theme) => (
+                      ].map((t) => (
                         <button
-                          key={theme.id}
+                          key={t.id}
+                          onClick={() => applyTheme(t.id as any)}
                           className={cn(
                             "flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all",
-                            theme.active 
+                            theme === t.id 
                               ? "bg-[#131314] border-[#9c78d6] ring-1 ring-[#9c78d6]" 
                               : "bg-[#131314]/50 border-white/[0.05] hover:border-white/10"
                           )}
                         >
-                          <div className={cn("p-3 rounded-xl", theme.active ? "bg-[#9c78d6]/10 text-[#9c78d6]" : "bg-white/5 text-muted-foreground")}>
-                            <theme.icon className="w-6 h-6" />
+                          <div className={cn("p-3 rounded-xl", theme === t.id ? "bg-[#9c78d6]/10 text-[#9c78d6]" : "bg-white/5 text-muted-foreground")}>
+                            <t.icon className="w-6 h-6" />
                           </div>
-                          <span className={cn("text-sm font-semibold", theme.active ? "text-white" : "text-muted-foreground")}>{theme.label}</span>
-                          {theme.active && <Check className="w-4 h-4 text-[#9c78d6]" />}
+                          <span className={cn("text-sm font-semibold", theme === t.id ? "text-white" : "text-muted-foreground")}>{t.label}</span>
+                          {theme === t.id && <Check className="w-4 h-4 text-[#9c78d6]" />}
                         </button>
                       ))}
                     </div>
-                    <div className="flex items-center justify-between p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03]">
-                      <div className="space-y-0.5">
-                        <p className="text-base font-medium text-white">Reduced motion</p>
-                        <p className="text-xs text-muted-foreground/50">Minimize animations throughout the app</p>
+                    
+                    <Separator className="bg-white/5" />
+
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-white text-base font-medium">AI creativity level</Label>
+                        <span className="text-sm font-bold text-[#9c78d6]">{aiCreativity[0]}%</span>
                       </div>
-                      <Switch className="data-[state=checked]:bg-[#9c78d6]" />
+                      <Slider 
+                        value={aiCreativity} 
+                        max={100} 
+                        step={1} 
+                        onValueChange={setAiCreativity}
+                        className="[&_[role=slider]]:bg-[#9c78d6] [&_[role=slider]]:border-white"
+                      />
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
 
+              {/* Security Content */}
               <TabsContent value="security" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
@@ -367,21 +421,39 @@ export default function SettingsPage() {
                           <p className="text-xs text-muted-foreground/50">Add an extra layer of security to your account</p>
                         </div>
                       </div>
-                      <Switch className="data-[state=checked]:bg-[#9c78d6]" />
+                      <Switch 
+                        checked={privacy.twoFactor} 
+                        onCheckedChange={(checked) => setPrivacy(prev => ({ ...prev, twoFactor: checked }))}
+                        className="data-[state=checked]:bg-[#9c78d6]" 
+                      />
                     </div>
                     <div className="p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03] flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <p className="text-base font-medium text-white">Password</p>
-                        <p className="text-xs text-muted-foreground/50">Last changed 3 months ago</p>
+                        <p className="text-base font-medium text-white">Discoverable profile</p>
+                        <p className="text-xs text-muted-foreground/50">Allow teammates to find you in search</p>
                       </div>
-                      <Button variant="secondary" className="bg-white/5 hover:bg-white/10 text-white border-none rounded-xl px-6 h-10 font-medium">
-                        Change password
-                      </Button>
+                      <Switch 
+                        checked={privacy.discoverableProfile} 
+                        onCheckedChange={(checked) => setPrivacy(prev => ({ ...prev, discoverableProfile: checked }))}
+                        className="data-[state=checked]:bg-[#9c78d6]" 
+                      />
+                    </div>
+                    <div className="p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03] flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <p className="text-base font-medium text-white">Product analytics tracking</p>
+                        <p className="text-xs text-muted-foreground/50">Help us improve with anonymous usage data</p>
+                      </div>
+                      <Switch 
+                        checked={privacy.analyticsTracking} 
+                        onCheckedChange={(checked) => setPrivacy(prev => ({ ...prev, analyticsTracking: checked }))}
+                        className="data-[state=checked]:bg-[#9c78d6]" 
+                      />
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
 
+              {/* Billing Content */}
               <TabsContent value="billing" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
@@ -394,21 +466,30 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6 px-8 pb-10">
-                    <div className="p-8 bg-gradient-to-br from-[#9c78d6] to-[#6d4da3] rounded-[24px] text-white shadow-xl relative overflow-hidden group">
-                      <div className="relative z-10 flex justify-between items-start">
-                        <div className="space-y-2">
-                          <p className="text-sm font-bold uppercase tracking-wider opacity-80">Current Plan</p>
-                          <h3 className="text-4xl font-bold tracking-tight">Pro Plan</h3>
-                          <p className="text-base font-medium opacity-90 mt-2">$29/month • Billed annually</p>
-                        </div>
-                        <Badge className="bg-white/20 hover:bg-white/30 text-white border-none rounded-full px-4 py-1 font-bold">ACTIVE</Badge>
-                      </div>
-                      <div className="mt-8 flex gap-4 relative z-10">
-                        <Button className="bg-white text-[#9c78d6] hover:bg-white/90 rounded-xl px-6 h-11 font-bold shadow-lg">Upgrade plan</Button>
-                        <Button variant="ghost" className="text-white hover:bg-white/10 rounded-xl px-6 h-11 font-bold">Manage payment</Button>
-                      </div>
-                      <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-[80px] group-hover:bg-white/20 transition-all duration-700" />
+                    <div className="grid gap-4 md:grid-cols-3">
+                      {[
+                        { id: "starter", name: "Starter", price: "$29/mo" },
+                        { id: "pro", name: "Pro Plan", price: "$99/mo" },
+                        { id: "enterprise", name: "Enterprise", price: "Custom" },
+                      ].map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => setPlan(p.id)}
+                          className={cn(
+                            "flex flex-col gap-2 p-6 rounded-2xl border text-left transition-all",
+                            plan === p.id 
+                              ? "bg-gradient-to-br from-[#9c78d6] to-[#6d4da3] border-[#9c78d6] text-white shadow-xl" 
+                              : "bg-[#131314]/50 border-white/[0.05] text-muted-foreground hover:border-white/10"
+                          )}
+                        >
+                          <p className={cn("text-sm font-bold uppercase tracking-wider", plan === p.id ? "text-white/80" : "text-muted-foreground/50")}>Plan</p>
+                          <h3 className={cn("text-2xl font-bold", plan === p.id ? "text-white" : "text-white/90")}>{p.name}</h3>
+                          <p className={cn("text-base font-medium", plan === p.id ? "text-white/90" : "text-muted-foreground/70")}>{p.price}</p>
+                          {plan === p.id && <Check className="w-4 h-4 mt-2 text-white" />}
+                        </button>
+                      ))}
                     </div>
+                    
                     <div className="p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03]">
                       <h4 className="text-sm font-bold text-muted-foreground/70 uppercase tracking-widest mb-4">Payment method</h4>
                       <div className="flex items-center justify-between">
