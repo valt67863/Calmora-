@@ -181,9 +181,9 @@ export default function SettingsPage() {
           </SidebarFooter>
         </Sidebar>
 
-        {/* Main Settings Content */}
-        <main className="flex-1 overflow-y-auto bg-[#131314]">
-          <div className="mx-auto max-w-5xl px-8 py-12 space-y-10">
+        {/* Main Settings Content - Removed horizontal gaps */}
+        <main className="flex-1 overflow-y-auto bg-[#131314] flex flex-col items-center">
+          <div className="w-full px-6 py-12 space-y-10">
             {/* Header Section */}
             <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="space-y-1">
@@ -274,7 +274,7 @@ export default function SettingsPage() {
                 </Card>
               </TabsContent>
 
-              {/* Notifications Tab Content - EXACTLY AS IMAGE */}
+              {/* Notifications Tab Content */}
               <TabsContent value="notifications" className="mt-8">
                 <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
