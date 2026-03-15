@@ -6,8 +6,6 @@ import {
   LayoutGrid, 
   ChevronDown, 
   Plus, 
-  MessageSquare, 
-  Mic, 
   ArrowUp,
   Settings,
   LogOut,
@@ -122,7 +120,6 @@ export default function AppDashboard() {
                       </div>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
-                  {/* Google Pop-up UI Background Color (#28292a) */}
                   <DropdownMenuContent side="right" align="end" className="w-64 bg-[#28292a] border-white/10 text-white shadow-2xl p-1.5 rounded-xl animate-in fade-in zoom-in-95 duration-100">
                     <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5 focus:bg-white/10 focus:text-white">
                       <Sparkles className="mr-3 h-4 w-4 text-[#B34DE6]" />
@@ -165,20 +162,19 @@ export default function AppDashboard() {
           </div>
 
           {/* Central Content */}
-          <div className="relative z-10 w-full max-w-3xl px-6 flex flex-col items-center">
-            <h1 className="text-5xl font-semibold text-white mb-16 tracking-tight">
+          <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center">
+            <h1 className="text-4xl font-semibold text-white mb-10 tracking-tight text-center">
               Let's build something, Valt
             </h1>
 
-            {/* Prompt Bar */}
-            <div className="w-full bg-[#1e1f20]/90 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-3 shadow-2xl flex items-center gap-3">
+            {/* Compact Prompt Bar */}
+            <div className="w-full bg-[#1e1f20]/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-2 shadow-2xl flex items-center gap-2 group focus-within:border-white/20 transition-all">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-11 w-11 rounded-full hover:bg-white/10 text-white shrink-0">
+                  <Button size="icon" variant="ghost" className="h-10 w-10 rounded-full hover:bg-white/10 text-white shrink-0">
                     <Plus className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                {/* Google Pop-up UI Background Color (#28292a) */}
                 <DropdownMenuContent align="start" side="top" className="w-52 bg-[#28292a] border-white/10 text-white shadow-2xl p-1.5 mb-3 rounded-2xl animate-in fade-in slide-in-from-bottom-2 duration-100">
                   <DropdownMenuItem 
                     className="hover:bg-white/10 cursor-pointer rounded-xl py-3 focus:bg-white/10 focus:text-white"
@@ -195,34 +191,29 @@ export default function AppDashboard() {
               </DropdownMenu>
 
               {hasPlan && (
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-1.5 rounded-full border border-white/10 shrink-0 group transition-all animate-in zoom-in-90">
-                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-sm font-semibold text-white">Plan</span>
+                <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/10 shrink-0 animate-in zoom-in-90">
+                  <Calendar className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs font-semibold text-white">Plan</span>
                   <button 
                     onClick={() => setHasPlan(false)}
-                    className="ml-1 p-0.5 rounded-full hover:bg-white/20 text-muted-foreground hover:text-white transition-colors"
+                    className="p-0.5 rounded-full hover:bg-white/20 text-muted-foreground hover:text-white transition-colors"
                   >
-                    <X className="h-3.5 w-3.5" />
+                    <X className="h-3 w-3" />
                   </button>
                 </div>
               )}
               
               <Input 
                 placeholder="Ask Lovable to create" 
-                className="flex-1 bg-transparent border-none text-white text-lg placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-12 p-0"
+                className="flex-1 bg-transparent border-none text-white text-base placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 p-1"
               />
 
-              <div className="flex items-center gap-1.5">
-                <Button size="icon" variant="ghost" className="h-11 w-11 rounded-full hover:bg-white/10 text-muted-foreground hover:text-white">
-                  <MessageSquare className="h-5 w-5" />
-                </Button>
-                <Button size="icon" variant="ghost" className="h-11 w-11 rounded-full hover:bg-white/10 text-muted-foreground hover:text-white">
-                  <Mic className="h-5 w-5" />
-                </Button>
-                <Button size="icon" className="h-11 w-11 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all">
-                  <ArrowUp className="h-5 w-5" />
-                </Button>
-              </div>
+              <Button 
+                size="icon" 
+                className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all shrink-0"
+              >
+                <ArrowUp className="h-5 w-5" />
+              </Button>
             </div>
           </div>
         </main>
