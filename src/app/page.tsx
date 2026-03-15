@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Home, 
   History, 
@@ -24,7 +25,6 @@ import {
   FileText,
   Code2,
   Lightbulb,
-  MessageSquare,
   ChevronRight
 } from 'lucide-react';
 import { 
@@ -52,27 +52,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const TEMPLATES = [
   {
     title: "Write a blog post",
     description: "Generate engaging content for your audience",
-    icon: <FileText className="h-5 w-5 text-blue-400" />,
+    icon: <FileText className="h-4 w-4 text-blue-400" />,
+    image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || '',
+    imageHint: "blog content"
   },
   {
     title: "Code generation",
     description: "Build functions and fix bugs quickly",
-    icon: <Code2 className="h-5 w-5 text-green-400" />,
+    icon: <Code2 className="h-4 w-4 text-green-400" />,
+    image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || '',
+    imageHint: "software coding"
   },
   {
     title: "Brainstorm ideas",
     description: "Creative concepts for your next project",
-    icon: <Lightbulb className="h-5 w-5 text-yellow-400" />,
-  },
-  {
-    title: "Summarize text",
-    description: "Condense long documents into key points",
-    icon: <MessageSquare className="h-5 w-5 text-purple-400" />,
+    icon: <Lightbulb className="h-4 w-4 text-yellow-400" />,
+    image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || '',
+    imageHint: "creative brainstorming"
   },
 ];
 
@@ -98,7 +100,7 @@ export default function AppDashboard() {
                     <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
                       <div className="flex items-center gap-2 w-full overflow-hidden">
                         <Avatar className="h-5 w-5 rounded-sm shrink-0">
-                          <AvatarImage src="https://picsum.photos/seed/valt-brand/20/20" />
+                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-brand')?.imageUrl} />
                           <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
                         </Avatar>
                         <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
@@ -155,13 +157,13 @@ export default function AppDashboard() {
             </SidebarGroup>
 
             <SidebarGroup className="mt-4">
-              <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 px-3 mb-2 group-data-[collapsible=icon]:hidden">Projects</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 px-3 mb-2 group-data-[collapsible=icon]:hidden">History</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="History" className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
+                    <SidebarMenuButton tooltip="Activity" className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
                       <History className="h-4 w-4" />
-                      <span>History</span>
+                      <span>Activity</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -177,7 +179,7 @@ export default function AppDashboard() {
                     <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
                       <div className="flex items-center gap-3 w-full overflow-hidden text-left group-data-[collapsible=icon]:justify-center">
                         <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7 shrink-0">
-                          <AvatarImage src="https://picsum.photos/seed/valt-user/80/80" />
+                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-user')?.imageUrl} />
                           <AvatarFallback className="bg-[#B34DE6] text-white font-bold">V</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
@@ -227,10 +229,10 @@ export default function AppDashboard() {
         </Sidebar>
 
         <main className="relative flex-1 flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide no-scrollbar">
-          {/* Hero Section (H1 + Input) centered in viewport */}
+          {/* Hero Section centered in viewport */}
           <div className="relative min-h-[90vh] flex flex-col items-center justify-center px-6">
             <div className="absolute inset-0 z-0">
-              <div className="absolute bottom-[-20%] left-[-10%] w-[120%] h-[80%] rounded-full lovable-gradient" />
+              <div className="absolute bottom-[-20%] left-[-10%] w-[120%] h-[80%] rounded-full lovable-gradient opacity-30" />
             </div>
 
             <div className="relative z-10 w-full max-w-2xl flex flex-col items-center">
@@ -288,9 +290,9 @@ export default function AppDashboard() {
             </div>
           </div>
 
-          {/* Template Section tucked below the main view */}
-          <div className="w-full max-w-2xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex items-center justify-between px-2 mb-4">
+          {/* Template Section below the fold */}
+          <div className="w-full max-w-5xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex items-center justify-between px-2 mb-6">
               <h2 className="text-sm font-semibold text-white/50 uppercase tracking-widest">Templates</h2>
               <Button variant="link" className="text-xs font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group">
                 View all templates
@@ -298,17 +300,29 @@ export default function AppDashboard() {
               </Button>
             </div>
 
-            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {TEMPLATES.map((template, idx) => (
                 <button 
                   key={idx}
-                  className="flex-shrink-0 w-52 bg-[#1e1f20]/50 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-2xl p-4 text-left transition-all group"
+                  className="flex flex-col bg-[#1e1f20]/50 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-[2rem] overflow-hidden text-left transition-all group shadow-lg"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4 transition-colors group-hover:bg-white/10">
-                    {template.icon}
+                  <div className="relative w-full aspect-[16/10] overflow-hidden">
+                    <Image 
+                      src={template.image} 
+                      alt={template.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      data-ai-hint={template.imageHint}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1e1f20] to-transparent opacity-60" />
+                    <div className="absolute bottom-4 left-4 w-9 h-9 rounded-xl bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/10">
+                      {template.icon}
+                    </div>
                   </div>
-                  <h3 className="text-sm font-semibold text-white mb-1">{template.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{template.description}</p>
+                  <div className="p-6">
+                    <h3 className="text-base font-semibold text-white mb-2">{template.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{template.description}</p>
+                  </div>
                 </button>
               ))}
             </div>

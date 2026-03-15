@@ -59,6 +59,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { PlaceHolderImages } from '@/lib/placeholder-images'
 
 export default function SettingsPage() {
   const [fullName, setFullName] = useState("Valt Parker")
@@ -123,7 +124,7 @@ export default function SettingsPage() {
                     <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
                       <div className="flex items-center gap-2 w-full overflow-hidden">
                         <Avatar className="h-5 w-5 rounded-sm shrink-0">
-                          <AvatarImage src="https://picsum.photos/seed/valt-brand/20/20" />
+                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-brand')?.imageUrl} />
                           <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
                         </Avatar>
                         <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
@@ -182,13 +183,13 @@ export default function SettingsPage() {
             </SidebarGroup>
 
             <SidebarGroup className="mt-4">
-              <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 px-3 mb-2 group-data-[collapsible=icon]:hidden">Projects</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40 px-3 mb-2 group-data-[collapsible=icon]:hidden">History</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="History" className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
+                    <SidebarMenuButton tooltip="Activity" className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
                       <History className="h-4 w-4" />
-                      <span>History</span>
+                      <span>Activity</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -204,7 +205,7 @@ export default function SettingsPage() {
                     <SidebarMenuButton tooltip="Account" className="h-14 w-full hover:bg-white/5 transition-colors rounded-xl px-2 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:justify-center">
                       <div className="flex items-center gap-3 w-full overflow-hidden text-left group-data-[collapsible=icon]:justify-center">
                         <Avatar className="h-9 w-9 rounded-full ring-2 ring-white/5 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7 shrink-0">
-                          <AvatarImage src="https://picsum.photos/seed/valt-user/80/80" />
+                          <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-user')?.imageUrl} />
                           <AvatarFallback className="bg-[#B34DE6] text-white font-bold">V</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
@@ -299,7 +300,7 @@ export default function SettingsPage() {
                   <CardContent className="space-y-8 px-8 pb-10">
                     <div className="flex items-center gap-5 mt-2">
                       <Avatar className="h-16 w-16 rounded-full ring-4 ring-white/5">
-                        <AvatarImage src="https://picsum.photos/seed/valt-profile-avatar/120" alt="Valt" />
+                        <AvatarImage src={PlaceHolderImages.find(img => img.id === 'valt-user')?.imageUrl} alt="Valt" />
                         <AvatarFallback className="bg-[#B34DE6] text-white text-xl font-bold">VP</AvatarFallback>
                       </Avatar>
                       <div className="space-y-0.5">
