@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Home, 
   LayoutGrid, 
@@ -14,7 +14,10 @@ import {
   Sparkles,
   Palette,
   CreditCard,
-  LifeBuoy
+  LifeBuoy,
+  X,
+  Calendar,
+  FileUp
 } from 'lucide-react';
 import { 
   Sidebar, 
@@ -42,6 +45,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function AppDashboard() {
+  const [hasPlan, setHasPlan] = useState(false);
+
   return (
     <SidebarProvider>
       <div className="flex h-screen w-full bg-[#201C22] text-foreground overflow-hidden">
@@ -117,30 +122,30 @@ export default function AppDashboard() {
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="right" align="end" className="w-64 bg-[#1c1c1c] border-white/10 text-white shadow-2xl p-2">
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 focus:bg-white/10 focus:text-white">
                       <Sparkles className="mr-2 h-4 w-4 text-[#B34DE6]" />
                       <span>What's New</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 focus:bg-white/10 focus:text-white">
                       <Palette className="mr-2 h-4 w-4 text-[#5E8EDD]" />
                       <span>Appearance</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-white/10 my-1" />
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 focus:bg-white/10 focus:text-white">
                       <CreditCard className="mr-2 h-4 w-4" />
                       <span>Subscription</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 focus:bg-white/10 focus:text-white">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-white/10 my-1" />
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 focus:bg-white/10 focus:text-white">
                       <LifeBuoy className="mr-2 h-4 w-4" />
                       <span>Help / Issue Feedback</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-white/10 my-1" />
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 text-red-400 focus:text-red-400">
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 text-red-400 focus:text-red-400 focus:bg-white/10">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
@@ -165,9 +170,39 @@ export default function AppDashboard() {
 
             {/* Prompt Bar */}
             <div className="w-full bg-[#1c1c1c]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] p-3 shadow-2xl flex items-center gap-3">
-              <Button size="icon" variant="ghost" className="h-10 w-10 rounded-full hover:bg-white/10 text-white">
-                <Plus className="h-5 w-5" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost" className="h-10 w-10 rounded-full hover:bg-white/10 text-white shrink-0">
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" side="top" className="w-48 bg-[#1c1c1c] border-white/10 text-white shadow-2xl p-1 mb-2">
+                  <DropdownMenuItem 
+                    className="hover:bg-white/10 cursor-pointer rounded-md py-2 focus:bg-white/10 focus:text-white"
+                    onClick={() => setHasPlan(true)}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    <span>Plan</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 focus:bg-white/10 focus:text-white">
+                    <FileUp className="mr-2 h-4 w-4" />
+                    <span>Attachment</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {hasPlan && (
+                <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 shrink-0 group">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-sm font-medium text-white">Plan</span>
+                  <button 
+                    onClick={() => setHasPlan(false)}
+                    className="text-muted-foreground hover:text-white transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              )}
               
               <Input 
                 placeholder="Ask Lovable to create" 
