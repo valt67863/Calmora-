@@ -6,20 +6,15 @@ import {
   Search, 
   BookOpen, 
   LayoutGrid, 
-  Star, 
-  User, 
-  Users, 
   ChevronDown, 
   Plus, 
   MessageSquare, 
   Mic, 
-  ArrowUp,
-  PanelLeft
+  ArrowUp
 } from 'lucide-react';
 import { 
   Sidebar, 
   SidebarContent, 
-  SidebarFooter, 
   SidebarGroup, 
   SidebarGroupContent, 
   SidebarGroupLabel, 
@@ -97,24 +92,6 @@ export default function AppDashboard() {
                     <SidebarMenuButton>
                       <LayoutGrid className="h-4 w-4" />
                       <span>All projects</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton>
-                      <Star className="h-4 w-4" />
-                      <span>Starred</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton>
-                      <User className="h-4 w-4" />
-                      <span>Created by me</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton>
-                      <Users className="h-4 w-4" />
-                      <span>Shared with me</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
