@@ -71,7 +71,7 @@ export default function SettingsPage() {
 
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full bg-[#131314] text-foreground overflow-hidden">
+      <div className="flex h-screen w-full bg-[#131314] text-foreground overflow-hidden font-body">
         <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#1e1f20]">
           <SidebarHeader className="p-4 group-data-[collapsible=icon]:p-2">
             <div className="flex items-center justify-between mb-4 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:mb-0">
