@@ -61,7 +61,7 @@ export default function AppDashboard() {
       title: "Write a blog post",
       description: "Generate engaging and SEO-friendly content for your audience",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
-      imageHint: "blog content"
+      imageHint: "writing blog"
     },
     {
       title: "Code generation",
@@ -286,21 +286,21 @@ export default function AppDashboard() {
             </div>
           </div>
 
-          {/* Template Section below the fold */}
-          <div className="w-full max-w-5xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex items-center justify-between px-2 mb-6">
-              <h2 className="text-sm font-semibold text-white/50 uppercase tracking-widest">Templates</h2>
-              <Button variant="link" className="text-xs font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group">
+          {/* Template Section below the fold - adjusted for a more compact size */}
+          <div className="w-full max-w-4xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex items-center justify-between px-2 mb-4">
+              <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Templates</h2>
+              <Button variant="link" className="text-[10px] font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group opacity-80 hover:opacity-100">
                 View all templates
-                <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                <ChevronRight className="h-2.5 w-2.5 transition-transform group-hover:translate-x-0.5" />
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {templates.map((template, idx) => (
                 <button 
                   key={idx}
-                  className="flex flex-col bg-[#1e1f20]/50 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-[2rem] overflow-hidden text-left transition-all group shadow-lg"
+                  className="flex flex-col bg-[#1e1f20]/40 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-[1.5rem] overflow-hidden text-left transition-all group shadow-md"
                 >
                   <div className="relative w-full aspect-[16/10] overflow-hidden">
                     <Image 
@@ -310,11 +310,11 @@ export default function AppDashboard() {
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       data-ai-hint={template.imageHint}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1e1f20] to-transparent opacity-40" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1e1f20]/80 to-transparent opacity-60" />
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wide opacity-90">{template.title}</h3>
-                    <p className="text-xs text-muted-foreground/70 leading-relaxed line-clamp-2">{template.description}</p>
+                  <div className="p-4">
+                    <h3 className="text-xs font-bold text-white mb-1.5 uppercase tracking-wider opacity-90">{template.title}</h3>
+                    <p className="text-[10px] text-muted-foreground/60 leading-relaxed line-clamp-2">{template.description}</p>
                   </div>
                 </button>
               ))}
