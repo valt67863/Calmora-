@@ -19,7 +19,9 @@ import {
   Sun,
   Monitor,
   Check,
-  FolderPlus
+  FolderPlus,
+  PlusCircle,
+  Building2
 } from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -116,16 +118,45 @@ export default function SettingsPage() {
             </div>
             <SidebarMenu className="group-data-[collapsible=icon]:hidden">
               <SidebarMenuItem>
-                <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
-                  <div className="flex items-center gap-2 w-full overflow-hidden">
-                    <Avatar className="h-5 w-5 rounded-sm shrink-0">
-                      <AvatarImage src="https://picsum.photos/seed/valt-brand/20/20" />
-                      <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
-                    <ChevronDown className="h-3 w-3 opacity-50 shrink-0" />
-                  </div>
-                </SidebarMenuButton>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors border border-white/5">
+                      <div className="flex items-center gap-2 w-full overflow-hidden">
+                        <Avatar className="h-5 w-5 rounded-sm shrink-0">
+                          <AvatarImage src="https://picsum.photos/seed/valt-brand/20/20" />
+                          <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
+                        <ChevronDown className="h-3 w-3 opacity-50 shrink-0" />
+                      </div>
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="right" align="start" sideOffset={12} className="w-64 bg-[#28292a] border-white/10 text-white shadow-2xl p-2 rounded-xl animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-2 py-1.5 mb-1">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Workspaces</p>
+                    </div>
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5 flex items-center justify-between bg-white/5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-6 h-6 rounded bg-[#B34DE6] flex items-center justify-center text-[10px] font-bold">V</div>
+                        <span className="text-sm font-medium">Valt's Studio</span>
+                      </div>
+                      <Check className="h-3.5 w-3.5 text-[#B34DE6]" />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5 flex items-center gap-3">
+                      <div className="w-6 h-6 rounded bg-white/10 flex items-center justify-center text-[10px] font-bold text-muted-foreground">L</div>
+                      <span className="text-sm font-medium text-muted-foreground">Lovable Labs</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-white/5 my-2" />
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5 text-[#B34DE6]">
+                      <PlusCircle className="mr-3 h-4 w-4" />
+                      <span className="text-sm font-medium">Create workspace</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-lg py-2.5">
+                      <Building2 className="mr-3 h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Workspace settings</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarHeader>
