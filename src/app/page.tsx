@@ -24,7 +24,10 @@ import {
   ChevronRight,
   LayoutGrid,
   Search,
-  Filter
+  Rocket,
+  Code2,
+  Terminal,
+  Zap
 } from 'lucide-react';
 import { 
   Sidebar, 
@@ -58,93 +61,119 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 
 const FALLBACK_IMAGE = "https://picsum.photos/seed/fallback/400/250";
 
+interface Template {
+  title: string;
+  description: string;
+  image: string;
+  imageHint: string;
+  category: string;
+  prompt: string;
+}
+
 export default function AppDashboard() {
   const [hasPlan, setHasPlan] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
   const categories = ["All", "Content", "Creative", "Code", "Business"];
 
-  const templates = useMemo(() => [
+  const templates: Template[] = useMemo(() => [
     {
       title: "Write a blog post",
       description: "Generate engaging and SEO-friendly content for your audience",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "writing blog",
-      category: "Content"
+      category: "Content",
+      prompt: "Draft a comprehensive blog post about [Topic]. Include a catchy title, introduction with a hook, three main points with subheadings, and a strong call to action. Tone should be professional yet conversational."
     },
     {
       title: "Code generation",
       description: "Efficiently build complex functions and fix logic bugs quickly",
       image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "software coding",
-      category: "Code"
+      category: "Code",
+      prompt: "Act as an expert software engineer. Write a TypeScript function that [Detailed Functionality]. Ensure the code is optimized, follows DRY principles, and includes error handling."
     },
     {
       title: "Brainstorm ideas",
       description: "Explore creative and unique concepts for your next project",
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "creative brainstorming",
-      category: "Creative"
+      category: "Creative",
+      prompt: "Generate 10 innovative and unique ideas for [Project/Niche]. Focus on market gaps, user pain points, and creative technological applications."
     },
     {
       title: "Marketing Copy",
       description: "Draft persuasive copy that converts visitors into customers",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "marketing copy",
-      category: "Business"
+      category: "Business",
+      prompt: "Create high-converting landing page copy for [Product Name]. Use the AIDA framework (Attention, Interest, Desire, Action) to guide the reader toward signing up."
     },
     {
       title: "Video Scripts",
       description: "Outline and write engaging scripts for your YouTube videos",
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "video script",
-      category: "Creative"
+      category: "Creative",
+      prompt: "Write a 5-minute YouTube video script about [Topic]. Include timestamps, visual cues for B-roll, and a dynamic intro designed to maximize viewer retention."
     },
     {
       title: "Social Media",
       description: "Generate trendy and viral-ready posts for all your platforms",
       image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "social media",
-      category: "Content"
+      category: "Content",
+      prompt: "Write a series of 3 LinkedIn posts about [Industry Insight]. The posts should provide value, end with a question to drive engagement, and include 5 relevant hashtags."
     },
   ], []);
 
-  const allTemplates = useMemo(() => [
+  const allTemplates: Template[] = useMemo(() => [
     ...templates,
     {
       title: "Email Drafts",
       description: "Professional and concise emails for any business situation",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "email writing",
-      category: "Business"
+      category: "Business",
+      prompt: "Write a professional outreach email to [Person/Role] regarding [Topic]. Keep it concise, professional, and emphasize a specific value proposition."
     },
     {
       title: "Presentation Outline",
       description: "Structure your ideas into compelling slides and narratives",
       image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "presentation slides",
-      category: "Creative"
+      category: "Creative",
+      prompt: "Outline a 15-slide deck for [Occasion/Topic]. Provide a slide title and 3 bullet points for each slide, ensuring a logical flow and a persuasive narrative arc."
     },
     {
       title: "Product Descriptions",
       description: "Compelling copy that highlights features and benefits",
       image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "e-commerce product",
-      category: "Business"
+      category: "Business",
+      prompt: "Write a compelling e-commerce product description for [Product]. Focus on benefits over features, and use sensory language to make the product come alive."
     },
     {
       title: "FAQ Generator",
       description: "Quickly answer common customer queries with clarity",
       image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
       imageHint: "customer support",
-      category: "Content"
+      category: "Content",
+      prompt: "Generate a list of the 10 most common FAQs for [Product/Service] along with clear, helpful, and concise answers."
     }
   ], [templates]);
 
@@ -426,6 +455,7 @@ export default function AppDashboard() {
                         filteredTemplates.map((template, idx) => (
                           <button 
                             key={idx}
+                            onClick={() => setSelectedTemplate(template)}
                             className="flex flex-col bg-[#131314]/40 hover:bg-[#131314]/80 border border-white/5 hover:border-white/10 rounded-[1.8rem] overflow-hidden text-left transition-all group shadow-md hover:shadow-xl hover:-translate-y-1 duration-300"
                           >
                             <div className="relative w-full aspect-[16/10] overflow-hidden">
@@ -472,6 +502,7 @@ export default function AppDashboard() {
               {templates.map((template, idx) => (
                 <button 
                   key={idx}
+                  onClick={() => setSelectedTemplate(template)}
                   className="flex flex-col bg-[#1e1f20]/40 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-[1.5rem] overflow-hidden text-left transition-all group shadow-md"
                 >
                   <div className="relative w-full aspect-[16/10] overflow-hidden">
@@ -494,6 +525,93 @@ export default function AppDashboard() {
           </div>
         </main>
       </div>
+
+      {/* Template Detail Sheet */}
+      <Sheet open={!!selectedTemplate} onOpenChange={(open) => !open && setSelectedTemplate(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-xl bg-[#1e1f20]/95 backdrop-blur-3xl border-l border-white/10 p-0 text-white shadow-2xl overflow-hidden flex flex-col rounded-l-[2rem]">
+          <div className="absolute top-0 right-0 p-6 flex items-center gap-4 z-20">
+            <Button 
+              className="bg-[#B34DE6] hover:bg-[#B34DE6]/90 text-white font-bold rounded-xl px-6 h-11 shadow-[0_0_20px_rgba(179,77,230,0.3)] transition-all flex items-center gap-2 group"
+            >
+              Deploy
+              <Rocket className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+            </Button>
+            <button 
+              onClick={() => setSelectedTemplate(null)}
+              className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white transition-colors border border-white/10"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="relative h-64 w-full">
+              <Image 
+                src={selectedTemplate?.image || FALLBACK_IMAGE} 
+                alt={selectedTemplate?.title || "Template"}
+                fill
+                className="object-cover"
+                data-ai-hint={selectedTemplate?.imageHint}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1e1f20] via-[#1e1f20]/50 to-transparent" />
+              <div className="absolute bottom-6 left-8">
+                <span className="bg-[#B34DE6]/20 text-[#B34DE6] text-[10px] font-bold px-2.5 py-1 rounded-full border border-[#B34DE6]/30 tracking-widest uppercase mb-3 inline-block backdrop-blur-md">
+                  {selectedTemplate?.category}
+                </span>
+                <SheetHeader className="text-left space-y-0">
+                  <SheetTitle className="text-4xl font-semibold text-white tracking-tight leading-tight">
+                    {selectedTemplate?.title}
+                  </SheetTitle>
+                </SheetHeader>
+              </div>
+            </div>
+
+            <div className="px-8 py-10 space-y-12">
+              <section className="space-y-4">
+                <h4 className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                  <LayoutGrid className="h-3 w-3" /> Description
+                </h4>
+                <p className="text-lg text-white/80 leading-relaxed font-medium">
+                  {selectedTemplate?.description}
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-[11px] font-bold text-[#B34DE6] uppercase tracking-[0.2em] flex items-center gap-2">
+                    <Terminal className="h-3 w-3" /> System Prompt
+                  </h4>
+                  <div className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground bg-white/5 px-2 py-1 rounded-md border border-white/5">
+                    <Zap className="h-3 w-3 text-yellow-500" />
+                    Optimized for GPT-4
+                  </div>
+                </div>
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-[#B34DE6]/20 to-[#5E8EDD]/20 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                  <div className="relative bg-[#131314]/80 border border-white/10 rounded-2xl p-6 font-mono text-[13px] text-white/70 leading-relaxed overflow-hidden">
+                    <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-500/40" />
+                        <div className="w-2 h-2 rounded-full bg-yellow-500/40" />
+                        <div className="w-2 h-2 rounded-full bg-green-500/40" />
+                      </div>
+                      <Code2 className="h-4 w-4 text-muted-foreground/40" />
+                    </div>
+                    {selectedTemplate?.prompt}
+                  </div>
+                </div>
+              </section>
+
+              <section className="bg-white/5 rounded-3xl p-8 border border-white/5">
+                <h4 className="text-sm font-semibold text-white mb-2">How to use this template</h4>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Click the deploy button to initialize this template in your active workspace. You can then customize the input parameters to fit your specific needs.
+                </p>
+              </section>
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
     </SidebarProvider>
   );
 }
