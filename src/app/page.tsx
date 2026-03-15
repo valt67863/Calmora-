@@ -20,7 +20,12 @@ import {
   FolderPlus,
   PlusCircle,
   Building2,
-  Check
+  Check,
+  FileText,
+  Code2,
+  Lightbulb,
+  MessageSquare,
+  ChevronRight
 } from 'lucide-react';
 import { 
   Sidebar, 
@@ -47,6 +52,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+const TEMPLATES = [
+  {
+    title: "Write a blog post",
+    description: "Generate engaging content for your audience",
+    icon: <FileText className="h-5 w-5 text-blue-400" />,
+  },
+  {
+    title: "Code generation",
+    description: "Build functions and fix bugs quickly",
+    icon: <Code2 className="h-5 w-5 text-green-400" />,
+  },
+  {
+    title: "Brainstorm ideas",
+    description: "Creative concepts for your next project",
+    icon: <Lightbulb className="h-5 w-5 text-yellow-400" />,
+  },
+  {
+    title: "Summarize text",
+    description: "Condense long documents into key points",
+    icon: <MessageSquare className="h-5 w-5 text-purple-400" />,
+  },
+];
 
 export default function AppDashboard() {
   const [hasPlan, setHasPlan] = useState(false);
@@ -254,6 +282,32 @@ export default function AppDashboard() {
               >
                 <ArrowUp className="h-5 w-5" />
               </Button>
+            </div>
+
+            {/* Template Section */}
+            <div className="mt-12 w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+              <div className="flex items-center justify-between px-2">
+                <h2 className="text-sm font-semibold text-white/50 uppercase tracking-widest">Templates</h2>
+                <Button variant="link" className="text-xs font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group">
+                  View all templates
+                  <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                </Button>
+              </div>
+
+              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
+                {TEMPLATES.map((template, idx) => (
+                  <button 
+                    key={idx}
+                    className="flex-shrink-0 w-52 bg-[#1e1f20]/50 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-2xl p-4 text-left transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4 transition-colors group-hover:bg-white/10">
+                      {template.icon}
+                    </div>
+                    <h3 className="text-sm font-semibold text-white mb-1">{template.title}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{template.description}</p>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </main>
