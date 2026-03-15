@@ -226,88 +226,91 @@ export default function AppDashboard() {
           <SidebarRail />
         </Sidebar>
 
-        <main className="relative flex-1 flex flex-col items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <div className="absolute bottom-[-20%] left-[-10%] w-[120%] h-[80%] rounded-full lovable-gradient" />
+        <main className="relative flex-1 flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-hide no-scrollbar">
+          {/* Hero Section (H1 + Input) centered in viewport */}
+          <div className="relative min-h-[90vh] flex flex-col items-center justify-center px-6">
+            <div className="absolute inset-0 z-0">
+              <div className="absolute bottom-[-20%] left-[-10%] w-[120%] h-[80%] rounded-full lovable-gradient" />
+            </div>
+
+            <div className="relative z-10 w-full max-w-2xl flex flex-col items-center">
+              <h1 className="text-4xl font-semibold text-white mb-10 tracking-tight text-center">
+                Let's build something, Valt
+              </h1>
+
+              <div className="w-full bg-[#1e1f20]/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-2 shadow-2xl flex items-center gap-2 group focus-within:border-white/20 transition-all">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size="icon" variant="ghost" className="h-10 w-10 rounded-full hover:bg-white/10 text-white shrink-0">
+                      <Plus className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" side="top" className="w-52 bg-[#28292a] border-white/10 text-white shadow-2xl p-1.5 mb-3 rounded-2xl animate-in fade-in slide-in-from-bottom-2 duration-100">
+                    <DropdownMenuItem 
+                      className="hover:bg-white/10 cursor-pointer rounded-xl py-3 focus:bg-white/10 focus:text-white"
+                      onClick={() => setHasPlan(true)}
+                    >
+                      <Calendar className="mr-3 h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Plan</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-xl py-3 focus:bg-white/10 focus:text-white">
+                      <FileUp className="mr-3 h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Attachment</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {hasPlan && (
+                  <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/10 shrink-0 animate-in zoom-in-90">
+                    <Calendar className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs font-semibold text-white">Plan</span>
+                    <button 
+                      onClick={() => setHasPlan(false)}
+                      className="p-0.5 rounded-full hover:bg-white/20 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                
+                <Input 
+                  placeholder="Ask Lovable to create" 
+                  className="flex-1 bg-transparent border-none text-white text-base placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 p-1"
+                />
+
+                <Button 
+                  size="icon" 
+                  className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all shrink-0"
+                >
+                  <ArrowUp className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
           </div>
 
-          <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center">
-            <h1 className="text-4xl font-semibold text-white mb-10 tracking-tight text-center">
-              Let's build something, Valt
-            </h1>
-
-            <div className="w-full bg-[#1e1f20]/95 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-2 shadow-2xl flex items-center gap-2 group focus-within:border-white/20 transition-all">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost" className="h-10 w-10 rounded-full hover:bg-white/10 text-white shrink-0">
-                    <Plus className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" className="w-52 bg-[#28292a] border-white/10 text-white shadow-2xl p-1.5 mb-3 rounded-2xl animate-in fade-in slide-in-from-bottom-2 duration-100">
-                  <DropdownMenuItem 
-                    className="hover:bg-white/10 cursor-pointer rounded-xl py-3 focus:bg-white/10 focus:text-white"
-                    onClick={() => setHasPlan(true)}
-                  >
-                    <Calendar className="mr-3 h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Plan</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-xl py-3 focus:bg-white/10 focus:text-white">
-                    <FileUp className="mr-3 h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">Attachment</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {hasPlan && (
-                <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/10 shrink-0 animate-in zoom-in-90">
-                  <Calendar className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs font-semibold text-white">Plan</span>
-                  <button 
-                    onClick={() => setHasPlan(false)}
-                    className="p-0.5 rounded-full hover:bg-white/20 text-muted-foreground hover:text-white transition-colors"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              )}
-              
-              <Input 
-                placeholder="Ask Lovable to create" 
-                className="flex-1 bg-transparent border-none text-white text-base placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 p-1"
-              />
-
-              <Button 
-                size="icon" 
-                className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/10 transition-all shrink-0"
-              >
-                <ArrowUp className="h-5 w-5" />
+          {/* Template Section tucked below the main view */}
+          <div className="w-full max-w-2xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="flex items-center justify-between px-2 mb-4">
+              <h2 className="text-sm font-semibold text-white/50 uppercase tracking-widest">Templates</h2>
+              <Button variant="link" className="text-xs font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group">
+                View all templates
+                <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
               </Button>
             </div>
 
-            {/* Template Section */}
-            <div className="mt-12 w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="flex items-center justify-between px-2">
-                <h2 className="text-sm font-semibold text-white/50 uppercase tracking-widest">Templates</h2>
-                <Button variant="link" className="text-xs font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group">
-                  View all templates
-                  <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                </Button>
-              </div>
-
-              <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
-                {TEMPLATES.map((template, idx) => (
-                  <button 
-                    key={idx}
-                    className="flex-shrink-0 w-52 bg-[#1e1f20]/50 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-2xl p-4 text-left transition-all group"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4 transition-colors group-hover:bg-white/10">
-                      {template.icon}
-                    </div>
-                    <h3 className="text-sm font-semibold text-white mb-1">{template.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{template.description}</p>
-                  </button>
-                ))}
-              </div>
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide no-scrollbar">
+              {TEMPLATES.map((template, idx) => (
+                <button 
+                  key={idx}
+                  className="flex-shrink-0 w-52 bg-[#1e1f20]/50 hover:bg-[#1e1f20] border border-white/5 hover:border-white/10 rounded-2xl p-4 text-left transition-all group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-4 transition-colors group-hover:bg-white/10">
+                    {template.icon}
+                  </div>
+                  <h3 className="text-sm font-semibold text-white mb-1">{template.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{template.description}</p>
+                </button>
+              ))}
             </div>
           </div>
         </main>
