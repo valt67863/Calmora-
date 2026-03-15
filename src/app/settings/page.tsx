@@ -5,7 +5,7 @@ import {
   Bell, 
   ChevronDown, 
   Home, 
-  LayoutGrid, 
+  History, 
   Settings, 
   LifeBuoy, 
   LogOut, 
@@ -58,7 +58,6 @@ import {
 import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
-  // Functional States from User Input
   const [fullName, setFullName] = useState("Valt Parker")
   const [email, setEmail] = useState("valt@lovable.ai")
   const [workspaceName, setWorkspaceName] = useState("Lovable Labs")
@@ -84,7 +83,6 @@ export default function SettingsPage() {
   const [plan, setPlan] = useState("pro")
   const [saving, setSaving] = useState(false)
 
-  // Completion Logic
   const completion = useMemo(() => {
     const profileDone = Number(Boolean(fullName && email && workspaceName)) * 40
     const securityDone = Number(privacy.twoFactor) * 30
@@ -150,9 +148,9 @@ export default function SettingsPage() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton tooltip="All projects" className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
-                      <LayoutGrid className="h-4 w-4" />
-                      <span>All projects</span>
+                    <SidebarMenuButton tooltip="History" className="hover:bg-white/5 text-muted-foreground hover:text-white transition-colors">
+                      <History className="h-4 w-4" />
+                      <span>History</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
