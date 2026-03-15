@@ -49,6 +49,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const FALLBACK_IMAGE = "https://picsum.photos/seed/fallback/400/250";
@@ -94,6 +102,34 @@ export default function AppDashboard() {
       imageHint: "social media"
     },
   ], []);
+
+  const allTemplates = useMemo(() => [
+    ...templates,
+    {
+      title: "Email Drafts",
+      description: "Professional and concise emails for any business situation",
+      image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "email writing"
+    },
+    {
+      title: "Presentation Outline",
+      description: "Structure your ideas into compelling slides and narratives",
+      image: PlaceHolderImages.find(img => img.id === 'template-brainstorm')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "presentation slides"
+    },
+    {
+      title: "Product Descriptions",
+      description: "Compelling copy that highlights features and benefits",
+      image: PlaceHolderImages.find(img => img.id === 'template-code')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "e-commerce product"
+    },
+    {
+      title: "FAQ Generator",
+      description: "Quickly answer common customer queries with clarity",
+      image: PlaceHolderImages.find(img => img.id === 'template-blog')?.imageUrl || FALLBACK_IMAGE,
+      imageHint: "customer support"
+    }
+  ], [templates]);
 
   return (
     <SidebarProvider>
@@ -308,10 +344,45 @@ export default function AppDashboard() {
           <div className="w-full max-w-4xl mx-auto px-6 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="flex items-center justify-between px-2 mb-4">
               <h2 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Templates</h2>
-              <Button variant="link" className="text-[10px] font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group opacity-80 hover:opacity-100">
-                View all templates
-                <ChevronRight className="h-2.5 w-2.5 transition-transform group-hover:translate-x-0.5" />
-              </Button>
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="link" className="text-[10px] font-bold text-[#B34DE6] p-0 h-auto hover:no-underline flex items-center gap-1 group opacity-80 hover:opacity-100">
+                    View all templates
+                    <ChevronRight className="h-2.5 w-2.5 transition-transform group-hover:translate-x-0.5" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-[90vw] w-full h-[85vh] bg-[#1e1f20]/90 backdrop-blur-xl border-white/10 p-0 overflow-hidden rounded-[2rem] flex flex-col">
+                  <DialogHeader className="p-8 pb-4">
+                    <DialogTitle className="text-2xl font-semibold text-white">Explore All Templates</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="flex-1 px-8 pb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 py-4">
+                      {allTemplates.map((template, idx) => (
+                        <button 
+                          key={idx}
+                          className="flex flex-col bg-[#131314]/40 hover:bg-[#131314]/80 border border-white/5 hover:border-white/10 rounded-[1.5rem] overflow-hidden text-left transition-all group shadow-md"
+                        >
+                          <div className="relative w-full aspect-[16/10] overflow-hidden">
+                            <Image 
+                              src={template.image || FALLBACK_IMAGE} 
+                              alt={template.title}
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                              data-ai-hint={template.imageHint}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#131314]/80 to-transparent opacity-60" />
+                          </div>
+                          <div className="p-4">
+                            <h3 className="text-xs font-bold text-white mb-1.5 uppercase tracking-wider opacity-90">{template.title}</h3>
+                            <p className="text-[10px] text-muted-foreground/60 leading-relaxed line-clamp-2">{template.description}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
