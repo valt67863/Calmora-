@@ -1,18 +1,33 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { Bell, CreditCard, Lock, Moon, Palette, ShieldCheck, Sun, User2, ChevronDown, Home, LayoutGrid, Settings, LifeBuoy, LogOut, Sparkles, CreditCard as BillingIcon } from "lucide-react"
+import { useState } from "react"
+import { 
+  Bell, 
+  ChevronDown, 
+  Home, 
+  LayoutGrid, 
+  Settings, 
+  LifeBuoy, 
+  LogOut, 
+  Sparkles, 
+  CreditCard as BillingIcon,
+  User2,
+  Palette,
+  ShieldCheck,
+  Lock,
+  Moon,
+  Sun,
+  Monitor,
+  Check
+} from "lucide-react"
 import Link from "next/link"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
@@ -37,6 +52,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 export default function SettingsPage() {
   const [fullName, setFullName] = useState("Valt Parker")
@@ -192,12 +208,7 @@ export default function SettingsPage() {
             {/* Tabs Navigation */}
             <Tabs defaultValue="profile" className="w-full">
               <TabsList className="bg-[#1e1f20] p-1.5 h-auto rounded-[20px] w-full grid grid-cols-5 border border-white/5">
-                <TabsTrigger 
-                  value="profile" 
-                  className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all"
-                >
-                  Profile
-                </TabsTrigger>
+                <TabsTrigger value="profile" className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all">Profile</TabsTrigger>
                 <TabsTrigger value="notifications" className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all">Notifications</TabsTrigger>
                 <TabsTrigger value="appearance" className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all">Appearance</TabsTrigger>
                 <TabsTrigger value="security" className="rounded-2xl py-2.5 data-[state=active]:bg-[#2d2e30] data-[state=active]:text-white text-muted-foreground/60 font-semibold text-sm transition-all">Security</TabsTrigger>
@@ -217,7 +228,6 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-8 px-8 pb-10">
-                    {/* User Profile Info */}
                     <div className="flex items-center gap-5 mt-2">
                       <Avatar className="h-16 w-16 rounded-full ring-4 ring-white/5">
                         <AvatarImage src="https://picsum.photos/seed/valt-profile-avatar/120" alt="Valt" />
@@ -228,41 +238,23 @@ export default function SettingsPage() {
                         <p className="text-sm font-medium text-muted-foreground/50">Admin • Verified founder</p>
                       </div>
                     </div>
-
-                    {/* Form Grid */}
                     <div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
                       <div className="space-y-2.5">
                         <Label htmlFor="full-name" className="text-sm font-bold text-muted-foreground/70 ml-1">Full name</Label>
-                        <Input 
-                          id="full-name" 
-                          value={fullName} 
-                          onChange={(e) => setFullName(e.target.value)} 
-                          className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4 focus-visible:ring-1 focus-visible:ring-white/20"
-                        />
+                        <Input id="full-name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4" />
                       </div>
                       <div className="space-y-2.5">
                         <Label htmlFor="email" className="text-sm font-bold text-muted-foreground/70 ml-1">Email</Label>
-                        <Input 
-                          id="email" 
-                          type="email" 
-                          value={email} 
-                          onChange={(e) => setEmail(e.target.value)} 
-                          className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4 focus-visible:ring-1 focus-visible:ring-white/20"
-                        />
+                        <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4" />
                       </div>
                       <div className="space-y-2.5">
                         <Label htmlFor="workspace" className="text-sm font-bold text-muted-foreground/70 ml-1">Workspace name</Label>
-                        <Input 
-                          id="workspace" 
-                          value={workspaceName} 
-                          onChange={(e) => setWorkspaceName(e.target.value)} 
-                          className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4 focus-visible:ring-1 focus-visible:ring-white/20"
-                        />
+                        <Input id="workspace" value={workspaceName} onChange={(e) => setWorkspaceName(e.target.value)} className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4" />
                       </div>
                       <div className="space-y-2.5">
                         <Label className="text-sm font-bold text-muted-foreground/70 ml-1">Time zone</Label>
                         <Select value={timeZone} onValueChange={setTimeZone}>
-                          <SelectTrigger className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4 focus:ring-1 focus:ring-white/20">
+                          <SelectTrigger className="bg-[#131314] border-white/5 text-white h-12 rounded-xl px-4">
                             <SelectValue placeholder="Select timezone" />
                           </SelectTrigger>
                           <SelectContent className="bg-[#28292a] border-white/10 text-white rounded-xl">
@@ -274,16 +266,168 @@ export default function SettingsPage() {
                         </Select>
                       </div>
                     </div>
-
                     <div className="space-y-2.5">
                       <Label htmlFor="bio" className="text-sm font-bold text-muted-foreground/70 ml-1">Bio</Label>
-                      <Textarea 
-                        id="bio" 
-                        rows={5} 
-                        value={bio} 
-                        onChange={(e) => setBio(e.target.value)} 
-                        className="bg-[#131314] border-white/5 text-white rounded-xl px-4 py-3 focus-visible:ring-1 focus-visible:ring-white/20 resize-none text-base leading-relaxed"
-                      />
+                      <Textarea id="bio" rows={5} value={bio} onChange={(e) => setBio(e.target.value)} className="bg-[#131314] border-white/5 text-white rounded-xl px-4 py-3 resize-none" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Notifications Tab Content - EXACTLY AS IMAGE */}
+              <TabsContent value="notifications" className="mt-8">
+                <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
+                  <CardHeader className="pb-6 pt-8 px-8">
+                    <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-white">
+                      <Bell className="w-6 h-6 text-muted-foreground" /> 
+                      Notifications
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/60 text-base">
+                      Control exactly what updates you receive and where.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3 px-8 pb-10">
+                    {[
+                      { id: "product", label: "Product updates", defaultChecked: true },
+                      { id: "security", label: "Security alerts", defaultChecked: true },
+                      { id: "usage", label: "Usage tips", defaultChecked: true },
+                      { id: "marketing", label: "Marketing emails", defaultChecked: false },
+                      { id: "push", label: "Desktop push", defaultChecked: true },
+                    ].map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03]">
+                        <Label htmlFor={item.id} className="text-base font-medium text-white cursor-pointer">{item.label}</Label>
+                        <Switch id={item.id} defaultChecked={item.defaultChecked} className="data-[state=checked]:bg-[#9c78d6]" />
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Appearance Tab Content */}
+              <TabsContent value="appearance" className="mt-8">
+                <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
+                  <CardHeader className="pb-6 pt-8 px-8">
+                    <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-white">
+                      <Palette className="w-6 h-6 text-muted-foreground" /> 
+                      Appearance
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/60 text-base">
+                      Customize how the studio looks and feels on your screen.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6 px-8 pb-10">
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { id: "light", label: "Light", icon: Sun },
+                        { id: "dark", label: "Dark", icon: Moon, active: true },
+                        { id: "system", label: "System", icon: Monitor },
+                      ].map((theme) => (
+                        <button
+                          key={theme.id}
+                          className={cn(
+                            "flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all",
+                            theme.active 
+                              ? "bg-[#131314] border-[#9c78d6] ring-1 ring-[#9c78d6]" 
+                              : "bg-[#131314]/50 border-white/[0.05] hover:border-white/10"
+                          )}
+                        >
+                          <div className={cn("p-3 rounded-xl", theme.active ? "bg-[#9c78d6]/10 text-[#9c78d6]" : "bg-white/5 text-muted-foreground")}>
+                            <theme.icon className="w-6 h-6" />
+                          </div>
+                          <span className={cn("text-sm font-semibold", theme.active ? "text-white" : "text-muted-foreground")}>{theme.label}</span>
+                          {theme.active && <Check className="w-4 h-4 text-[#9c78d6]" />}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03]">
+                      <div className="space-y-0.5">
+                        <p className="text-base font-medium text-white">Reduced motion</p>
+                        <p className="text-xs text-muted-foreground/50">Minimize animations throughout the app</p>
+                      </div>
+                      <Switch className="data-[state=checked]:bg-[#9c78d6]" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Security Tab Content */}
+              <TabsContent value="security" className="mt-8">
+                <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
+                  <CardHeader className="pb-6 pt-8 px-8">
+                    <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-white">
+                      <ShieldCheck className="w-6 h-6 text-muted-foreground" /> 
+                      Security & Privacy
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/60 text-base">
+                      Manage your password, two-factor authentication, and active sessions.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4 px-8 pb-10">
+                    <div className="p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03] flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-xl bg-white/5">
+                          <Lock className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-base font-medium text-white">Two-factor authentication</p>
+                          <p className="text-xs text-muted-foreground/50">Add an extra layer of security to your account</p>
+                        </div>
+                      </div>
+                      <Switch className="data-[state=checked]:bg-[#9c78d6]" />
+                    </div>
+                    <div className="p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03] flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <p className="text-base font-medium text-white">Password</p>
+                        <p className="text-xs text-muted-foreground/50">Last changed 3 months ago</p>
+                      </div>
+                      <Button variant="secondary" className="bg-white/5 hover:bg-white/10 text-white border-none rounded-xl px-6 h-10 font-medium">
+                        Change password
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Billing Tab Content */}
+              <TabsContent value="billing" className="mt-8">
+                <Card className="bg-[#1e1f20] border-none rounded-[28px] p-2 overflow-hidden shadow-2xl">
+                  <CardHeader className="pb-6 pt-8 px-8">
+                    <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-white">
+                      <BillingIcon className="w-6 h-6 text-muted-foreground" /> 
+                      Billing & Subscription
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/60 text-base">
+                      Manage your current plan, payment methods, and view your invoices.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6 px-8 pb-10">
+                    <div className="p-8 bg-gradient-to-br from-[#9c78d6] to-[#6d4da3] rounded-[24px] text-white shadow-xl relative overflow-hidden group">
+                      <div className="relative z-10 flex justify-between items-start">
+                        <div className="space-y-2">
+                          <p className="text-sm font-bold uppercase tracking-wider opacity-80">Current Plan</p>
+                          <h3 className="text-4xl font-bold tracking-tight">Pro Plan</h3>
+                          <p className="text-base font-medium opacity-90 mt-2">$29/month • Billed annually</p>
+                        </div>
+                        <Badge className="bg-white/20 hover:bg-white/30 text-white border-none rounded-full px-4 py-1 font-bold">ACTIVE</Badge>
+                      </div>
+                      <div className="mt-8 flex gap-4 relative z-10">
+                        <Button className="bg-white text-[#9c78d6] hover:bg-white/90 rounded-xl px-6 h-11 font-bold shadow-lg">Upgrade plan</Button>
+                        <Button variant="ghost" className="text-white hover:bg-white/10 rounded-xl px-6 h-11 font-bold">Manage payment</Button>
+                      </div>
+                      <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-[80px] group-hover:bg-white/20 transition-all duration-700" />
+                    </div>
+                    <div className="p-6 bg-[#131314]/50 rounded-2xl border border-white/[0.03]">
+                      <h4 className="text-sm font-bold text-muted-foreground/70 uppercase tracking-widest mb-4">Payment method</h4>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-8 bg-white/5 rounded-md border border-white/10 flex items-center justify-center font-bold italic text-xs">VISA</div>
+                          <div>
+                            <p className="text-sm font-semibold text-white">Visa ending in 4242</p>
+                            <p className="text-xs text-muted-foreground/50">Expiry 12/26</p>
+                          </div>
+                        </div>
+                        <Button variant="link" className="text-[#9c78d6] font-bold">Edit</Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
