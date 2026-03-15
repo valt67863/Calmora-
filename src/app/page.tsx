@@ -10,7 +10,11 @@ import {
   Mic, 
   ArrowUp,
   Settings,
-  LogOut
+  LogOut,
+  Sparkles,
+  Palette,
+  CreditCard,
+  LifeBuoy
 } from 'lucide-react';
 import { 
   Sidebar, 
@@ -40,11 +44,11 @@ import {
 export default function AppDashboard() {
   return (
     <SidebarProvider>
-      <div className="flex h-screen w-full bg-black overflow-hidden">
-        <Sidebar className="border-r border-white/5">
+      <div className="flex h-screen w-full bg-[#201C22] text-foreground overflow-hidden">
+        <Sidebar className="border-r border-white/5 bg-[#201C22]">
           <SidebarHeader className="p-4 pt-6">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-orange-500 to-pink-500 flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-[#B34DE6] to-[#5E8EDD] flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full" />
               </div>
               <SidebarTrigger />
@@ -52,13 +56,13 @@ export default function AppDashboard() {
             
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg">
+                <SidebarMenuButton className="h-10 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors">
                   <div className="flex items-center gap-2 w-full">
                     <Avatar className="h-5 w-5 rounded-sm">
                       <AvatarImage src="https://picsum.photos/seed/valt-brand/20/20" />
-                      <AvatarFallback className="bg-pink-600 text-[10px]">V</AvatarFallback>
+                      <AvatarFallback className="bg-[#B34DE6] text-[10px]">V</AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium flex-1 truncate">Valt's Lovable</span>
+                    <span className="text-sm font-medium flex-1 truncate">Valt's Studio</span>
                     <ChevronDown className="h-3 w-3 opacity-50" />
                   </div>
                 </SidebarMenuButton>
@@ -70,7 +74,7 @@ export default function AppDashboard() {
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton isActive tooltip="Home" className="text-white">
+                  <SidebarMenuButton isActive tooltip="Home" className="text-white hover:bg-white/5">
                     <Home className="h-4 w-4" />
                     <span>Home</span>
                   </SidebarMenuButton>
@@ -83,7 +87,7 @@ export default function AppDashboard() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton className="hover:bg-white/5">
                       <LayoutGrid className="h-4 w-4" />
                       <span>All projects</span>
                     </SidebarMenuButton>
@@ -102,7 +106,7 @@ export default function AppDashboard() {
                       <div className="flex items-center gap-3 w-full overflow-hidden text-left">
                         <Avatar className="h-8 w-8 rounded-full ring-1 ring-white/10">
                           <AvatarImage src="https://picsum.photos/seed/valt-user/80/80" />
-                          <AvatarFallback className="bg-primary text-white">V</AvatarFallback>
+                          <AvatarFallback className="bg-[#B34DE6] text-white">V</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col flex-1 min-w-0">
                           <span className="text-sm font-semibold text-white truncate">Valt</span>
@@ -112,13 +116,31 @@ export default function AppDashboard() {
                       </div>
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent side="right" align="end" className="w-56 bg-[#1c1c1c] border-white/10 text-white">
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer">
+                  <DropdownMenuContent side="right" align="end" className="w-64 bg-[#1c1c1c] border-white/10 text-white shadow-2xl p-2">
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                      <Sparkles className="mr-2 h-4 w-4 text-[#B34DE6]" />
+                      <span>What's New</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                      <Palette className="mr-2 h-4 w-4 text-[#5E8EDD]" />
+                      <span>Appearance</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-white/10 my-1" />
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      <span>Subscription</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-white/10" />
-                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer text-red-400 focus:text-red-400">
+                    <DropdownMenuSeparator className="bg-white/10 my-1" />
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2">
+                      <LifeBuoy className="mr-2 h-4 w-4" />
+                      <span>Help / Issue Feedback</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-white/10 my-1" />
+                    <DropdownMenuItem className="hover:bg-white/10 cursor-pointer rounded-md py-2 text-red-400 focus:text-red-400">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
                     </DropdownMenuItem>
